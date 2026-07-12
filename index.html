@@ -641,14 +641,23 @@
     </div>
     <div class="chips" id="chips">
       <button class="chip active" onclick="setArea(this,'ALL')">All</button>
-      <button class="chip" onclick="setArea(this,'OBS')">OBS</button>
-      <button class="chip" onclick="setArea(this,'RBV')">RBV</button>
-      <button class="chip" onclick="setArea(this,'SCT')">SCT</button>
-      <button class="chip" onclick="setArea(this,'PAO1')">PAO1</button>
-      <button class="chip" onclick="setArea(this,'MGP1')">MGP1</button>
-      <button class="chip" onclick="setArea(this,'PLC')">PLC</button>
       <button class="chip" onclick="setArea(this,'AHS')">AHS</button>
+      <button class="chip" onclick="setArea(this,'OBS')">OBS</button>
+      <button class="chip" onclick="setArea(this,'SSN')">SSN</button>
       <button class="chip" onclick="setArea(this,'SP1')">SP1</button>
+      <button class="chip" onclick="setArea(this,'PLC')">PLC</button>
+      <button class="chip" onclick="setArea(this,'SPV')">SPV</button>
+      <button class="chip" onclick="setArea(this,'RKM')">RKM</button>
+      <button class="chip" onclick="setArea(this,'RBV')">RBV</button>
+      <button class="chip" onclick="setArea(this,'SSP')">SSP</button>
+      <button class="chip" onclick="setArea(this,'MP1')">MP1</button>
+      <button class="chip" onclick="setArea(this,'CHS')">CHS</button>
+      <button class="chip" onclick="setArea(this,'RGT1')">RGT1</button>
+      <button class="chip" onclick="setArea(this,'SJM')">SJM</button>
+      <button class="chip" onclick="setArea(this,'MGP1')">MGP1</button>
+      <button class="chip" onclick="setArea(this,'SCT')">SCT</button>
+      <button class="chip" onclick="setArea(this,'RJM')">RJM</button>
+      <button class="chip" onclick="setArea(this,'PAO1')">PAO1</button>
     </div>
   </div>
 
@@ -831,20 +840,20 @@
 
   /* ── Normalize field names from Apps Script response ─────────────────── */
   function normalize(c) {
-    // Apps Script may return headers as-is or camelCase — handle both
+    // Maps Apps Script response to exact Excel column names
     return {
-      sNo:          c.sNo          || c['S.No.']       || '',
-      conNo:        c.conNo        || c['ConNo']        || '',
-      consumerName: c.consumerName || c['ConsumerName'] || '',
-      meterNo:      c.meterNo      || c['MeterNo']      || '',
-      meterSerial:  c.meterSerial  || c['MeterSerial']  || '',
-      address:      c.address      || c['Address']      || '',
-      areaCode:     c.areaCode     || c['AreaCode']      || '',
-      phone:        c.phone        || c['Phone']         || '',
-      status:       c.status       || c['Status']        || 'Active',
-      billAmount:   c.billAmount   || c['BillAmount']    || '',
-      lastEditedBy: c.lastEditedBy || c['LastEditedBy']  || '',
-      createdAt:    c.createdAt    || c['CreatedAt']     || '',
+      sNo:          c['S.No.']       || c.sNo          || '',
+      conNo:        c['ConNo']       || c.conNo        || '',
+      consumerName: c['ConsumerName']|| c.consumerName || '',
+      address:      c['Address']     || c.address      || '',
+      labNo:        c['LabNo']       || c.labNo        || '',
+      meterNo:      c['MeterNo']     || c.meterNo      || '',
+      transfCode:   c['TransfCode']  || c.transfCode   || '', // Area filter field
+      phoneNo:      c['PhoneNo']     || c.phoneNo      || '',
+      status:       c['Status']      || c.status       || 'Active',
+      lastEditedBy: c['LastEditedBy']|| c.lastEditedBy || '',
+      lastEditedAt: c['LastEditedAt']|| c.lastEditedAt || '',
+      createdAt:    c['CreatedAt']   || c.createdAt    || '',
     };
   }
 
@@ -857,7 +866,7 @@
 
     // Area filter
     if (activeArea !== 'ALL') {
-      filtered = filtered.filter(c => c.areaCode === activeArea);
+      filtered = filtered.filter(c => c.transfCode === activeArea);
     }
 
     // Text search
@@ -867,7 +876,8 @@
         (c.consumerName || '').toLowerCase().includes(q) ||
         (c.conNo        || '').toLowerCase().includes(q) ||
         (c.meterNo      || '').toLowerCase().includes(q) ||
-        (c.phone        || '').includes(q)
+        (c.phoneNo      || '').includes(q) ||
+        (c.address      || '').toLowerCase().includes(q)
       );
     }
 
@@ -921,10 +931,10 @@
     const div = document.createElement('div');
     div.className = 'c-card';
 
-    const phone = c.phone
+    const phone = c.phoneNo
       ? `<div class="c-meta-item">
            <span class="material-icons-round">phone</span>
-           ${esc(c.phone)}
+           ${esc(c.phoneNo)}
          </div>` : '';
 
     const meter = c.meterNo
@@ -933,8 +943,8 @@
            ${esc(c.meterNo)}
          </div>` : '';
 
-    const area = c.areaCode
-      ? `<span class="area-badge">${esc(c.areaCode)}</span>` : '';
+    const area = c.transfCode
+      ? `<span class="area-badge">${esc(c.transfCode)}</span>` : '';
 
     const delBtn = isAdmin
       ? `<button class="btn-c btn-del"
