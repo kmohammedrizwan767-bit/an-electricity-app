@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#0052B4">
+  <title>Import Consumers — A&amp;N Electricity</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+
+  <!-- SheetJS — Excel parser -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+  <style>
+  :root {
+    --primary: #0052B4; --primary-light: #1976D2;
+    --accent: #FFC107; --danger: #D32F2F; --success: #2E7D32;
+    --bg: #EEF2F7; --card: #FFFFFF; --card-border: #D1DCF0;
+    --text-1: #1A1A2E; --text-2: #5A6A85;
+    --inp-bg: #F4F7FF; --inp-border: #C5D0E8;
+    --ff-d: 'Poppins', sans-serif; --ff-b: 'Roboto', sans-serif;
+    --r: 20px;
+  }
+  [data-theme="dark"] {
+    --bg: #080F1E; --card: #0D1D36; --card-border: #1A2E50;
+    --text-1: #E8F0FE; --text-2: #7A99CC;
+    --inp-bg: #081428; --inp-border: #1A2E50;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: var(--ff-b);
+    background: var(--bg);
+    color: var(--text-1);
+    min-height: 100vh;
+    padding: 0 0 40px;
+    -webkit-font-smoothing: antialiased;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* Navbar */
+  .navbar {
+    background: var(--primary);
+    padding: 14px 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    margin-bottom: 20px;
+  }
+  .nav-back {
+    background: rgba(255,255,255,0.15);
+    border: none; border-radius: 50%;
+    width: 36px; height: 36px;
+    display: flex; align-items: center; justify-content: center;
+    color: #fff; cursor: pointer;
+    text-decoration: none;
+  }
+  .nav-back .material-icons-round { font-size: 20px; }
+  .nav-title {
+    font-family: var(--ff-d);
+    font-size: 16px;
+    font-weight: 600;
+    color: #fff;
+  }
+  .nav-sub { font-size: 11px; color: rgba(255,255,255,0.7); display: block; }
+
+  /* Page */
+  .page { padding: 0 14px; }
+
+  /* Card */
+  .card {
+    background: var(--card);
+    border: 1px solid var(--card-border);
+    border-radius: var(--r);
+    padding: 20px;
+    margin-bottom: 14px;
+  }
+  .card-title {
+    font-family: var(--ff-d);
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-1);
+    margin-bottom: 4px;
+  }
+  .card-sub { font-size: 12px; color: var(--text-2); margin-bottom: 16px; line-height: 1.5; }
+
+  /* File picker */
+  .file-zone {
+    border: 2px dashed var(--inp-border);
+    border-radius: 14px;
+    padding: 28px 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s;
+    position: relative;
+  }
+  .file-zone:hover, .file-zone.drag { border-color: var(--primary); background: rgba(0,82,180,0.05); }
+  .file-zone input { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; }
+  .file-zone .material-icons-round { font-size: 40px; color: var(--text-2); margin-bottom: 8px; }
+  .file-zone-text { font-family: var(--ff-d); font-size: 13px; color: var(--text-2); }
+  .file-zone-sub { font-size: 11px; color: var(--text-2); opacity: 0.7; margin-top: 4px; }
+  .file-zone.selected { border-color: var(--success); border-style: solid; }
+  .file-zone.selected .material-icons-round { color: var(--success); }
+
+  /* Sheet selector */
+  .sheet-sel-wrap { margin-top: 14px; }
+  .sel-label { font-size: 12px; color: var(--text-2); font-family: var(--ff-d); font-weight: 500; margin-bottom: 6px; display: block; text-transform: uppercase; letter-spacing: 0.4px; }
+  .sel {
+    width: 100%;
+    background: var(--inp-bg);
+    border: 1.5px solid var(--inp-border);
+    border-radius: 12px;
+    padding: 10px 14px;
+    font-family: var(--ff-b);
+    font-size: 14px;
+    color: var(--text-1);
+    outline: none;
+    -webkit-appearance: none;
+  }
+  .sel:focus { border-color: var(--primary); }
+
+  /* Stats row */
+  .stats-row {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+  .stat-box {
+    flex: 1;
+    background: var(--inp-bg);
+    border: 1px solid var(--inp-border);
+    border-radius: 14px;
+    padding: 12px;
+    text-align: center;
+  }
+  .stat-num {
+    font-family: var(--ff-d);
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--primary);
+  }
+  .stat-lbl { font-size: 11px; color: var(--text-2); margin-top: 2px; }
+
+  /* Preview table */
+  .preview-wrap {
+    overflow-x: auto;
+    border-radius: 12px;
+    border: 1px solid var(--inp-border);
+    margin-bottom: 16px;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 11.5px;
+    white-space: nowrap;
+  }
+  th {
+    background: var(--primary);
+    color: #fff;
+    padding: 8px 12px;
+    font-family: var(--ff-d);
+    font-weight: 600;
+    text-align: left;
+  }
+  td {
+    padding: 7px 12px;
+    border-bottom: 1px solid var(--inp-border);
+    color: var(--text-1);
+  }
+  tr:last-child td { border-bottom: none; }
+  tr:nth-child(even) td { background: var(--inp-bg); }
+
+  /* Columns toggle */
+  .col-map { margin-bottom: 16px; }
+  .col-map-title { font-size: 12px; color: var(--text-2); font-family: var(--ff-d); font-weight: 500; margin-bottom: 8px; }
+  .col-list { display: flex; flex-wrap: wrap; gap: 6px; }
+  .col-badge {
+    background: rgba(0,82,180,0.1);
+    color: var(--primary);
+    font-size: 11px;
+    font-family: var(--ff-d);
+    font-weight: 500;
+    padding: 3px 10px;
+    border-radius: 8px;
+  }
+  [data-theme="dark"] .col-badge { background: rgba(25,118,210,0.2); }
+
+  /* Progress */
+  .progress-wrap { margin-bottom: 14px; }
+  .progress-bar {
+    height: 8px;
+    background: var(--inp-bg);
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 6px;
+  }
+  .progress-fill {
+    height: 100%;
+    background: var(--primary);
+    border-radius: 4px;
+    transition: width 0.4s ease;
+    width: 0%;
+  }
+  .progress-text { font-size: 12px; color: var(--text-2); text-align: center; }
+
+  /* Alerts */
+  .alert {
+    border-radius: 12px;
+    padding: 12px 14px;
+    display: none;
+    align-items: center;
+    gap: 10px;
+    font-size: 13px;
+    margin-bottom: 14px;
+    line-height: 1.5;
+  }
+  .alert.show { display: flex; }
+  .alert.err { background: rgba(211,47,47,0.08); color: var(--danger); border: 1px solid rgba(211,47,47,0.2); }
+  .alert.ok  { background: rgba(46,125,50,0.08); color: var(--success); border: 1px solid rgba(46,125,50,0.2); }
+  .alert.info { background: rgba(0,82,180,0.08); color: var(--primary); border: 1px solid rgba(0,82,180,0.2); }
+  .alert .material-icons-round { font-size: 18px; flex-shrink: 0; }
+
+  /* Buttons */
+  .btn-primary {
+    width: 100%;
+    background: var(--primary);
+    color: #fff;
+    border: none;
+    border-radius: 14px;
+    height: 50px;
+    font-family: var(--ff-d);
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: opacity 0.2s;
+  }
+  .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+  .btn-primary:not(:disabled):active { opacity: 0.85; }
+  .btn-primary .spin {
+    width: 18px; height: 18px;
+    border: 2px solid rgba(255,255,255,0.4);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    display: none;
+  }
+  .btn-primary.loading .spin { display: block; }
+  .btn-primary.loading .lbl { display: none; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .btn-sec {
+    width: 100%;
+    background: var(--inp-bg);
+    border: 1.5px solid var(--inp-border);
+    border-radius: 14px;
+    height: 44px;
+    font-family: var(--ff-d);
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-1);
+    cursor: pointer;
+    margin-top: 10px;
+  }
+
+  /* Info box */
+  .info-box {
+    background: var(--inp-bg);
+    border-radius: 12px;
+    padding: 14px;
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+  }
+  .info-box .material-icons-round { color: var(--primary); font-size: 20px; flex-shrink: 0; margin-top: 1px; }
+  .info-box-text { font-size: 12px; color: var(--text-2); line-height: 1.6; }
+  .info-box-text strong { color: var(--text-1); }
+
+  .hidden { display: none !important; }
+  </style>
+</head>
+<body>
+
+  <!-- Navbar -->
+  <nav class="navbar">
+    <a href="./index.html" class="nav-back"><span class="material-icons-round">arrow_back</span></a>
+    <div>
+      <span class="nav-title">Import Consumers</span>
+      <span class="nav-sub">Upload Excel to Google Sheets</span>
+    </div>
+  </nav>
+
+  <div class="page">
+
+    <!-- Step 1: File Upload -->
+    <div class="card" id="step1">
+      <div class="card-title">Step 1 — Select your Excel file</div>
+      <div class="card-sub">Select your .xlsx file containing consumer data. The app will read it and send to Google Sheets.</div>
+
+      <div class="file-zone" id="fileZone">
+        <input type="file" id="fileInput" accept=".xlsx,.xls" onchange="handleFile(this)">
+        <span class="material-icons-round" id="fileIcon">upload_file</span>
+        <div class="file-zone-text" id="fileZoneText">Tap to select Excel file</div>
+        <div class="file-zone-sub">.xlsx or .xls format</div>
+      </div>
+
+      <div class="sheet-sel-wrap hidden" id="sheetSelWrap">
+        <label class="sel-label">Select Sheet</label>
+        <select class="sel" id="sheetSel" onchange="loadSheet()"></select>
+      </div>
+    </div>
+
+    <!-- Step 2: Preview -->
+    <div class="card hidden" id="step2">
+      <div class="card-title">Step 2 — Preview</div>
+      <div class="card-sub" id="previewSub">Showing first 5 rows of data</div>
+
+      <div class="stats-row">
+        <div class="stat-box">
+          <div class="stat-num" id="statTotal">0</div>
+          <div class="stat-lbl">Total Consumers</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-num" id="statCols">0</div>
+          <div class="stat-lbl">Columns</div>
+        </div>
+      </div>
+
+      <div class="col-map">
+        <div class="col-map-title">Columns found in file:</div>
+        <div class="col-list" id="colList"></div>
+      </div>
+
+      <div class="preview-wrap">
+        <table id="previewTable"></table>
+      </div>
+
+      <div class="info-box">
+        <span class="material-icons-round">info_outline</span>
+        <div class="info-box-text">
+          <strong>Duplicate check is automatic.</strong> If a ConNo already exists in the sheet, that row will be skipped. Only new records will be added.
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 3: Import -->
+    <div class="card hidden" id="step3">
+      <div class="card-title">Step 3 — Import to Google Sheets</div>
+      <div class="card-sub">Data will be imported to <strong>CONSUMER DATA ALL</strong> sheet.</div>
+
+      <div class="alert info show" id="importInfo">
+        <span class="material-icons-round">cloud_upload</span>
+        <span>Ready to import <strong id="importCount">0</strong> consumers. This may take 5–8 minutes for 8000+ records. Keep screen on.</span>
+      </div>
+
+      <div class="alert err hidden" id="importErr">
+        <span class="material-icons-round">error_outline</span>
+        <span id="importErrMsg"></span>
+      </div>
+
+      <div class="alert ok hidden" id="importOk">
+        <span class="material-icons-round">check_circle_outline</span>
+        <span id="importOkMsg"></span>
+      </div>
+
+      <div class="progress-wrap hidden" id="progressWrap">
+        <div class="progress-bar">
+          <div class="progress-fill" id="progressFill"></div>
+        </div>
+        <div class="progress-text" id="progressText">Importing…</div>
+      </div>
+
+      <button class="btn-primary" id="importBtn" onclick="startImport()">
+        <span class="material-icons-round lbl">cloud_upload</span>
+        <span class="lbl">Start Import</span>
+        <div class="spin"></div>
+      </button>
+
+      <button class="btn-sec hidden" id="doneBtn" onclick="location.href='./index.html'">
+        Back to Consumer List
+      </button>
+    </div>
+
+  </div><!-- /page -->
+
+  <script src="./db.js"></script>
+  <script>
+  'use strict';
+
+  const API_URL   = 'https://script.google.com/macros/s/AKfycbyeO7pIZrT1WKPHHuR8LKxhPKgf4uELmkSkIgUefNwT88JdCBiAoTAfgKTyCBKEMmBowQ/exec';
+  const BATCH_SIZE = 500; // 8000+ records — 500 per batch // Send 250 records per API call
+
+  let session    = null;
+  let workbook   = null;
+  let parsedData = []; // Array of consumer objects
+
+  const $ = id => document.getElementById(id);
+
+  /* ── Auth check ─────────────────────────────────────────────── */
+  window.addEventListener('DOMContentLoaded', () => {
+    session = AN_DB.getSession();
+    if (!session?.token) { location.replace('./login.html'); return; }
+    if (session.role !== 'admin' && session.role !== 'Admin' &&
+        session.role !== 'superadmin' && session.role !== 'SuperAdmin') {
+      alert('Admin access required.');
+      location.replace('./index.html');
+    }
+  });
+
+  /* ── Handle file selection ───────────────────────────────────── */
+  function handleFile(input) {
+    const file = input.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = e => {
+      try {
+        workbook = XLSX.read(e.target.result, { type: 'array' });
+        const names = workbook.SheetNames;
+
+        // Update UI
+        $('fileZone').classList.add('selected');
+        $('fileIcon').textContent = 'check_circle';
+        $('fileZoneText').textContent = file.name;
+
+        // Populate sheet selector
+        const sel = $('sheetSel');
+        sel.innerHTML = '';
+        names.forEach(name => {
+          const opt = document.createElement('option');
+          opt.value = name;
+          opt.textContent = name;
+          // Auto-select CONSUMER DATA ALL if exists
+          if (name === 'CONSUMER DATA ALL') opt.selected = true;
+          sel.appendChild(opt);
+        });
+
+        $('sheetSelWrap').classList.remove('hidden');
+        loadSheet();
+
+      } catch (err) {
+        alert('Could not read Excel file. Make sure it is a valid .xlsx file.');
+        console.error(err);
+      }
+    };
+    reader.readAsArrayBuffer(file);
+  }
+
+  /* ── Parse selected sheet ────────────────────────────────────── */
+  function loadSheet() {
+    const sheetName = $('sheetSel').value;
+    const ws        = workbook.Sheets[sheetName];
+
+    // Convert to array of objects (header row = keys)
+    const rows = XLSX.utils.sheet_to_json(ws, {
+      defval: '',       // Empty cells = empty string
+      raw:    false,    // All values as strings
+    });
+
+    if (!rows.length) {
+      alert('No data found in this sheet.');
+      return;
+    }
+
+    parsedData = rows;
+    showPreview(rows);
+    $('step2').classList.remove('hidden');
+    $('step3').classList.remove('hidden');
+    $('importCount').textContent = rows.length;
+  }
+
+  /* ── Show preview table ─────────────────────────────────────── */
+  function showPreview(rows) {
+    const headers = Object.keys(rows[0]);
+
+    $('statTotal').textContent = rows.length;
+    $('statCols').textContent  = headers.length;
+
+    // Column badges
+    $('colList').innerHTML = headers
+      .map(h => `<span class="col-badge">${h}</span>`)
+      .join('');
+
+    // Preview table (first 5 rows)
+    const preview = rows.slice(0, 5);
+    let html = '<thead><tr>' + headers.map(h => `<th>${h}</th>`).join('') + '</tr></thead><tbody>';
+    preview.forEach(row => {
+      html += '<tr>' + headers.map(h => `<td>${row[h] || ''}</td>`).join('') + '</tr>';
+    });
+    html += '</tbody>';
+    $('previewTable').innerHTML = html;
+
+    $('previewSub').textContent =
+      `Showing first 5 of ${rows.length} consumers · ${headers.length} columns`;
+  }
+
+  /* ── Start import ───────────────────────────────────────────── */
+  async function startImport() {
+    if (!parsedData.length) return;
+
+    $('importBtn').classList.add('loading');
+    $('importBtn').disabled = true;
+    $('importErr').classList.add('hidden');
+    $('importOk').classList.add('hidden');
+    $('importInfo').classList.add('hidden');
+    $('progressWrap').classList.remove('hidden');
+
+    const total   = parsedData.length;
+    const batches = Math.ceil(total / BATCH_SIZE);
+    let   added   = 0;
+    let   skipped = 0;
+
+    for (let b = 0; b < batches; b++) {
+      const start  = b * BATCH_SIZE;
+      const end    = Math.min(start + BATCH_SIZE, total);
+      const batch  = parsedData.slice(start, end);
+
+      // Update progress
+      const pct = Math.round((b / batches) * 100);
+      $('progressFill').style.width = pct + '%';
+      $('progressText').textContent =
+        `Importing batch ${b + 1} of ${batches} (${start + 1}–${end} of ${total})…`;
+
+      try {
+        const res = await fetch(API_URL, {
+          method:  'POST',
+          headers: { 'Content-Type': 'text/plain' },
+          body: JSON.stringify({
+            action:    'importConsumers',
+            token:     session.token,
+            officeId:  session.officeId,
+            sheetName: 'CONSUMER DATA ALL',
+            consumers: batch
+          })
+        });
+
+        const json = await res.json();
+
+        if (json.success) {
+          added   += (json.added   || 0);
+          skipped += (json.skipped || 0);
+        } else {
+          throw new Error(json.error || json.message || 'Import failed');
+        }
+
+      } catch (err) {
+        $('progressWrap').classList.add('hidden');
+        $('importBtn').classList.remove('loading');
+        $('importBtn').disabled = false;
+        showImportErr('Error: ' + err.message + '. Try again.');
+        return;
+      }
+    }
+
+    // All done
+    $('progressFill').style.width = '100%';
+    $('progressText').textContent = 'Import complete!';
+
+    setTimeout(() => {
+      $('progressWrap').classList.add('hidden');
+      $('importBtn').classList.add('hidden');
+      $('doneBtn').classList.remove('hidden');
+
+      $('importOkMsg').innerHTML =
+        `✅ Import complete!<br>
+         Added: <strong>${added}</strong> new consumers<br>
+         Skipped: <strong>${skipped}</strong> duplicates`;
+      $('importOk').classList.remove('hidden');
+
+    }, 800);
+  }
+
+  function showImportErr(msg) {
+    $('importErrMsg').textContent = msg;
+    $('importErr').classList.remove('hidden');
+  }
+
+  /* ── Drag and drop support ──────────────────────────────────── */
+  const zone = $('fileZone');
+  zone.addEventListener('dragover',  e => { e.preventDefault(); zone.classList.add('drag'); });
+  zone.addEventListener('dragleave', () => zone.classList.remove('drag'));
+  zone.addEventListener('drop', e => {
+    e.preventDefault();
+    zone.classList.remove('drag');
+    const file = e.dataTransfer.files[0];
+    if (file) {
+      $('fileInput').files = e.dataTransfer.files;
+      handleFile($('fileInput'));
+    }
+  });
+  </script>
+</body>
+</html>
