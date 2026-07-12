@@ -1,0 +1,1199 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" id="themeColorMeta" content="#0052B4">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <title>A&amp;N Electricity — Consumer Manager</title>
+
+  <!-- PWA -->
+  <link rel="manifest" href="./manifest.json">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+
+  <style>
+    /* ══════════════════════════════════════════
+       DESIGN TOKENS
+    ══════════════════════════════════════════ */
+    :root {
+      --primary:       #0052B4;
+      --primary-light: #1976D2;
+      --primary-dark:  #003A82;
+      --accent:        #FFC107;
+      --danger:        #D32F2F;
+      --success:       #2E7D32;
+
+      /* Light mode */
+      --bg:          #EEF2F7;
+      --card:        #FFFFFF;
+      --card-border: #D1DCF0;
+      --text-1:      #1A1A2E;
+      --text-2:      #5A6A85;
+      --inp-bg:      #F4F7FF;
+      --inp-border:  #C5D0E8;
+      --shadow:      0 2px 12px rgba(0,82,180,0.08);
+
+      /* Layout heights */
+      --nav-h:    56px;
+      --search-h: 108px;  /* input(44) + chips(42) + padding(22) */
+      --sync-h:   36px;
+      --bnav-h:   64px;
+
+      /* Radii */
+      --r-card: 20px;
+      --r-inp:  12px;
+      --r-btn:  12px;
+
+      /* Fonts */
+      --ff-d: 'Poppins', sans-serif;
+      --ff-b: 'Roboto', sans-serif;
+    }
+
+    [data-theme="dark"] {
+      --bg:          #080F1E;
+      --card:        #0D1D36;
+      --card-border: #1A2E50;
+      --text-1:      #E8F0FE;
+      --text-2:      #7A99CC;
+      --inp-bg:      #081428;
+      --inp-border:  #1A2E50;
+      --shadow:      0 2px 12px rgba(0,0,0,0.3);
+    }
+
+    /* ══════════════════════════════════════════
+       RESET & BASE
+    ══════════════════════════════════════════ */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: var(--ff-b);
+      background: var(--bg);
+      color: var(--text-1);
+      min-height: 100vh;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .hidden { display: none !important; }
+
+    /* ══════════════════════════════════════════
+       TOP NAVBAR
+    ══════════════════════════════════════════ */
+    .navbar {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      height: var(--nav-h);
+      background: var(--primary);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 12px;
+      z-index: 100;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+    }
+
+    .nav-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .nav-bolt { font-size: 22px; line-height: 1; }
+
+    .nav-app {
+      font-family: var(--ff-d);
+      font-size: 15px;
+      font-weight: 700;
+      color: #fff;
+      line-height: 1.2;
+    }
+
+    .nav-office {
+      font-size: 11px;
+      color: rgba(255,255,255,0.7);
+      display: block;
+      line-height: 1.2;
+      max-width: 160px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .nav-right { display: flex; gap: 4px; }
+
+    .nav-btn {
+      background: rgba(255,255,255,0.15);
+      border: none;
+      border-radius: 50%;
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      cursor: pointer;
+      transition: background 0.2s;
+      position: relative;
+    }
+    .nav-btn:active { background: rgba(255,255,255,0.28); }
+    .nav-btn .material-icons-round { font-size: 20px; }
+
+    /* ══════════════════════════════════════════
+       USER MENU
+    ══════════════════════════════════════════ */
+    .user-menu {
+      position: fixed;
+      top: calc(var(--nav-h) + 8px);
+      right: 12px;
+      background: var(--card);
+      border: 1px solid var(--card-border);
+      border-radius: 18px;
+      padding: 16px;
+      z-index: 200;
+      min-width: 200px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+    }
+
+    .u-name {
+      font-family: var(--ff-d);
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-1);
+    }
+    .u-role {
+      font-size: 11px;
+      color: var(--primary);
+      text-transform: capitalize;
+      margin-top: 2px;
+      font-family: var(--ff-d);
+      font-weight: 500;
+    }
+
+    .menu-divider {
+      height: 1px;
+      background: var(--card-border);
+      margin: 12px 0;
+    }
+
+    .menu-item {
+      width: 100%;
+      background: none;
+      border: none;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 4px;
+      color: var(--danger);
+      font-size: 13px;
+      cursor: pointer;
+      border-radius: 8px;
+      font-family: var(--ff-b);
+    }
+    .menu-item:active { background: rgba(211,47,47,0.08); }
+    .menu-item .material-icons-round { font-size: 18px; }
+
+    .menu-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 150;
+    }
+
+    /* ══════════════════════════════════════════
+       SEARCH SECTION (fixed)
+    ══════════════════════════════════════════ */
+    .search-section {
+      position: fixed;
+      top: var(--nav-h);
+      left: 0; right: 0;
+      background: var(--bg);
+      padding: 10px 14px 0;
+      z-index: 90;
+      border-bottom: 1px solid var(--card-border);
+    }
+
+    .search-wrap {
+      display: flex;
+      align-items: center;
+      background: var(--inp-bg);
+      border: 1.5px solid var(--inp-border);
+      border-radius: var(--r-inp);
+      padding: 0 12px;
+      gap: 8px;
+      height: 44px;
+      transition: border-color 0.2s;
+    }
+    .search-wrap:focus-within { border-color: var(--primary); }
+
+    .s-icon { color: var(--text-2); font-size: 20px !important; flex-shrink: 0; }
+
+    .search-inp {
+      flex: 1;
+      background: none;
+      border: none;
+      outline: none;
+      font-family: var(--ff-b);
+      font-size: 14px;
+      color: var(--text-1);
+    }
+    .search-inp::placeholder { color: var(--text-2); }
+
+    .s-clear {
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--text-2);
+      display: flex;
+      padding: 2px;
+    }
+    .s-clear .material-icons-round { font-size: 18px; }
+
+    /* Area chips */
+    .chips {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding: 10px 0;
+      scrollbar-width: none;
+      -webkit-overflow-scrolling: touch;
+    }
+    .chips::-webkit-scrollbar { display: none; }
+
+    .chip {
+      flex-shrink: 0;
+      background: var(--inp-bg);
+      border: 1.5px solid var(--inp-border);
+      border-radius: 20px;
+      padding: 4px 14px;
+      font-size: 12px;
+      font-family: var(--ff-d);
+      font-weight: 500;
+      color: var(--text-2);
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .chip.active {
+      background: var(--primary);
+      border-color: var(--primary);
+      color: #fff;
+    }
+
+    /* ══════════════════════════════════════════
+       SYNC BAR (fixed)
+    ══════════════════════════════════════════ */
+    .sync-bar {
+      position: fixed;
+      top: calc(var(--nav-h) + var(--search-h));
+      left: 0; right: 0;
+      height: var(--sync-h);
+      background: var(--bg);
+      display: flex;
+      align-items: center;
+      padding: 0 14px;
+      gap: 8px;
+      z-index: 80;
+      border-bottom: 1px solid var(--card-border);
+    }
+
+    .sync-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #9E9E9E;
+      flex-shrink: 0;
+      transition: background 0.3s;
+    }
+    .sync-dot.online  { background: #4CAF50; }
+    .sync-dot.syncing { background: var(--accent); animation: blink 1s infinite; }
+    .sync-dot.offline { background: #FF5722; }
+    .sync-dot.pending { background: var(--accent); }
+
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+    .sync-text  { font-size: 11.5px; color: var(--text-2); flex: 1; }
+    .cnt-text {
+      font-size: 12px;
+      font-family: var(--ff-d);
+      font-weight: 600;
+      color: var(--primary);
+    }
+
+    /* ══════════════════════════════════════════
+       MAIN CONTENT
+    ══════════════════════════════════════════ */
+    .main {
+      padding-top: calc(var(--nav-h) + var(--search-h) + var(--sync-h) + 12px);
+      padding-bottom: calc(var(--bnav-h) + 20px);
+      padding-left: 14px;
+      padding-right: 14px;
+    }
+
+    /* ══════════════════════════════════════════
+       CONSUMER CARD
+    ══════════════════════════════════════════ */
+    .c-card {
+      background: var(--card);
+      border: 1px solid var(--card-border);
+      border-radius: var(--r-card);
+      padding: 14px 16px;
+      margin-bottom: 10px;
+      box-shadow: var(--shadow);
+      transition: transform 0.1s;
+    }
+    .c-card:active { transform: scale(0.99); }
+
+    .c-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 8px;
+    }
+
+    .c-name {
+      font-family: var(--ff-d);
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-1);
+      line-height: 1.3;
+      flex: 1;
+      padding-right: 8px;
+    }
+
+    .area-badge {
+      background: rgba(0,82,180,0.12);
+      color: var(--primary);
+      font-size: 10px;
+      font-family: var(--ff-d);
+      font-weight: 600;
+      padding: 3px 8px;
+      border-radius: 8px;
+      flex-shrink: 0;
+    }
+    [data-theme="dark"] .area-badge { background: rgba(25,118,210,0.2); }
+
+    .c-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px 14px;
+      margin-bottom: 12px;
+    }
+
+    .c-meta-item {
+      display: flex;
+      align-items: center;
+      gap: 3px;
+      font-size: 12px;
+      color: var(--text-2);
+    }
+    .c-meta-item .material-icons-round { font-size: 13px; }
+
+    .c-actions {
+      display: flex;
+      gap: 8px;
+      justify-content: flex-end;
+    }
+
+    .btn-c {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      padding: 6px 14px;
+      border-radius: var(--r-btn);
+      font-size: 12px;
+      font-family: var(--ff-d);
+      font-weight: 500;
+      cursor: pointer;
+      border: none;
+      transition: opacity 0.2s;
+    }
+    .btn-c:active { opacity: 0.65; }
+    .btn-c .material-icons-round { font-size: 14px; }
+
+    .btn-edit {
+      background: rgba(0,82,180,0.1);
+      color: var(--primary);
+    }
+    [data-theme="dark"] .btn-edit { background: rgba(25,118,210,0.15); }
+
+    .btn-del {
+      background: rgba(211,47,47,0.1);
+      color: var(--danger);
+    }
+    [data-theme="dark"] .btn-del { background: rgba(211,47,47,0.15); }
+
+    /* ══════════════════════════════════════════
+       SKELETON LOADER
+    ══════════════════════════════════════════ */
+    .skeleton {
+      background: var(--card);
+      border: 1px solid var(--card-border);
+      border-radius: var(--r-card);
+      padding: 16px;
+      margin-bottom: 10px;
+    }
+
+    .sk {
+      border-radius: 6px;
+      background: linear-gradient(
+        90deg,
+        var(--inp-bg) 25%,
+        var(--card-border) 50%,
+        var(--inp-bg) 75%
+      );
+      background-size: 200% 100%;
+      animation: shimmer 1.4s infinite;
+    }
+    @keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
+
+    .sk-h { height: 15px; margin-bottom: 10px; }
+    .sk-m { height: 11px; margin-bottom: 8px; }
+    .sk-s { height: 11px; }
+
+    /* ══════════════════════════════════════════
+       EMPTY & ERROR STATES
+    ══════════════════════════════════════════ */
+    .empty-state {
+      text-align: center;
+      padding: 64px 24px;
+    }
+    .empty-state .material-icons-round {
+      font-size: 52px;
+      color: var(--text-2);
+      opacity: 0.4;
+    }
+    .empty-title {
+      font-family: var(--ff-d);
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text-1);
+      margin: 12px 0 6px;
+    }
+    .empty-sub { font-size: 13px; color: var(--text-2); }
+
+    .err-bar {
+      background: rgba(211,47,47,0.08);
+      border: 1px solid rgba(211,47,47,0.2);
+      border-radius: 14px;
+      padding: 12px 14px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 12px;
+      font-size: 13px;
+      color: var(--danger);
+    }
+    .err-bar .material-icons-round { font-size: 18px; flex-shrink: 0; }
+
+    /* ══════════════════════════════════════════
+       FAB
+    ══════════════════════════════════════════ */
+    .fab {
+      position: fixed;
+      bottom: calc(var(--bnav-h) + 14px);
+      right: 18px;
+      width: 54px;
+      height: 54px;
+      border-radius: 50%;
+      background: var(--primary);
+      color: #fff;
+      border: none;
+      box-shadow: 0 4px 18px rgba(0,82,180,0.45);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      z-index: 90;
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+    .fab:active {
+      transform: scale(0.9);
+      box-shadow: 0 2px 8px rgba(0,82,180,0.3);
+    }
+    .fab .material-icons-round { font-size: 26px; }
+
+    /* ══════════════════════════════════════════
+       BOTTOM NAVIGATION
+    ══════════════════════════════════════════ */
+    .bottom-nav {
+      position: fixed;
+      bottom: 0; left: 0; right: 0;
+      height: var(--bnav-h);
+      background: var(--card);
+      border-top: 1px solid var(--card-border);
+      display: flex;
+      z-index: 100;
+    }
+
+    .bnav-btn {
+      flex: 1;
+      background: none;
+      border: none;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 2px;
+      color: var(--text-2);
+      font-size: 10px;
+      font-family: var(--ff-d);
+      font-weight: 500;
+      cursor: pointer;
+      padding: 6px 0 10px;
+      transition: color 0.2s;
+    }
+    .bnav-btn.active { color: var(--primary); }
+    .bnav-btn .material-icons-round { font-size: 22px; }
+
+    /* ══════════════════════════════════════════
+       LOAD MORE
+    ══════════════════════════════════════════ */
+    .load-more-wrap {
+      text-align: center;
+      padding: 4px 0 16px;
+    }
+
+    .load-more-btn {
+      background: var(--inp-bg);
+      border: 1.5px solid var(--inp-border);
+      border-radius: var(--r-btn);
+      padding: 10px 28px;
+      font-size: 13px;
+      font-family: var(--ff-d);
+      font-weight: 500;
+      color: var(--text-1);
+      cursor: pointer;
+    }
+
+    /* ══════════════════════════════════════════
+       TOAST
+    ══════════════════════════════════════════ */
+    #toast {
+      position: fixed;
+      bottom: calc(var(--bnav-h) + 12px);
+      left: 50%;
+      transform: translateX(-50%);
+      background: #1A1A2E;
+      color: #fff;
+      padding: 9px 20px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-family: var(--ff-b);
+      z-index: 999;
+      white-space: nowrap;
+      pointer-events: none;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+      opacity: 0;
+      transition: opacity 0.25s;
+    }
+    #toast.show { opacity: 1; }
+    #toast.err  { background: var(--danger); }
+  </style>
+</head>
+<body>
+
+  <!-- ── TOP NAVBAR ──────────────────────────────── -->
+  <nav class="navbar">
+    <div class="nav-left">
+      <span class="nav-bolt">⚡</span>
+      <div>
+        <span class="nav-app">AN Electric</span>
+        <span class="nav-office" id="navOffice">Loading…</span>
+      </div>
+    </div>
+    <div class="nav-right">
+      <button class="nav-btn" id="themeToggle" aria-label="Toggle theme">
+        <span class="material-icons-round" id="themeIcon">dark_mode</span>
+      </button>
+      <button class="nav-btn" id="userMenuBtn" aria-label="User menu">
+        <span class="material-icons-round">account_circle</span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- ── USER DROPDOWN ───────────────────────────── -->
+  <div class="user-menu hidden" id="userMenu">
+    <div class="u-name" id="uName">—</div>
+    <div class="u-role" id="uRole">—</div>
+    <div class="menu-divider"></div>
+    <button class="menu-item" onclick="handleLogout()">
+      <span class="material-icons-round">logout</span>
+      Sign Out
+    </button>
+  </div>
+  <div class="menu-overlay hidden" id="menuOverlay" onclick="closeUserMenu()"></div>
+
+  <!-- ── SEARCH SECTION ─────────────────────────── -->
+  <div class="search-section">
+    <div class="search-wrap">
+      <span class="material-icons-round s-icon">search</span>
+      <input class="search-inp" type="search" id="searchInp"
+             placeholder="Name, ConNo, meter, phone…"
+             autocomplete="off" autocorrect="off" autocapitalize="none">
+      <button class="s-clear hidden" id="sClear" onclick="clearSearch()" aria-label="Clear">
+        <span class="material-icons-round">close</span>
+      </button>
+    </div>
+    <div class="chips" id="chips">
+      <button class="chip active" onclick="setArea(this,'ALL')">All</button>
+      <button class="chip" onclick="setArea(this,'OBS')">OBS</button>
+      <button class="chip" onclick="setArea(this,'RBV')">RBV</button>
+      <button class="chip" onclick="setArea(this,'SCT')">SCT</button>
+      <button class="chip" onclick="setArea(this,'PAO1')">PAO1</button>
+      <button class="chip" onclick="setArea(this,'MGP1')">MGP1</button>
+      <button class="chip" onclick="setArea(this,'PLC')">PLC</button>
+      <button class="chip" onclick="setArea(this,'AHS')">AHS</button>
+      <button class="chip" onclick="setArea(this,'SP1')">SP1</button>
+    </div>
+  </div>
+
+  <!-- ── SYNC BAR ────────────────────────────────── -->
+  <div class="sync-bar">
+    <span class="sync-dot syncing" id="syncDot"></span>
+    <span class="sync-text" id="syncText">Loading…</span>
+    <span class="cnt-text"  id="cntText"></span>
+  </div>
+
+  <!-- ── MAIN LIST ───────────────────────────────── -->
+  <main class="main">
+    <div id="consumerList"><!-- filled by JS --></div>
+    <div class="load-more-wrap hidden" id="loadMoreWrap">
+      <button class="load-more-btn" onclick="loadMore()">Load more</button>
+    </div>
+    <div class="empty-state hidden" id="emptyState">
+      <span class="material-icons-round">search_off</span>
+      <div class="empty-title" id="emptyTitle">No consumers found</div>
+      <div class="empty-sub"  id="emptySub">Try a different search or area</div>
+    </div>
+  </main>
+
+  <!-- ── FAB ────────────────────────────────────── -->
+  <button class="fab" id="fabBtn" onclick="openAddForm()" aria-label="Add consumer">
+    <span class="material-icons-round">add</span>
+  </button>
+
+  <!-- ── BOTTOM NAV ─────────────────────────────── -->
+  <nav class="bottom-nav">
+    <button class="bnav-btn active" id="bnav-consumers" onclick="switchTab('consumers')">
+      <span class="material-icons-round">people</span>
+      <span>Consumers</span>
+    </button>
+    <button class="bnav-btn" id="bnav-activity" onclick="switchTab('activity')">
+      <span class="material-icons-round">history</span>
+      <span>Activity</span>
+    </button>
+    <button class="bnav-btn hidden" id="bnav-admin" onclick="switchTab('admin')">
+      <span class="material-icons-round">manage_accounts</span>
+      <span>Admin</span>
+    </button>
+  </nav>
+
+  <!-- ── TOAST ──────────────────────────────────── -->
+  <div id="toast"></div>
+
+  <!-- ── SCRIPTS ────────────────────────────────── -->
+  <script src="./db.js"></script>
+  <script>
+  'use strict';
+
+  /* ── CONFIG ─────────────────────────────────────────────────────────────── */
+  const API_URL   = 'https://script.google.com/macros/s/AKfycbyeO7pIZrT1WKPHHuR8LKxhPKgf4uELmkSkIgUefNwT88JdCBiAoTAfgKTyCBKEMmBowQ/exec';
+  const PAGE_SIZE = 25; // Cards shown per "load more"
+
+  /* ── STATE ──────────────────────────────────────────────────────────────── */
+  let session    = null;
+  let isAdmin    = false;
+  let masterList = [];  // All consumers from DB (unchanged)
+  let filtered   = [];  // Current search+area result
+  let displayedN = 0;   // Cards rendered so far from filtered[]
+  let activeArea = 'ALL';
+  let searchQ    = '';
+  let searchT    = null;
+  let toastT     = null;
+
+  /* ── DOM ────────────────────────────────────────────────────────────────── */
+  const $ = id => document.getElementById(id);
+
+  /* ══════════════════════════════════════════════════════════════════════════
+     INIT
+  ══════════════════════════════════════════════════════════════════════════ */
+  async function init() {
+
+    // 1. Auth check — redirect if no session
+    session = AN_DB.getSession();
+    if (!session?.token) {
+      location.replace('./login.html');
+      return;
+    }
+
+    // 2. SuperAdmin belongs on superadmin.html
+    if (session.role === 'superadmin') {
+      location.replace('./superadmin.html');
+      return;
+    }
+
+    isAdmin = (session.role === 'admin');
+
+    // 3. Register service worker
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('./sw.js').catch(() => {});
+      navigator.serviceWorker.addEventListener('message', onSWMessage);
+    }
+
+    // 4. Online / offline listeners
+    window.addEventListener('online',  onOnline);
+    window.addEventListener('offline', onOffline);
+
+    // 5. Theme
+    const theme = localStorage.getItem('an_elect_theme') || 'dark';
+    applyTheme(theme);
+
+    // 6. Fill navbar
+    $('navOffice').textContent = session.officeName || 'My Office';
+    $('uName').textContent     = session.fullName   || session.username;
+    $('uRole').textContent     = session.role;
+
+    // 7. Admin-only UI
+    if (isAdmin) $('bnav-admin').classList.remove('hidden');
+
+    // 8. Ensure SW can sync (store API URL in IDB)
+    await AN_DB.setApiUrl(API_URL);
+
+    // 9. Load consumers
+    await loadConsumers();
+  }
+
+  /* ══════════════════════════════════════════════════════════════════════════
+     LOAD CONSUMERS
+  ══════════════════════════════════════════════════════════════════════════ */
+  async function loadConsumers() {
+    renderSkeleton();
+    setSyncStatus('syncing', 'Loading…');
+
+    // A. Show cached data immediately (fast)
+    const cached = await AN_DB.getAllConsumers();
+    if (cached.length) {
+      masterList = cached;
+      applyFilters();
+      setSyncStatus('syncing', 'Refreshing from server…');
+    }
+
+    // B. Fetch fresh from Google Sheets
+    if (!navigator.onLine) {
+      if (!cached.length) showError('No data cached. Connect to internet first.');
+      setSyncStatus('offline', 'Offline — showing cached data');
+      return;
+    }
+
+    try {
+      const res = await fetch(API_URL, {
+        method:  'POST',
+        headers: { 'Content-Type': 'text/plain' },
+        body: JSON.stringify({
+          action:   'getConsumers',    // ← action name in your Consumer.gs
+          token:    session.token,
+          officeId: session.officeId
+        })
+      });
+
+      const json = await res.json();
+
+      if (json.success && Array.isArray(json.data)) {
+        const consumers = json.data.map(normalize);
+        await AN_DB.setAllConsumers(consumers);
+        await AN_DB.setLastSync(Date.now());
+        masterList = consumers;
+        applyFilters();
+        setSyncStatus('online', `Synced ${timeAgo(Date.now())}`);
+
+      } else if (json.error === 'SESSION_EXPIRED' || json.error === 'INVALID_TOKEN') {
+        await AN_DB.clearSession();
+        alert('Session expired. Please log in again.');
+        location.replace('./login.html');
+
+      } else {
+        // API returned an error — keep cached data
+        setSyncStatus('online', 'Using cached data');
+        console.warn('[App] API error:', json.message || json.error);
+      }
+
+    } catch (err) {
+      console.error('[App] Fetch error:', err);
+      if (!cached.length) showError('Could not load. Check your connection.');
+      setSyncStatus('offline', 'Offline — showing cached data');
+    }
+  }
+
+  /* ── Normalize field names from Apps Script response ─────────────────── */
+  function normalize(c) {
+    // Apps Script may return headers as-is or camelCase — handle both
+    return {
+      sNo:          c.sNo          || c['S.No.']       || '',
+      conNo:        c.conNo        || c['ConNo']        || '',
+      consumerName: c.consumerName || c['ConsumerName'] || '',
+      meterNo:      c.meterNo      || c['MeterNo']      || '',
+      meterSerial:  c.meterSerial  || c['MeterSerial']  || '',
+      address:      c.address      || c['Address']      || '',
+      areaCode:     c.areaCode     || c['AreaCode']      || '',
+      phone:        c.phone        || c['Phone']         || '',
+      status:       c.status       || c['Status']        || 'Active',
+      billAmount:   c.billAmount   || c['BillAmount']    || '',
+      lastEditedBy: c.lastEditedBy || c['LastEditedBy']  || '',
+      createdAt:    c.createdAt    || c['CreatedAt']     || '',
+    };
+  }
+
+  /* ══════════════════════════════════════════════════════════════════════════
+     FILTER & RENDER
+  ══════════════════════════════════════════════════════════════════════════ */
+  function applyFilters() {
+    // Start from master list
+    filtered = masterList;
+
+    // Area filter
+    if (activeArea !== 'ALL') {
+      filtered = filtered.filter(c => c.areaCode === activeArea);
+    }
+
+    // Text search
+    if (searchQ.trim()) {
+      const q = searchQ.toLowerCase().trim();
+      filtered = filtered.filter(c =>
+        (c.consumerName || '').toLowerCase().includes(q) ||
+        (c.conNo        || '').toLowerCase().includes(q) ||
+        (c.meterNo      || '').toLowerCase().includes(q) ||
+        (c.phone        || '').includes(q)
+      );
+    }
+
+    // Count badge
+    $('cntText').textContent = filtered.length
+      ? `${filtered.length} consumer${filtered.length !== 1 ? 's' : ''}`
+      : '';
+
+    // Empty state
+    if (!filtered.length) {
+      $('consumerList').innerHTML = '';
+      $('loadMoreWrap').classList.add('hidden');
+      $('emptyState').classList.remove('hidden');
+      if (searchQ || activeArea !== 'ALL') {
+        $('emptyTitle').textContent = 'No results';
+        $('emptySub').textContent   = 'Try a different name, ConNo, or area';
+      } else {
+        $('emptyTitle').textContent = 'No consumers yet';
+        $('emptySub').textContent   = 'Tap + to add the first consumer';
+      }
+      return;
+    }
+
+    $('emptyState').classList.add('hidden');
+
+    // Reset and render first page
+    displayedN = 0;
+    $('consumerList').innerHTML = '';
+    appendCards();
+  }
+
+  function appendCards() {
+    const frag = document.createDocumentFragment();
+    const end  = Math.min(displayedN + PAGE_SIZE, filtered.length);
+
+    for (let i = displayedN; i < end; i++) {
+      frag.appendChild(makeCard(filtered[i]));
+    }
+
+    $('consumerList').appendChild(frag);
+    displayedN = end;
+
+    // Show/hide "Load more"
+    $('loadMoreWrap').classList.toggle('hidden', displayedN >= filtered.length);
+  }
+
+  function loadMore() { appendCards(); }
+
+  /* ── Build a consumer card DOM element ──────────────────────────────── */
+  function makeCard(c) {
+    const div = document.createElement('div');
+    div.className = 'c-card';
+
+    const phone = c.phone
+      ? `<div class="c-meta-item">
+           <span class="material-icons-round">phone</span>
+           ${esc(c.phone)}
+         </div>` : '';
+
+    const meter = c.meterNo
+      ? `<div class="c-meta-item">
+           <span class="material-icons-round">electric_meter</span>
+           ${esc(c.meterNo)}
+         </div>` : '';
+
+    const area = c.areaCode
+      ? `<span class="area-badge">${esc(c.areaCode)}</span>` : '';
+
+    const delBtn = isAdmin
+      ? `<button class="btn-c btn-del"
+           onclick="confirmDelete('${esc(c.conNo)}','${esc(c.consumerName)}')">
+           <span class="material-icons-round">delete</span>Delete
+         </button>` : '';
+
+    div.innerHTML = `
+      <div class="c-top">
+        <div class="c-name">${esc(c.consumerName || '—')}</div>
+        ${area}
+      </div>
+      <div class="c-meta">
+        <div class="c-meta-item">
+          <span class="material-icons-round">tag</span>
+          ${esc(c.conNo || '—')}
+        </div>
+        ${meter}
+        ${phone}
+      </div>
+      <div class="c-actions">
+        <button class="btn-c btn-edit"
+          onclick="openEditForm('${esc(c.conNo)}')">
+          <span class="material-icons-round">edit</span>Edit
+        </button>
+        ${delBtn}
+      </div>
+    `;
+    return div;
+  }
+
+  /* ── Skeleton (6 placeholder cards) ─────────────────────────────────── */
+  function renderSkeleton() {
+    $('emptyState').classList.add('hidden');
+    $('consumerList').innerHTML = Array(6).fill(`
+      <div class="skeleton">
+        <div class="sk sk-h" style="width:60%"></div>
+        <div class="sk sk-m" style="width:45%"></div>
+        <div class="sk sk-s" style="width:35%"></div>
+      </div>`).join('');
+  }
+
+  /* ══════════════════════════════════════════════════════════════════════════
+     SEARCH
+  ══════════════════════════════════════════════════════════════════════════ */
+  $('searchInp').addEventListener('input', e => {
+    searchQ = e.target.value;
+    $('sClear').classList.toggle('hidden', !searchQ);
+    clearTimeout(searchT);
+    searchT = setTimeout(applyFilters, 280);
+  });
+
+  function clearSearch() {
+    $('searchInp').value = '';
+    searchQ = '';
+    $('sClear').classList.add('hidden');
+    applyFilters();
+  }
+
+  /* ══════════════════════════════════════════════════════════════════════════
+     AREA FILTER
+  ══════════════════════════════════════════════════════════════════════════ */
+  function setArea(el, code) {
+    activeArea = code;
+    document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+    el.classList.add('active');
+    applyFilters();
+  }
+
+  /* ══════════════════════════════════════════════════════════════════════════
+     THEME
+  ══════════════════════════════════════════════════════════════════════════ */
+  function applyTheme(t) {
+    document.documentElement.setAttribute('data-theme', t);
+    $('themeIcon').textContent      = t === 'dark' ? 'dark_mode' : 'light_mode';
+    $('themeColorMeta').content     = t === 'dark' ? '#0D1D36'   : '#0052B4';
+    localStorage.setItem('an_elect_theme', t);
+  }
+
+  $('themeToggle').addEventListener('click', () => {
+    applyTheme(
+      document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark'
+    );
+  });
+
+  /* ══════════════════════════════════════════════════════════════════════════
+     USER MENU
+  ══════════════════════════════════════════════════════════════════════════ */
+  $('userMenuBtn').addEventListener('click', () => {
+    $('userMenu').classList.toggle('hidden');
+    $('menuOverlay').classList.toggle('hidden');
+  });
+
+  function closeUserMenu() {
+    $('userMenu').classList.add('hidden');
+    $('menuOverlay').classList.add('hidden');
+  }
+
+  /* ══════════════════════════════════════════════════════════════════════════
+     LOGOUT
+  ══════════════════════════════════════════════════════════════════════════ */
+  async function handleLogout() {
+    closeUserMenu();
+
+    // Tell server (best effort — might be offline)
+    try {
+      await fetch(API_URL, {
+        method:  'POST',
+        headers: { 'Content-Type': 'text/plain' },
+        body: JSON.stringify({ action: 'logout', token: session.token })
+      });
+    } catch { /* ignore */ }
+
+    await AN_DB.clearAllData();
+    await AN_DB.clearSession();
+    location.replace('./login.html');
+  }
+
+  /* ══════════════════════════════════════════════════════════════════════════
+     DELETE CONSUMER (Admin only)
+  ══════════════════════════════════════════════════════════════════════════ */
+  function confirmDelete(conNo, name) {
+    if (!confirm(`Delete "${name}"?\n\nThis action cannot be undone.`)) return;
+    doDelete(conNo);
+  }
+
+  async function doDelete(conNo) {
+    try {
+      if (navigator.onLine) {
+        const res  = await fetch(API_URL, {
+          method:  'POST',
+          headers: { 'Content-Type': 'text/plain' },
+          body: JSON.stringify({
+            action:   'deleteConsumer',
+            token:    session.token,
+            officeId: session.officeId,
+            data:     { conNo }
+          })
+        });
+        const json = await res.json();
+
+        if (json.success) {
+          await AN_DB.deleteConsumer(conNo);
+          masterList = masterList.filter(c => c.conNo !== conNo);
+          applyFilters();
+          toast('Consumer deleted');
+        } else {
+          toast(json.message || 'Delete failed', 'err');
+        }
+      } else {
+        // Queue for later sync
+        await AN_DB.deleteConsumer(conNo);
+        await AN_DB.addPendingChange('deleteConsumer', { conNo }, session.officeId);
+        await AN_DB.requestSync();
+        masterList = masterList.filter(c => c.conNo !== conNo);
+        applyFilters();
+        toast('Deleted offline — will sync when online');
+        updateSyncDot();
+      }
+    } catch (err) {
+      console.error('[App] Delete failed:', err);
+      toast('Error deleting consumer', 'err');
+    }
+  }
+
+  /* ══════════════════════════════════════════════════════════════════════════
+     ADD / EDIT — Stubs (will be wired in Step 6)
+  ══════════════════════════════════════════════════════════════════════════ */
+  function openAddForm()       { toast('Add Consumer — Step 6 coming soon!'); }
+  function openEditForm(conNo) { toast('Edit Consumer — Step 6 coming soon!'); }
+
+  /* ══════════════════════════════════════════════════════════════════════════
+     BOTTOM TABS
+  ══════════════════════════════════════════════════════════════════════════ */
+  function switchTab(tab) {
+    document.querySelectorAll('.bnav-btn').forEach(b => b.classList.remove('active'));
+    $(`bnav-${tab}`)?.classList.add('active');
+
+    if (tab === 'activity') toast('Activity Log — coming in Step 8!');
+    if (tab === 'admin')    toast('Admin Panel — coming in Step 6!');
+    if (tab === 'consumers') { /* already on this tab */ }
+  }
+
+  /* ══════════════════════════════════════════════════════════════════════════
+     SYNC STATUS
+  ══════════════════════════════════════════════════════════════════════════ */
+  function setSyncStatus(type, text) {
+    $('syncDot').className  = `sync-dot ${type}`;
+    $('syncText').textContent = text;
+  }
+
+  async function updateSyncDot() {
+    const n = await AN_DB.getPendingCount();
+    if (n > 0) setSyncStatus('pending', `${n} pending — will sync`);
+  }
+
+  function onOnline() {
+    setSyncStatus('syncing', 'Back online — syncing…');
+    AN_DB.requestSync();
+    setTimeout(loadConsumers, 800);
+  }
+
+  function onOffline() {
+    setSyncStatus('offline', 'Offline — edits save locally');
+  }
+
+  function onSWMessage({ data }) {
+    if (!data) return;
+    if (data.type === 'SYNC_COMPLETE') {
+      setSyncStatus('online', `${data.synced} change${data.synced !== 1 ? 's' : ''} synced`);
+      loadConsumers();
+    }
+    if (data.type === 'SYNC_FAILED') {
+      setSyncStatus('pending', 'Sync failed — will retry');
+    }
+  }
+
+  /* ══════════════════════════════════════════════════════════════════════════
+     ERROR BAR
+  ══════════════════════════════════════════════════════════════════════════ */
+  function showError(msg) {
+    $('consumerList').innerHTML = `
+      <div class="err-bar">
+        <span class="material-icons-round">warning_amber</span>
+        ${esc(msg)}
+      </div>`;
+  }
+
+  /* ══════════════════════════════════════════════════════════════════════════
+     TOAST
+  ══════════════════════════════════════════════════════════════════════════ */
+  function toast(msg, type = '') {
+    const el = $('toast');
+    el.textContent = msg;
+    el.className   = `show ${type}`.trim();
+    clearTimeout(toastT);
+    toastT = setTimeout(() => { el.className = type; }, 2800);
+  }
+
+  /* ══════════════════════════════════════════════════════════════════════════
+     UTILS
+  ══════════════════════════════════════════════════════════════════════════ */
+  function esc(s) {
+    return String(s ?? '')
+      .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+      .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  function timeAgo(ts) {
+    const d = Date.now() - ts;
+    if (d < 60000)   return 'just now';
+    if (d < 3600000) return `${Math.floor(d / 60000)}m ago`;
+    return `${Math.floor(d / 3600000)}h ago`;
+  }
+
+  /* ══════════════════════════════════════════════════════════════════════════
+     START
+  ══════════════════════════════════════════════════════════════════════════ */
+  init();
+  </script>
+</body>
+</html>
