@@ -804,9 +804,10 @@
         method:  'POST',
         headers: { 'Content-Type': 'text/plain' },
         body: JSON.stringify({
-          action:   'getConsumers',    // ← action name in your Consumer.gs
-          token:    session.token,
-          officeId: session.officeId
+          action:    'getConsumers',
+          token:     session.token,
+          officeId:  session.officeId,
+          sheetName: 'CONSUMER DATA ALL'  // Full data sheet
         })
       });
 
@@ -842,18 +843,19 @@
   function normalize(c) {
     // Maps Apps Script response to exact Excel column names
     return {
-      sNo:          c['S.No.']       || c.sNo          || '',
-      conNo:        c['ConNo']       || c.conNo        || '',
+      _rowIndex:    c._rowIndex    || 0,   // Sheet row number — needed for edit/delete
+      sNo:          c['S.No.']     || c.sNo          || '',
+      conNo:        c['ConNo']     || c.conNo        || '',
       consumerName: c['ConsumerName']|| c.consumerName || '',
-      address:      c['Address']     || c.address      || '',
-      labNo:        c['LabNo']       || c.labNo        || '',
-      meterNo:      c['MeterNo']     || c.meterNo      || '',
-      transfCode:   c['TransfCode']  || c.transfCode   || '', // Area filter field
-      phoneNo:      c['PhoneNo']     || c.phoneNo      || '',
-      status:       c['Status']      || c.status       || 'Active',
+      address:      c['Address']   || c.address      || '',
+      labNo:        c['LabNo']     || c.labNo        || '',
+      meterNo:      c['MeterNo']   || c.meterNo      || '',
+      transfCode:   c['TransfCode']|| c.transfCode   || '', // Area filter field
+      phoneNo:      c['PhoneNo']   || c.phoneNo      || '',
+      status:       c['Status']    || c.status       || 'Active',
       lastEditedBy: c['LastEditedBy']|| c.lastEditedBy || '',
       lastEditedAt: c['LastEditedAt']|| c.lastEditedAt || '',
-      createdAt:    c['CreatedAt']   || c.createdAt    || '',
+      createdAt:    c['CreatedAt'] || c.createdAt    || '',
     };
   }
 
@@ -948,7 +950,7 @@
 
     const delBtn = isAdmin
       ? `<button class="btn-c btn-del"
-           onclick="confirmDelete('${esc(c.conNo)}','${esc(c.consumerName)}')">
+           onclick="confirmDelete(${c._rowIndex},'${esc(c.conNo)}','${esc(c.consumerName)}')">
            <span class="material-icons-round">delete</span>Delete
          </button>` : '';
 
@@ -1066,22 +1068,29 @@
   /* ══════════════════════════════════════════════════════════════════════════
      DELETE CONSUMER (Admin only)
   ══════════════════════════════════════════════════════════════════════════ */
-  function confirmDelete(conNo, name) {
+
+  /* ══════════════════════════════════════════════════════════════════════════
+  /* ══════════════════════════════════════════════════════════════════════════
+     DELETE CONSUMER (Admin only)
+  ══════════════════════════════════════════════════════════════════════════ */
+  function confirmDelete(rowIndex, conNo, name) {
     if (!confirm(`Delete "${name}"?\n\nThis action cannot be undone.`)) return;
-    doDelete(conNo);
+    doDelete(rowIndex, conNo);
   }
 
-  async function doDelete(conNo) {
+  async function doDelete(rowIndex, conNo) {
     try {
       if (navigator.onLine) {
-        const res  = await fetch(API_URL, {
+        const res = await fetch(API_URL, {
           method:  'POST',
           headers: { 'Content-Type': 'text/plain' },
           body: JSON.stringify({
-            action:   'deleteConsumer',
-            token:    session.token,
-            officeId: session.officeId,
-            data:     { conNo }
+            action:    'deleteConsumer',
+            token:     session.token,
+            officeId:  session.officeId,
+            sheetName: 'CONSUMER DATA ALL',
+            rowIndex:  rowIndex,
+            conNo:     conNo
           })
         });
         const json = await res.json();
@@ -1092,12 +1101,11 @@
           applyFilters();
           toast('Consumer deleted');
         } else {
-          toast(json.message || 'Delete failed', 'err');
+          toast(json.error || json.message || 'Delete failed', 'err');
         }
       } else {
-        // Queue for later sync
         await AN_DB.deleteConsumer(conNo);
-        await AN_DB.addPendingChange('deleteConsumer', { conNo }, session.officeId);
+        await AN_DB.addPendingChange('deleteConsumer', { rowIndex, conNo }, session.officeId);
         await AN_DB.requestSync();
         masterList = masterList.filter(c => c.conNo !== conNo);
         applyFilters();
