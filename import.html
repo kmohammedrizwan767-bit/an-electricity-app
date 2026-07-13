@@ -352,7 +352,15 @@
     <!-- Step 3: Import -->
     <div class="card hidden" id="step3">
       <div class="card-title">Step 3 — Import to Google Sheets</div>
-      <div class="card-sub">Data will be imported to <strong>CONSUMER DATA ALL</strong> sheet.</div>
+      <div class="card-sub">Choose which sheet to import data into.</div>
+
+      <div class="s-field" style="margin-bottom:16px">
+        <label class="sel-label">Import to Sheet</label>
+        <select class="sel" id="targetSheet">
+          <option value="CONSUMER DATA ALL">CONSUMER DATA ALL (full details — recommended)</option>
+          <option value="CONSUMER DATA">CONSUMER DATA (basic 4 columns)</option>
+        </select>
+      </div>
 
       <div class="alert info show" id="importInfo">
         <span class="material-icons-round">cloud_upload</span>
@@ -535,7 +543,7 @@
             action:    'importConsumers',
             token:     session.token,
             officeId:  session.officeId,
-            sheetName: 'CONSUMER DATA ALL',
+            sheetName: $('targetSheet').value,
             consumers: batch
           })
         });
