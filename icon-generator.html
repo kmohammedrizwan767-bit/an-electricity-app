@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AN Electric — Icon Generator</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: sans-serif;
+    background: #0a0a1a;
+    color: #e0e0ff;
+    min-height: 100vh;
+    padding: 24px 16px;
+  }
+  h1 { color: #FFC107; font-size: 20px; margin-bottom: 4px; }
+  p  { color: #888; font-size: 13px; margin-bottom: 24px; }
+
+  .preview {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin-bottom: 32px;
+  }
+  .preview canvas {
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0,82,180,0.4);
+  }
+  .preview-label {
+    color: #aaa;
+    font-size: 12px;
+    text-align: center;
+    margin-top: 4px;
+  }
+  .preview-wrap { text-align: center; }
+
+  button.gen-btn {
+    background: #0052B4;
+    color: #fff;
+    border: none;
+    padding: 14px 28px;
+    border-radius: 12px;
+    font-size: 15px;
+    cursor: pointer;
+    margin-bottom: 24px;
+    width: 100%;
+    max-width: 320px;
+    display: block;
+  }
+  button.gen-btn:hover { background: #1976D2; }
+
+  #links { display: flex; flex-wrap: wrap; gap: 10px; }
+  .dl-link {
+    background: #111830;
+    color: #FFC107;
+    text-decoration: none;
+    padding: 8px 14px;
+    border-radius: 8px;
+    font-size: 13px;
+    border: 1px solid #1a2a4a;
+  }
+  .dl-link:hover { background: #1a2a4a; }
+
+  .instructions {
+    background: #0d1a30;
+    border: 1px solid #1a2a4a;
+    border-radius: 12px;
+    padding: 16px;
+    margin-top: 32px;
+    font-size: 13px;
+    line-height: 1.8;
+    color: #aaa;
+  }
+  .instructions h2 { color: #FFC107; font-size: 14px; margin-bottom: 8px; }
+  .instructions code {
+    background: #0a1020;
+    padding: 2px 6px;
+    border-radius: 4px;
+    color: #7CB9FF;
+    font-size: 12px;
+  }
+</style>
+</head>
+<body>
+
+<h1>⚡ AN Electric — Icon Generator</h1>
+<p>Generates all required PWA icon sizes from the app design. Run this once, save the icons to /icons/ folder.</p>
+
+<div class="preview" id="previews"></div>
+
+<button class="gen-btn" onclick="downloadAll()">⬇ Download All Icons as PNG</button>
+
+<div id="links"></div>
+
+<div class="instructions">
+  <h2>📁 Instructions</h2>
+  1. Click <strong>"Download All Icons"</strong> above<br>
+  2. Each PNG will download separately<br>
+  3. Move all downloaded files to your project's <code>/icons/</code> folder<br>
+  4. File names: <code>icon-72.png</code>, <code>icon-96.png</code>, ... <code>icon-512.png</code><br>
+  5. Delete this <code>icon-generator.html</code> before final deployment
+</div>
+
+<canvas id="offscreen" style="display:none"></canvas>
+
+<script>
+'use strict';
+
+// ── Icon sizes required by manifest.json ──────────────────────────────────────
+const SIZES = [72, 96, 128, 144, 152, 192, 384, 512];
+
+// ── Draw the AN Electric icon onto a canvas context ──────────────────────────
+function drawIcon(ctx, size) {
+  const s = size; // Alias for readability
+
+  // ── Background: blue gradient rounded rect ──
+  const bg = ctx.createLinearGradient(0, 0, s, s);
+  bg.addColorStop(0,   '#1976D2');
+  bg.addColorStop(1,   '#003A8C');
+
+  const r = s * 0.1875; // Rounded corner radius (96/512 ≈ 0.188)
+  ctx.beginPath();
+  ctx.moveTo(r, 0);
+  ctx.lineTo(s - r, 0);
+  ctx.quadraticCurveTo(s, 0, s, r);
+  ctx.lineTo(s, s - r);
+  ctx.quadraticCurveTo(s, s, s - r, s);
+  ctx.lineTo(r, s);
+  ctx.quadraticCurveTo(0, s, 0, s - r);
+  ctx.lineTo(0, r);
+  ctx.quadraticCurveTo(0, 0, r, 0);
+  ctx.closePath();
+  ctx.fillStyle = bg;
+  ctx.fill();
+
+  // ── Lightning bolt (scaled from 512×512 design) ──
+  //  Original points in 512 viewBox:
+  //  295,60 — 175,268 — 252,268 — 218,450 — 226,450 — 342,242 — 263,242
+  const scale = s / 512;
+  const bolt = [
+    [295, 60 ], [175, 268], [252, 268],
+    [218, 450], [226, 450], [342, 242], [263, 242],
+  ].map(([x, y]) => [x * scale, y * scale]);
+
+  ctx.beginPath();
+  ctx.moveTo(bolt[0][0], bolt[0][1]);
+  for (let i = 1; i < bolt.length; i++) {
+    ctx.lineTo(bolt[i][0], bolt[i][1]);
+  }
+  ctx.closePath();
+
+  // Subtle glow (shadow)
+  ctx.shadowColor   = '#FFC107';
+  ctx.shadowBlur    = s * 0.03;
+  ctx.fillStyle     = '#FFC107';
+  ctx.fill();
+  ctx.shadowBlur    = 0;
+
+  // Edge highlight
+  ctx.strokeStyle   = 'rgba(255,255,255,0.2)';
+  ctx.lineWidth     = Math.max(1, s * 0.004);
+  ctx.lineJoin      = 'round';
+  ctx.stroke();
+}
+
+// ── Generate canvas for a given size ─────────────────────────────────────────
+function generateCanvas(size) {
+  const canvas    = document.createElement('canvas');
+  canvas.width    = size;
+  canvas.height   = size;
+  const ctx       = canvas.getContext('2d');
+  drawIcon(ctx, size);
+  return canvas;
+}
+
+// ── Render preview thumbnails ─────────────────────────────────────────────────
+function renderPreviews() {
+  const container = document.getElementById('previews');
+  const previewSizes = [72, 128, 192, 512];
+
+  for (const size of previewSizes) {
+    const canvas = generateCanvas(size);
+
+    // Scale down for display
+    const displaySize = Math.min(size, 96);
+    canvas.style.width  = displaySize + 'px';
+    canvas.style.height = displaySize + 'px';
+
+    const wrap  = document.createElement('div');
+    wrap.className = 'preview-wrap';
+    const label = document.createElement('div');
+    label.className = 'preview-label';
+    label.textContent = `${size}×${size}`;
+
+    wrap.appendChild(canvas);
+    wrap.appendChild(label);
+    container.appendChild(wrap);
+  }
+}
+
+// ── Download a single icon ────────────────────────────────────────────────────
+function downloadIcon(size) {
+  const canvas = generateCanvas(size);
+  const link   = document.createElement('a');
+  link.download = `icon-${size}.png`;
+  link.href     = canvas.toDataURL('image/png');
+  link.click();
+}
+
+// ── Download all icons sequentially ──────────────────────────────────────────
+async function downloadAll() {
+  const linksEl = document.getElementById('links');
+  linksEl.innerHTML = '<span style="color:#888;font-size:13px">Generating…</span>';
+
+  // Sequential download with delay (browsers block rapid downloads)
+  for (let i = 0; i < SIZES.length; i++) {
+    const size = SIZES[i];
+    await new Promise(resolve => setTimeout(resolve, i * 300));
+    downloadIcon(size);
+  }
+
+  // Show individual download links too
+  linksEl.innerHTML = '';
+  for (const size of SIZES) {
+    const canvas = generateCanvas(size);
+    const a      = document.createElement('a');
+    a.className  = 'dl-link';
+    a.textContent = `icon-${size}.png`;
+    a.download   = `icon-${size}.png`;
+    a.href       = canvas.toDataURL('image/png');
+    linksEl.appendChild(a);
+  }
+}
+
+// ── Init ──────────────────────────────────────────────────────────────────────
+renderPreviews();
+</script>
+</body>
+</html>
