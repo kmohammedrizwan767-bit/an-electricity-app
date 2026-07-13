@@ -12,1132 +12,660 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
-
   <style>
+
   /* ═══════════════════════════════════════════
-     DESIGN TOKENS
+     TOKENS
   ═══════════════════════════════════════════ */
   :root {
-    --primary:       #0052B4;
-    --primary-light: #1976D2;
-    --primary-dark:  #003A82;
-    --accent:        #FFC107;
-    --danger:        #D32F2F;
-    --success:       #2E7D32;
-    --warning:       #F57C00;
-
-    --bg:          #EEF2F7;
-    --card:        #FFFFFF;
-    --card-border: #D1DCF0;
-    --text-1:      #1A1A2E;
-    --text-2:      #5A6A85;
-    --inp-bg:      #F4F7FF;
-    --inp-border:  #C5D0E8;
-    --shadow:      0 2px 12px rgba(0,82,180,0.08);
-    --shadow-lg:   0 8px 32px rgba(0,82,180,0.15);
-
-    --nav-h:    56px;
-    --search-h: 108px;
-    --sync-h:   38px;
-    --bnav-h:   64px;
-
-    --r-card: 20px;
-    --r-inp:  12px;
-    --r-btn:  12px;
-    --r-chip: 20px;
-
-    --ff-d: 'Poppins', sans-serif;
-    --ff-b: 'Roboto', sans-serif;
-
-    --ease: cubic-bezier(0.4, 0, 0.2, 1);
-    --dur:  0.22s;
+    --primary:#0052B4; --primary-l:#1976D2; --primary-d:#003A82;
+    --accent:#FFC107;  --danger:#D32F2F;    --success:#2E7D32;
+    --bg:#EEF2F7;     --card:#FFFFFF;       --card-b:#D1DCF0;
+    --t1:#1A1A2E;     --t2:#5A6A85;
+    --inp:#F4F7FF;    --inp-b:#C5D0E8;
+    --nav-h:56px;     --search-h:100px;     --bnav-h:64px;
+    --r:20px; --ri:12px; --rb:12px;
+    --fd:'Poppins',sans-serif; --fb:'Roboto',sans-serif;
+    --ease:cubic-bezier(.4,0,.2,1); --d:.22s;
+    --sh:0 2px 12px rgba(0,82,180,.08);
+    --sh-lg:0 8px 32px rgba(0,82,180,.15);
   }
-
-  [data-theme="dark"] {
-    --bg:          #080F1E;
-    --card:        #0D1D36;
-    --card-border: #1A2E50;
-    --text-1:      #E8F0FE;
-    --text-2:      #7A99CC;
-    --inp-bg:      #081428;
-    --inp-border:  #1A2E50;
-    --shadow:      0 2px 12px rgba(0,0,0,0.35);
-    --shadow-lg:   0 8px 32px rgba(0,0,0,0.4);
+  [data-theme=dark]{
+    --bg:#080F1E; --card:#0D1D36; --card-b:#1A2E50;
+    --t1:#E8F0FE; --t2:#7A99CC;
+    --inp:#081428; --inp-b:#1A2E50;
+    --sh:0 2px 12px rgba(0,0,0,.35);
+    --sh-lg:0 8px 32px rgba(0,0,0,.4);
   }
 
   /* ═══════════════════════════════════════════
-     RESET + BASE
+     RESET
   ═══════════════════════════════════════════ */
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-  body {
-    font-family: var(--ff-b);
-    background: var(--bg);
-    color: var(--text-1);
-    min-height: 100vh;
-    overflow-x: hidden;
-    -webkit-font-smoothing: antialiased;
-    -webkit-tap-highlight-color: transparent;
-    transition: background-color var(--dur) var(--ease),
-                color var(--dur) var(--ease);
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  body{
+    font-family:var(--fb);background:var(--bg);color:var(--t1);
+    min-height:100vh;overflow-x:hidden;
+    -webkit-font-smoothing:antialiased;-webkit-tap-highlight-color:transparent;
   }
+  .hidden{display:none!important}
 
-  .hidden { display: none !important; }
-
-  /* Targeted transitions for theme switch — only on elements that change */
-  .navbar, .search-section, .sync-bar, .bottom-nav,
-  .c-card, .skeleton, .user-menu, .bottom-sheet,
-  .search-wrap, .chip, .inp, .btn-c, .area-badge {
-    transition: background-color var(--dur) var(--ease),
-                border-color var(--dur) var(--ease),
-                color var(--dur) var(--ease);
+  /* Smooth theme transition on key elements only */
+  .navbar,.search-sec,.bottom-nav,.c-card,.skeleton,
+  .user-menu,.bottom-sheet,.search-wrap,.chip{
+    transition:background-color var(--d) var(--ease),
+               border-color var(--d) var(--ease),
+               color var(--d) var(--ease);
   }
 
   /* ═══════════════════════════════════════════
-     SPLASH SCREEN
+     SPLASH
   ═══════════════════════════════════════════ */
-  .splash {
-    position: fixed;
-    inset: 0;
-    background: #080F1E;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 12px;
-    z-index: 9999;
-    transition: opacity 0.35s var(--ease);
+  .splash{
+    position:fixed;inset:0;background:#080F1E;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    gap:10px;z-index:9999;transition:opacity .35s var(--ease);
   }
-  .splash.fade { opacity: 0; pointer-events: none; }
-  .splash-bolt {
-    font-size: 56px;
-    animation: bolt-pulse 1.2s ease-in-out infinite alternate;
-  }
-  @keyframes bolt-pulse { from { transform: scale(0.9); } to { transform: scale(1.05); } }
-  .splash-name {
-    font-family: var(--ff-d);
-    font-size: 22px;
-    font-weight: 700;
-    color: #fff;
-    letter-spacing: 0.5px;
-  }
-  .splash-sub {
-    font-size: 13px;
-    color: rgba(255,255,255,0.5);
-    font-family: var(--ff-b);
-  }
+  .splash.out{opacity:0;pointer-events:none}
+  .splash-bolt{font-size:52px;animation:bolt .9s ease-in-out infinite alternate}
+  @keyframes bolt{from{transform:scale(.92)}to{transform:scale(1.06)}}
+  .splash-name{font-family:var(--fd);font-size:20px;font-weight:700;color:#fff}
+  .splash-sub{font-size:12px;color:rgba(255,255,255,.45)}
 
   /* ═══════════════════════════════════════════
-     SHEET BACKDROP
+     BACKDROP + SHEETS
   ═══════════════════════════════════════════ */
-  .backdrop {
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.55);
-    z-index: 290;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.3s var(--ease);
-    -webkit-backdrop-filter: blur(2px);
-    backdrop-filter: blur(2px);
+  .backdrop{
+    position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:290;
+    opacity:0;pointer-events:none;transition:opacity .3s var(--ease);
+    backdrop-filter:blur(2px);-webkit-backdrop-filter:blur(2px);
   }
-  .backdrop.show { opacity: 1; pointer-events: all; }
+  .backdrop.show{opacity:1;pointer-events:all}
+
+  .bottom-sheet{
+    position:fixed;bottom:0;left:0;right:0;
+    background:var(--card);border-radius:24px 24px 0 0;
+    padding:8px 20px 32px;z-index:300;
+    transform:translateY(100%);transition:transform .35s var(--ease);
+    max-height:92vh;overflow-y:auto;
+  }
+  .bottom-sheet.open{transform:translateY(0)}
+  .sheet-handle{width:40px;height:4px;background:var(--card-b);border-radius:2px;margin:10px auto 18px}
+  .sheet-title{
+    font-family:var(--fd);font-size:16px;font-weight:700;
+    color:var(--t1);margin-bottom:18px;text-align:center;
+  }
+
+  /* ── Sheet form ── */
+  .sf{margin-bottom:13px}
+  .sl{font-size:11px;font-family:var(--fd);font-weight:500;color:var(--t2);
+      margin-bottom:5px;display:block;text-transform:uppercase;letter-spacing:.4px}
+  .siw{display:flex;align-items:center;background:var(--inp);border:1.5px solid var(--inp-b);
+       border-radius:var(--ri);padding:0 12px;height:46px;gap:8px}
+  .siw:focus-within{border-color:var(--primary)}
+  .siw .material-icons-round{color:var(--t2);font-size:18px;flex-shrink:0}
+  .sinp{flex:1;background:none;border:none;outline:none;font-family:var(--fb);font-size:14px;color:var(--t1)}
+  .sinp::placeholder{color:var(--t2)}
+  .eye{background:none;border:none;color:var(--t2);cursor:pointer;display:flex;padding:2px}
+  .eye .material-icons-round{font-size:18px}
+
+  .strength-bar{height:3px;border-radius:2px;background:var(--inp-b);overflow:hidden;margin-top:5px}
+  .strength-fill{height:100%;border-radius:2px;transition:width .3s,background .3s;width:0}
+  .strength-txt{font-size:11px;color:var(--t2);margin-top:3px}
+
+  .s-alert{border-radius:10px;padding:10px 14px;display:none;align-items:center;
+            gap:8px;font-size:13px;margin-bottom:12px;line-height:1.5}
+  .s-alert.show{display:flex}
+  .s-alert.err{background:rgba(211,47,47,.1);color:var(--danger);border:1px solid rgba(211,47,47,.2)}
+  .s-alert.ok{background:rgba(46,125,50,.1);color:var(--success);border:1px solid rgba(46,125,50,.2)}
+  .s-alert .material-icons-round{font-size:16px;flex-shrink:0}
+
+  .btn-sh{
+    width:100%;background:var(--primary);color:#fff;border:none;
+    border-radius:var(--rb);height:48px;font-family:var(--fd);font-size:15px;
+    font-weight:600;cursor:pointer;margin-top:8px;
+    display:flex;align-items:center;justify-content:center;gap:8px;
+    transition:opacity .2s;position:relative;overflow:hidden;
+  }
+  .btn-sh:active{opacity:.85}
+  .btn-sh .spin{
+    width:18px;height:18px;border:2px solid rgba(255,255,255,.4);
+    border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;display:none;
+  }
+  .btn-sh.loading .spin{display:block}
+  .btn-sh.loading .bl{display:none}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .btn-cancel{
+    width:100%;background:var(--inp);border:1.5px solid var(--inp-b);
+    border-radius:var(--rb);height:44px;font-family:var(--fd);font-size:14px;
+    font-weight:500;color:var(--t1);cursor:pointer;margin-top:8px;
+  }
+
+  /* ── About sheet ── */
+  .ab-logo{text-align:center;font-size:48px;margin-bottom:8px}
+  .ab-name{text-align:center;font-family:var(--fd);font-size:17px;font-weight:700;color:var(--t1);margin-bottom:3px}
+  .ab-ver{text-align:center;font-size:12px;color:var(--t2);margin-bottom:18px}
+  .ab-row{display:flex;gap:12px;padding:12px 0;border-bottom:1px solid var(--card-b);align-items:flex-start}
+  .ab-row:last-child{border-bottom:none}
+  .ab-row .material-icons-round{color:var(--primary);font-size:18px;flex-shrink:0;margin-top:1px}
+  .ab-key{font-size:10px;color:var(--t2);font-family:var(--fd);font-weight:500;text-transform:uppercase}
+  .ab-val{font-size:13px;color:var(--t1);margin-top:1px}
+
+  /* ── Delete confirm sheet ── */
+  .del-ico{text-align:center;margin-bottom:10px}
+  .del-ico .material-icons-round{font-size:44px;color:var(--danger)}
+  .del-ttl{text-align:center;font-family:var(--fd);font-size:16px;font-weight:700;color:var(--t1);margin-bottom:6px}
+  .del-sub{text-align:center;font-size:13px;color:var(--t2);margin-bottom:20px;line-height:1.5}
+  .del-who{font-weight:600;color:var(--danger);display:block;margin-top:4px;font-size:14px}
+  .btn-del-confirm{
+    width:100%;background:var(--danger);color:#fff;border:none;
+    border-radius:var(--rb);height:48px;font-family:var(--fd);font-size:15px;
+    font-weight:600;cursor:pointer;margin-bottom:10px;transition:opacity .2s;
+  }
+  .btn-del-confirm:active{opacity:.8}
+
+  /* ── Consumer detail sheet ── */
+  .det-name{font-family:var(--fd);font-size:17px;font-weight:700;color:var(--t1);margin-bottom:4px}
+  .det-conno{font-size:12px;color:var(--t2);margin-bottom:16px}
+  .det-field{
+    display:flex;justify-content:space-between;align-items:center;
+    padding:10px 0;border-bottom:1px solid var(--card-b);gap:12px;
+  }
+  .det-field:last-of-type{border-bottom:none}
+  .det-label{font-size:12px;color:var(--t2);font-family:var(--fd);font-weight:500;flex-shrink:0}
+  .det-value{font-size:13px;color:var(--t1);text-align:right}
+  .det-badge{
+    font-size:11px;font-family:var(--fd);font-weight:600;
+    padding:3px 10px;border-radius:8px;
+  }
+  .det-badge.active{background:rgba(46,125,50,.12);color:#2E7D32}
+  .det-badge.inactive{background:rgba(120,120,120,.12);color:#757575}
+  .det-badge.defaulter{background:rgba(211,47,47,.12);color:var(--danger)}
+  [data-theme=dark] .det-badge.active{background:rgba(46,125,50,.2);color:#66BB6A}
+  [data-theme=dark] .det-badge.defaulter{background:rgba(211,47,47,.2);color:#EF5350}
+  .det-actions{display:flex;gap:10px;margin-top:16px}
+  .det-btn{
+    flex:1;height:46px;border-radius:var(--rb);border:none;
+    font-family:var(--fd);font-size:13px;font-weight:600;cursor:pointer;
+    display:flex;align-items:center;justify-content:center;gap:6px;
+    transition:opacity .2s;
+  }
+  .det-btn:active{opacity:.7}
+  .det-btn .material-icons-round{font-size:16px}
+  .det-edit{background:rgba(0,82,180,.1);color:var(--primary)}
+  [data-theme=dark] .det-edit{background:rgba(25,118,210,.15)}
+  .det-del{background:rgba(211,47,47,.1);color:var(--danger)}
+  [data-theme=dark] .det-del{background:rgba(211,47,47,.15)}
 
   /* ═══════════════════════════════════════════
-     BOTTOM SHEET (modal)
+     NAVBAR
   ═══════════════════════════════════════════ */
-  .bottom-sheet {
-    position: fixed;
-    bottom: 0; left: 0; right: 0;
-    background: var(--card);
-    border-radius: 24px 24px 0 0;
-    padding: 8px 20px 32px;
-    z-index: 300;
-    transform: translateY(100%);
-    transition: transform 0.35s var(--ease);
-    max-height: 92vh;
-    overflow-y: auto;
+  .navbar{
+    position:fixed;top:0;left:0;right:0;height:var(--nav-h);
+    background:var(--primary);display:flex;align-items:center;
+    justify-content:space-between;padding:0 12px;z-index:100;
+    box-shadow:0 2px 10px rgba(0,0,0,.2);
   }
-  .bottom-sheet.open { transform: translateY(0); }
+  .nav-left{display:flex;align-items:center;gap:10px}
+  .nav-bolt{font-size:22px;line-height:1}
+  .nav-app{font-family:var(--fd);font-size:15px;font-weight:700;color:#fff;line-height:1.2}
+  .nav-office{
+    font-size:11px;color:rgba(255,255,255,.7);display:block;
+    line-height:1.2;max-width:160px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  }
+  .nav-right{display:flex;gap:4px}
+  .nav-btn{
+    background:rgba(255,255,255,.15);border:none;border-radius:50%;
+    width:36px;height:36px;display:flex;align-items:center;justify-content:center;
+    color:#fff;cursor:pointer;transition:background .15s;
+  }
+  .nav-btn:active{background:rgba(255,255,255,.3)}
+  .nav-btn .material-icons-round{font-size:20px}
 
-  .sheet-handle {
-    width: 40px; height: 4px;
-    background: var(--card-border);
-    border-radius: 2px;
-    margin: 10px auto 20px;
+  /* Select mode bar (replaces navbar) */
+  .sel-bar{
+    position:fixed;top:0;left:0;right:0;height:var(--nav-h);
+    background:#102040;display:flex;align-items:center;
+    padding:0 12px;gap:12px;z-index:110;
   }
-  .sheet-title {
-    font-family: var(--ff-d);
-    font-size: 17px;
-    font-weight: 700;
-    color: var(--text-1);
-    margin-bottom: 20px;
-    text-align: center;
+  .sel-cancel{
+    background:rgba(255,255,255,.15);border:none;border-radius:50%;
+    width:36px;height:36px;display:flex;align-items:center;justify-content:center;
+    color:#fff;cursor:pointer;flex-shrink:0;
   }
-
-  /* ── Sheet form fields ── */
-  .s-field { margin-bottom: 14px; }
-  .s-label {
-    font-size: 12px;
-    font-family: var(--ff-d);
-    font-weight: 500;
-    color: var(--text-2);
-    margin-bottom: 6px;
-    display: block;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
+  .sel-cancel .material-icons-round{font-size:20px}
+  .sel-cnt{flex:1;font-family:var(--fd);font-size:15px;font-weight:600;color:#fff}
+  .sel-all-btn{
+    background:rgba(255,255,255,.15);border:none;border-radius:20px;
+    padding:6px 14px;font-family:var(--fd);font-size:12px;font-weight:500;
+    color:#fff;cursor:pointer;white-space:nowrap;
   }
-  .s-inp-wrap {
-    display: flex;
-    align-items: center;
-    background: var(--inp-bg);
-    border: 1.5px solid var(--inp-border);
-    border-radius: var(--r-inp);
-    padding: 0 12px;
-    height: 46px;
-    gap: 8px;
-  }
-  .s-inp-wrap:focus-within { border-color: var(--primary); }
-  .s-inp-wrap .material-icons-round { color: var(--text-2); font-size: 18px; flex-shrink: 0; }
-  .inp {
-    flex: 1;
-    background: none;
-    border: none;
-    outline: none;
-    font-family: var(--ff-b);
-    font-size: 14px;
-    color: var(--text-1);
-  }
-  .inp::placeholder { color: var(--text-2); }
-
-  .eye-btn {
-    background: none; border: none;
-    color: var(--text-2); cursor: pointer;
-    display: flex; padding: 2px;
-  }
-  .eye-btn .material-icons-round { font-size: 18px; }
-
-  .s-err {
-    font-size: 12px;
-    color: var(--danger);
-    margin-top: 4px;
-    display: none;
-  }
-  .s-err.show { display: block; }
-
-  /* Password strength bar */
-  .strength-wrap { margin-top: 6px; }
-  .strength-bar {
-    height: 3px;
-    border-radius: 2px;
-    background: var(--inp-border);
-    overflow: hidden;
-  }
-  .strength-fill {
-    height: 100%;
-    border-radius: 2px;
-    transition: width 0.3s, background 0.3s;
-    width: 0%;
-  }
-  .strength-text { font-size: 11px; color: var(--text-2); margin-top: 3px; }
-
-  .btn-sheet {
-    width: 100%;
-    background: var(--primary);
-    color: #fff;
-    border: none;
-    border-radius: var(--r-btn);
-    height: 48px;
-    font-family: var(--ff-d);
-    font-size: 15px;
-    font-weight: 600;
-    cursor: pointer;
-    margin-top: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    transition: opacity 0.2s;
-    position: relative;
-    overflow: hidden;
-  }
-  .btn-sheet:active { opacity: 0.85; }
-  .btn-sheet .spin {
-    width: 18px; height: 18px;
-    border: 2px solid rgba(255,255,255,0.4);
-    border-top-color: #fff;
-    border-radius: 50%;
-    animation: spin 0.7s linear infinite;
-    display: none;
-  }
-  .btn-sheet.loading .spin { display: block; }
-  .btn-sheet.loading .btn-lbl { display: none; }
-  @keyframes spin { to { transform: rotate(360deg); } }
-
-  /* Alert inside sheets */
-  .s-alert {
-    border-radius: 10px;
-    padding: 10px 14px;
-    font-size: 13px;
-    display: none;
-    align-items: center;
-    gap: 8px;
-    margin-bottom: 14px;
-  }
-  .s-alert.show { display: flex; }
-  .s-alert.err  { background: rgba(211,47,47,0.1); color: var(--danger); border: 1px solid rgba(211,47,47,0.2); }
-  .s-alert.ok   { background: rgba(46,125,50,0.1); color: var(--success); border: 1px solid rgba(46,125,50,0.2); }
-  .s-alert .material-icons-round { font-size: 16px; flex-shrink: 0; }
-
-  /* About sheet */
-  .about-logo { text-align: center; font-size: 52px; margin-bottom: 8px; }
-  .about-app  {
-    text-align: center;
-    font-family: var(--ff-d);
-    font-size: 18px;
-    font-weight: 700;
-    color: var(--text-1);
-    margin-bottom: 4px;
-  }
-  .about-ver {
-    text-align: center;
-    font-size: 12px;
-    color: var(--text-2);
-    margin-bottom: 20px;
-  }
-  .about-row {
-    display: flex;
-    gap: 12px;
-    padding: 12px 0;
-    border-bottom: 1px solid var(--card-border);
-    align-items: flex-start;
-  }
-  .about-row:last-child { border-bottom: none; }
-  .about-row .material-icons-round { color: var(--primary); font-size: 20px; flex-shrink: 0; margin-top: 1px; }
-  .about-key { font-size: 11px; color: var(--text-2); font-family: var(--ff-d); font-weight: 500; text-transform: uppercase; }
-  .about-val { font-size: 13px; color: var(--text-1); margin-top: 2px; }
-
-  /* Delete confirm sheet */
-  .del-icon { text-align: center; margin-bottom: 12px; }
-  .del-icon .material-icons-round { font-size: 48px; color: var(--danger); }
-  .del-title {
-    text-align: center;
-    font-family: var(--ff-d);
-    font-size: 17px;
-    font-weight: 700;
-    color: var(--text-1);
-    margin-bottom: 6px;
-  }
-  .del-sub { text-align: center; font-size: 13px; color: var(--text-2); margin-bottom: 24px; }
-  .del-name {
-    font-weight: 600;
-    color: var(--danger);
-    display: block;
-    font-size: 14px;
-    margin-top: 4px;
-  }
-  .btn-del-confirm {
-    width: 100%;
-    background: var(--danger);
-    color: #fff;
-    border: none;
-    border-radius: var(--r-btn);
-    height: 48px;
-    font-family: var(--ff-d);
-    font-size: 15px;
-    font-weight: 600;
-    cursor: pointer;
-    margin-bottom: 10px;
-    transition: opacity 0.2s;
-  }
-  .btn-del-confirm:active { opacity: 0.8; }
-  .btn-cancel {
-    width: 100%;
-    background: var(--inp-bg);
-    color: var(--text-1);
-    border: 1.5px solid var(--inp-border);
-    border-radius: var(--r-btn);
-    height: 44px;
-    font-family: var(--ff-d);
-    font-size: 14px;
-    font-weight: 500;
-    cursor: pointer;
-  }
-
-  /* ═══════════════════════════════════════════
-     TOP NAVBAR
-  ═══════════════════════════════════════════ */
-  .navbar {
-    position: fixed;
-    top: 0; left: 0; right: 0;
-    height: var(--nav-h);
-    background: var(--primary);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0 12px;
-    z-index: 100;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-  }
-  .nav-left { display: flex; align-items: center; gap: 10px; }
-  .nav-bolt { font-size: 22px; line-height: 1; }
-  .nav-app {
-    font-family: var(--ff-d);
-    font-size: 15px;
-    font-weight: 700;
-    color: #fff;
-    line-height: 1.2;
-  }
-  .nav-office {
-    font-size: 11px;
-    color: rgba(255,255,255,0.7);
-    display: block;
-    line-height: 1.2;
-    max-width: 160px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-  .nav-right { display: flex; gap: 4px; }
-  .nav-btn {
-    background: rgba(255,255,255,0.15);
-    border: none;
-    border-radius: 50%;
-    width: 36px; height: 36px;
-    display: flex; align-items: center; justify-content: center;
-    color: #fff;
-    cursor: pointer;
-    transition: background 0.15s;
-    position: relative;
-    overflow: hidden;
-  }
-  .nav-btn:active { background: rgba(255,255,255,0.3); }
-  .nav-btn .material-icons-round { font-size: 20px; }
 
   /* ═══════════════════════════════════════════
      USER MENU
   ═══════════════════════════════════════════ */
-  .user-menu {
-    position: fixed;
-    top: calc(var(--nav-h) + 8px);
-    right: 12px;
-    background: var(--card);
-    border: 1px solid var(--card-border);
-    border-radius: 20px;
-    padding: 16px;
-    z-index: 200;
-    min-width: 210px;
-    box-shadow: var(--shadow-lg);
-    opacity: 0;
-    transform: translateY(-8px) scale(0.96);
-    pointer-events: none;
-    transition: opacity 0.2s var(--ease), transform 0.2s var(--ease);
+  .user-menu{
+    position:fixed;top:calc(var(--nav-h) + 8px);right:12px;
+    background:var(--card);border:1px solid var(--card-b);border-radius:20px;
+    padding:16px;z-index:200;min-width:210px;box-shadow:var(--sh-lg);
+    opacity:0;transform:translateY(-8px) scale(.96);pointer-events:none;
+    transition:opacity .2s var(--ease),transform .2s var(--ease);
   }
-  .user-menu.show { opacity: 1; transform: translateY(0) scale(1); pointer-events: all; }
-
-  .u-avatar {
-    width: 44px; height: 44px;
-    border-radius: 50%;
-    background: var(--primary);
-    display: flex; align-items: center; justify-content: center;
-    margin-bottom: 10px;
+  .user-menu.show{opacity:1;transform:none;pointer-events:all}
+  .um-avatar{width:42px;height:42px;border-radius:50%;background:var(--primary);
+             display:flex;align-items:center;justify-content:center;margin-bottom:8px}
+  .um-avatar .material-icons-round{color:#fff;font-size:22px}
+  .um-name{font-family:var(--fd);font-size:14px;font-weight:600;color:var(--t1)}
+  .um-role{font-size:11px;color:var(--primary);margin-top:2px;font-family:var(--fd);font-weight:500;text-transform:capitalize}
+  .menu-div{height:1px;background:var(--card-b);margin:11px 0}
+  .mi{
+    width:100%;background:none;border:none;display:flex;align-items:center;
+    gap:12px;padding:9px 6px;color:var(--t1);font-size:13px;cursor:pointer;
+    border-radius:10px;font-family:var(--fb);text-align:left;transition:background .15s;
   }
-  .u-avatar .material-icons-round { color: #fff; font-size: 24px; }
-  .u-name {
-    font-family: var(--ff-d);
-    font-size: 14px;
-    font-weight: 600;
-    color: var(--text-1);
-  }
-  .u-role {
-    font-size: 11px;
-    color: var(--primary);
-    text-transform: capitalize;
-    margin-top: 2px;
-    font-family: var(--ff-d);
-    font-weight: 500;
-  }
-  .menu-divider { height: 1px; background: var(--card-border); margin: 12px 0; }
-  .menu-item {
-    width: 100%;
-    background: none;
-    border: none;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 9px 6px;
-    color: var(--text-1);
-    font-size: 13px;
-    cursor: pointer;
-    border-radius: 10px;
-    font-family: var(--ff-b);
-    text-align: left;
-    transition: background 0.15s;
-  }
-  .menu-item:hover { background: var(--inp-bg); }
-  .menu-item .material-icons-round { font-size: 18px; color: var(--text-2); }
-  .menu-item.danger { color: var(--danger); }
-  .menu-item.danger .material-icons-round { color: var(--danger); }
-  .menu-overlay {
-    position: fixed;
-    inset: 0;
-    z-index: 150;
-  }
+  .mi:hover{background:var(--inp)}
+  .mi .material-icons-round{font-size:18px;color:var(--t2)}
+  .mi.danger{color:var(--danger)}
+  .mi.danger .material-icons-round{color:var(--danger)}
+  .menu-ov{position:fixed;inset:0;z-index:150}
 
   /* ═══════════════════════════════════════════
      SEARCH SECTION (fixed)
   ═══════════════════════════════════════════ */
-  .search-section {
-    position: fixed;
-    top: var(--nav-h);
-    left: 0; right: 0;
-    background: var(--bg);
-    padding: 10px 14px 0;
-    z-index: 90;
-    border-bottom: 1px solid var(--card-border);
+  .search-sec{
+    position:fixed;top:var(--nav-h);left:0;right:0;
+    background:var(--bg);padding:10px 14px 0;z-index:90;
+    border-bottom:1px solid var(--card-b);
   }
-  .search-wrap {
-    display: flex;
-    align-items: center;
-    background: var(--inp-bg);
-    border: 1.5px solid var(--inp-border);
-    border-radius: var(--r-inp);
-    padding: 0 12px;
-    gap: 8px;
-    height: 44px;
+  .search-wrap{
+    display:flex;align-items:center;background:var(--inp);
+    border:1.5px solid var(--inp-b);border-radius:var(--ri);
+    padding:0 12px;gap:8px;height:44px;
   }
-  .search-wrap:focus-within { border-color: var(--primary); }
-  .s-ico { color: var(--text-2); font-size: 20px !important; flex-shrink: 0; }
-  .search-inp {
-    flex: 1;
-    background: none;
-    border: none;
-    outline: none;
-    font-family: var(--ff-b);
-    font-size: 14px;
-    color: var(--text-1);
+  .search-wrap:focus-within{border-color:var(--primary)}
+  .s-ico{color:var(--t2);font-size:20px!important;flex-shrink:0}
+  .search-inp{
+    flex:1;background:none;border:none;outline:none;
+    font-family:var(--fb);font-size:14px;color:var(--t1);
   }
-  .search-inp::placeholder { color: var(--text-2); }
-  /* Hide browser default X button on search input */
+  .search-inp::placeholder{color:var(--t2)}
   .search-inp::-webkit-search-decoration,
   .search-inp::-webkit-search-cancel-button,
   .search-inp::-webkit-search-results-button,
-  .search-inp::-webkit-search-results-decoration { display: none; }
-  .s-clear {
-    background: none; border: none;
-    cursor: pointer; color: var(--text-2);
-    display: flex; padding: 2px;
-  }
-  .s-clear .material-icons-round { font-size: 18px; }
+  .search-inp::-webkit-search-results-decoration{display:none}
+  .s-clr{background:none;border:none;cursor:pointer;color:var(--t2);display:flex;padding:2px}
+  .s-clr .material-icons-round{font-size:18px}
 
-  .chips-outer {
-    position: relative;
+  .chips-wrap{position:relative}
+  .chips-wrap::after{
+    content:'';position:absolute;right:0;top:0;bottom:0;width:28px;
+    background:linear-gradient(to right,transparent,var(--bg));pointer-events:none;z-index:1;
   }
-  .chips-outer::after {
-    content: '';
-    position: absolute;
-    right: 0; top: 0; bottom: 0;
-    width: 32px;
-    background: linear-gradient(to right, transparent, var(--bg));
-    pointer-events: none;
-    z-index: 1;
+  .chips{
+    display:flex;gap:8px;overflow-x:auto;padding:10px 0;
+    scrollbar-width:none;-webkit-overflow-scrolling:touch;scroll-behavior:smooth;
   }
-  .chips {
-    display: flex;
-    gap: 8px;
-    overflow-x: auto;
-    padding: 10px 0;
-    scrollbar-width: none;
-    -webkit-overflow-scrolling: touch;
-    scroll-behavior: smooth;
+  .chips::-webkit-scrollbar{display:none}
+  .chip{
+    flex-shrink:0;background:var(--inp);border:1.5px solid var(--inp-b);
+    border-radius:20px;padding:4px 14px;font-size:12px;font-family:var(--fd);
+    font-weight:500;color:var(--t2);cursor:pointer;transition:all .15s;
   }
-  .chips::-webkit-scrollbar { display: none; }
-  .chip {
-    flex-shrink: 0;
-    background: var(--inp-bg);
-    border: 1.5px solid var(--inp-border);
-    border-radius: var(--r-chip);
-    padding: 4px 14px;
-    font-size: 12px;
-    font-family: var(--ff-d);
-    font-weight: 500;
-    color: var(--text-2);
-    cursor: pointer;
-    transition: all 0.15s;
-    position: relative;
-    overflow: hidden;
-  }
-  .chip.active { background: var(--primary); border-color: var(--primary); color: #fff; }
-
-  /* ═══════════════════════════════════════════
-     SYNC BAR (fixed)
-  ═══════════════════════════════════════════ */
-  .sync-bar {
-    position: fixed;
-    top: calc(var(--nav-h) + var(--search-h));
-    left: 0; right: 0;
-    height: var(--sync-h);
-    background: var(--bg);
-    display: flex;
-    align-items: center;
-    padding: 0 14px;
-    gap: 8px;
-    z-index: 80;
-    border-bottom: 1px solid var(--card-border);
-  }
-  .sync-dot {
-    width: 7px; height: 7px;
-    border-radius: 50%;
-    background: #9E9E9E;
-    flex-shrink: 0;
-    transition: background 0.4s;
-  }
-  .sync-dot.online  { background: #4CAF50; }
-  .sync-dot.syncing { background: var(--accent); animation: blink 1s infinite; }
-  .sync-dot.offline { background: #FF5722; }
-  .sync-dot.pending { background: var(--accent); }
-  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.25} }
-
-  .sync-text { font-size: 11.5px; color: var(--text-2); flex: 1; }
-  .cnt-text {
-    font-size: 12px;
-    font-family: var(--ff-d);
-    font-weight: 600;
-    color: var(--primary);
-  }
-  .refresh-btn {
-    background: none;
-    border: none;
-    color: var(--text-2);
-    cursor: pointer;
-    padding: 4px;
-    display: flex;
-    align-items: center;
-    border-radius: 50%;
-    transition: color 0.2s;
-  }
-  .refresh-btn:active { color: var(--primary); }
-  .refresh-btn .material-icons-round { font-size: 18px; }
-  .refresh-btn.spinning .material-icons-round { animation: spin 0.7s linear infinite; }
+  .chip.active{background:var(--primary);border-color:var(--primary);color:#fff}
 
   /* ═══════════════════════════════════════════
      MAIN CONTENT
   ═══════════════════════════════════════════ */
-  .main {
-    padding-top: calc(var(--nav-h) + var(--search-h) + var(--sync-h) + 12px);
-    padding-bottom: calc(var(--bnav-h) + 24px);
-    padding-left: 14px;
-    padding-right: 14px;
+  .main{
+    padding-bottom:calc(var(--bnav-h) + 24px);
+    padding-left:14px;padding-right:14px;
   }
+
+  /* ── Sync / Count bar (scrolls with content) ── */
+  .sync-row{
+    display:flex;align-items:center;gap:8px;
+    padding:10px 2px 8px;
+  }
+  .sync-dot{
+    width:7px;height:7px;border-radius:50%;background:#9E9E9E;
+    flex-shrink:0;transition:background .4s;
+  }
+  .sync-dot.online{background:#4CAF50}
+  .sync-dot.syncing{background:var(--accent);animation:blink 1s infinite}
+  .sync-dot.offline{background:#FF5722}
+  .sync-dot.pending{background:var(--accent)}
+  @keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+  .sync-txt{font-size:11.5px;color:var(--t2);flex:1}
+  .cnt-txt{font-size:12px;font-family:var(--fd);font-weight:600;color:var(--primary)}
+  .refresh-btn{
+    background:none;border:none;color:var(--t2);cursor:pointer;
+    padding:4px;display:flex;align-items:center;border-radius:50%;
+  }
+  .refresh-btn:active{color:var(--primary)}
+  .refresh-btn .material-icons-round{font-size:18px}
+  .refresh-btn.spin .material-icons-round{animation:spin .7s linear infinite}
 
   /* ═══════════════════════════════════════════
      CONSUMER CARD
   ═══════════════════════════════════════════ */
-  .c-card {
-    background: var(--card);
-    border: 1px solid var(--card-border);
-    border-radius: var(--r-card);
-    padding: 14px 16px;
-    margin-bottom: 10px;
-    box-shadow: var(--shadow);
-    position: relative;
-    overflow: hidden;
-    animation: fadeUp 0.3s var(--ease) both;
+  .c-card{
+    background:var(--card);border:1px solid var(--card-b);
+    border-radius:var(--r);padding:13px 14px;margin-bottom:9px;
+    box-shadow:var(--sh);position:relative;overflow:hidden;
+    animation:fadeUp .28s var(--ease) both;cursor:pointer;
+    transition:transform .1s,border-color .15s,background .15s;
+    user-select:none;-webkit-user-select:none;
   }
-  @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(10px); }
-    to   { opacity: 1; transform: translateY(0); }
-  }
-  .c-card:active { transform: scale(0.985); }
+  @keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+  .c-card:active{transform:scale(.985)}
+  .c-card.selected{border-color:var(--primary);background:rgba(0,82,180,.06)}
+  [data-theme=dark] .c-card.selected{background:rgba(25,118,210,.12)}
 
-  .c-row1 {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 4px;
+  /* Long-press visual feedback */
+  .c-card.pressing::after{
+    content:'';position:absolute;inset:0;background:rgba(0,82,180,.06);
+    border-radius:inherit;pointer-events:none;
   }
-  .c-conno {
-    font-size: 11.5px;
-    font-family: var(--ff-d);
-    font-weight: 600;
-    color: var(--text-2);
-  }
-  .c-badges { display: flex; gap: 6px; align-items: center; }
 
-  .area-badge {
-    background: rgba(0,82,180,0.12);
-    color: var(--primary);
-    font-size: 10px;
-    font-family: var(--ff-d);
-    font-weight: 600;
-    padding: 2px 8px;
-    border-radius: 8px;
+  .c-inner{display:flex;align-items:center;gap:11px}
+  .c-check{
+    width:22px;height:22px;border-radius:50%;border:2px solid var(--inp-b);
+    display:flex;align-items:center;justify-content:center;
+    flex-shrink:0;background:var(--inp);transition:all .15s;
   }
-  [data-theme="dark"] .area-badge { background: rgba(25,118,210,0.2); }
+  .c-card.selected .c-check{background:var(--primary);border-color:var(--primary)}
+  .c-check .material-icons-round{font-size:13px;color:#fff;display:none}
+  .c-card.selected .c-check .material-icons-round{display:block}
 
-  .status-badge {
-    font-size: 10px;
-    font-family: var(--ff-d);
-    font-weight: 600;
-    padding: 2px 8px;
-    border-radius: 8px;
+  .c-body{flex:1;min-width:0}
+  .c-row1{display:flex;align-items:center;gap:6px;margin-bottom:3px}
+  .c-conno{font-size:11px;font-family:var(--fd);font-weight:600;color:var(--t2);flex:1}
+  .area-badge{
+    background:rgba(0,82,180,.1);color:var(--primary);
+    font-size:10px;font-family:var(--fd);font-weight:600;padding:2px 7px;border-radius:7px;
   }
-  .status-badge.active    { background: rgba(46,125,50,0.12); color: #2E7D32; }
-  .status-badge.inactive  { background: rgba(120,120,120,0.12); color: #757575; }
-  .status-badge.defaulter { background: rgba(211,47,47,0.12); color: #D32F2F; }
-  [data-theme="dark"] .status-badge.active    { background: rgba(46,125,50,0.2); color: #66BB6A; }
-  [data-theme="dark"] .status-badge.defaulter { background: rgba(211,47,47,0.2); color: #EF5350; }
+  [data-theme=dark] .area-badge{background:rgba(25,118,210,.18)}
+  .status-badge{font-size:10px;font-family:var(--fd);font-weight:600;padding:2px 7px;border-radius:7px}
+  .status-badge.active{background:rgba(46,125,50,.1);color:#2E7D32}
+  .status-badge.inactive{background:rgba(120,120,120,.1);color:#757575}
+  .status-badge.defaulter{background:rgba(211,47,47,.1);color:var(--danger)}
+  [data-theme=dark] .status-badge.active{background:rgba(46,125,50,.18);color:#66BB6A}
+  [data-theme=dark] .status-badge.defaulter{background:rgba(211,47,47,.18);color:#EF5350}
 
-  .c-name {
-    font-family: var(--ff-d);
-    font-size: 14px;
-    font-weight: 600;
-    color: var(--text-1);
-    line-height: 1.3;
-    margin-bottom: 8px;
+  .c-name{
+    font-family:var(--fd);font-size:14px;font-weight:600;color:var(--t1);
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+    margin-bottom:4px;
   }
-  .c-meta {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 4px 14px;
-    margin-bottom: 12px;
-  }
-  .c-meta-item {
-    display: flex;
-    align-items: center;
-    gap: 3px;
-    font-size: 12px;
-    color: var(--text-2);
-  }
-  .c-meta-item .material-icons-round { font-size: 13px; }
+  .c-meta{display:flex;flex-wrap:wrap;gap:3px 12px}
+  .c-mi{display:flex;align-items:center;gap:3px;font-size:11.5px;color:var(--t2)}
+  .c-mi .material-icons-round{font-size:12px}
 
-  .c-actions {
-    display: flex;
-    gap: 8px;
-    justify-content: flex-end;
-  }
-  .btn-c {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    padding: 6px 14px;
-    border-radius: var(--r-btn);
-    font-size: 12px;
-    font-family: var(--ff-d);
-    font-weight: 500;
-    cursor: pointer;
-    border: none;
-    transition: opacity 0.15s, transform 0.1s;
-    position: relative;
-    overflow: hidden;
-  }
-  .btn-c:active { opacity: 0.7; transform: scale(0.96); }
-  .btn-c .material-icons-round { font-size: 14px; }
-  .btn-edit { background: rgba(0,82,180,0.1); color: var(--primary); }
-  [data-theme="dark"] .btn-edit { background: rgba(25,118,210,0.15); }
-  .btn-del { background: rgba(211,47,47,0.1); color: var(--danger); }
-  [data-theme="dark"] .btn-del { background: rgba(211,47,47,0.15); }
+  .c-arrow{color:var(--inp-b);font-size:20px;flex-shrink:0;line-height:1}
 
   /* Ripple */
-  .ripple {
-    position: absolute;
-    border-radius: 50%;
-    background: rgba(255,255,255,0.3);
-    transform: scale(0);
-    animation: ripple-anim 0.5s ease-out forwards;
-    pointer-events: none;
+  .ripple{
+    position:absolute;border-radius:50%;background:rgba(0,82,180,.1);
+    transform:scale(0);animation:rip .55s ease-out forwards;pointer-events:none;
   }
-  [data-theme="light"] .c-card .ripple { background: rgba(0,82,180,0.1); }
-  @keyframes ripple-anim { to { transform: scale(4); opacity: 0; } }
+  [data-theme=dark] .ripple{background:rgba(255,255,255,.06)}
+  @keyframes rip{to{transform:scale(4);opacity:0}}
 
   /* ═══════════════════════════════════════════
-     SKELETON LOADER
+     SKELETON
   ═══════════════════════════════════════════ */
-  .skeleton {
-    background: var(--card);
-    border: 1px solid var(--card-border);
-    border-radius: var(--r-card);
-    padding: 16px;
-    margin-bottom: 10px;
+  .skeleton{
+    background:var(--card);border:1px solid var(--card-b);
+    border-radius:var(--r);padding:14px;margin-bottom:9px;
   }
-  .sk {
-    border-radius: 6px;
-    background: linear-gradient(
-      90deg,
-      var(--inp-bg) 25%,
-      var(--card-border) 50%,
-      var(--inp-bg) 75%
-    );
-    background-size: 200% 100%;
-    animation: shimmer 1.4s infinite;
+  .sk{
+    border-radius:6px;
+    background:linear-gradient(90deg,var(--inp) 25%,var(--card-b) 50%,var(--inp) 75%);
+    background-size:200% 100%;animation:shim 1.4s infinite;
   }
-  @keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
-  .sk-row { display: flex; justify-content: space-between; margin-bottom: 10px; }
-  .sk-h { height: 12px; border-radius: 6px; }
-  .sk-m { height: 15px; margin-bottom: 8px; }
-  .sk-s { height: 11px; }
+  @keyframes shim{0%{background-position:200% 0}100%{background-position:-200% 0}}
+  .sk-row{display:flex;justify-content:space-between;margin-bottom:9px}
 
   /* ═══════════════════════════════════════════
-     EMPTY + ERROR STATES
+     EMPTY + ERROR
   ═══════════════════════════════════════════ */
-  .empty-state {
-    text-align: center;
-    padding: 60px 24px;
-    animation: fadeUp 0.4s var(--ease);
-  }
-  .empty-state .material-icons-round { font-size: 56px; color: var(--text-2); opacity: 0.35; }
-  .empty-title {
-    font-family: var(--ff-d);
-    font-size: 15px;
-    font-weight: 600;
-    color: var(--text-1);
-    margin: 14px 0 6px;
-  }
-  .empty-sub { font-size: 13px; color: var(--text-2); line-height: 1.5; }
+  .empty-state{text-align:center;padding:56px 24px;animation:fadeUp .4s var(--ease)}
+  .empty-state .material-icons-round{font-size:52px;color:var(--t2);opacity:.3}
+  .empty-title{font-family:var(--fd);font-size:15px;font-weight:600;color:var(--t1);margin:12px 0 5px}
+  .empty-sub{font-size:13px;color:var(--t2);line-height:1.5}
 
-  .err-bar {
-    background: rgba(211,47,47,0.08);
-    border: 1px solid rgba(211,47,47,0.2);
-    border-radius: 14px;
-    padding: 12px 14px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 12px;
-    font-size: 13px;
-    color: var(--danger);
+  .err-bar{
+    background:rgba(211,47,47,.07);border:1px solid rgba(211,47,47,.18);
+    border-radius:14px;padding:12px 14px;display:flex;align-items:center;
+    gap:10px;font-size:13px;color:var(--danger);margin-bottom:10px;
   }
-  .err-bar .material-icons-round { font-size: 18px; flex-shrink: 0; }
+  .err-bar .material-icons-round{font-size:17px;flex-shrink:0}
+
+  /* ═══════════════════════════════════════════
+     SELECT DELETE BAR
+  ═══════════════════════════════════════════ */
+  .del-bar{
+    position:fixed;bottom:var(--bnav-h);left:0;right:0;
+    background:var(--danger);padding:13px 16px;
+    display:flex;align-items:center;justify-content:center;
+    gap:10px;z-index:95;
+    animation:slideUp .25s var(--ease);
+  }
+  @keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+  .del-bar-btn{
+    background:none;border:none;color:#fff;font-family:var(--fd);
+    font-size:15px;font-weight:600;cursor:pointer;
+    display:flex;align-items:center;gap:8px;
+  }
+  .del-bar-btn .material-icons-round{font-size:20px}
 
   /* ═══════════════════════════════════════════
      FAB
   ═══════════════════════════════════════════ */
-  .fab {
-    position: fixed;
-    bottom: calc(var(--bnav-h) + 14px);
-    right: 18px;
-    width: 54px; height: 54px;
-    border-radius: 50%;
-    background: var(--primary);
-    color: #fff;
-    border: none;
-    box-shadow: 0 4px 20px rgba(0,82,180,0.45);
-    display: flex; align-items: center; justify-content: center;
-    cursor: pointer;
-    z-index: 90;
-    transition: transform 0.15s var(--ease), box-shadow 0.15s;
-    overflow: hidden;
+  .fab{
+    position:fixed;bottom:calc(var(--bnav-h) + 14px);right:18px;
+    width:54px;height:54px;border-radius:50%;background:var(--primary);
+    color:#fff;border:none;box-shadow:0 4px 20px rgba(0,82,180,.45);
+    display:flex;align-items:center;justify-content:center;cursor:pointer;
+    z-index:90;transition:transform .15s var(--ease),box-shadow .15s;overflow:hidden;
   }
-  .fab:active { transform: scale(0.88); box-shadow: 0 2px 8px rgba(0,82,180,0.3); }
-  .fab .material-icons-round { font-size: 26px; }
+  .fab:active{transform:scale(.88);box-shadow:0 2px 8px rgba(0,82,180,.3)}
+  .fab .material-icons-round{font-size:26px}
 
   /* ═══════════════════════════════════════════
-     BOTTOM NAVIGATION
+     BOTTOM NAV
   ═══════════════════════════════════════════ */
-  .bottom-nav {
-    position: fixed;
-    bottom: 0; left: 0; right: 0;
-    height: var(--bnav-h);
-    background: var(--card);
-    border-top: 1px solid var(--card-border);
-    display: flex;
-    z-index: 100;
+  .bottom-nav{
+    position:fixed;bottom:0;left:0;right:0;height:var(--bnav-h);
+    background:var(--card);border-top:1px solid var(--card-b);
+    display:flex;z-index:100;
   }
-  .bnav-btn {
-    flex: 1;
-    background: none;
-    border: none;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 2px;
-    color: var(--text-2);
-    font-size: 10px;
-    font-family: var(--ff-d);
-    font-weight: 500;
-    cursor: pointer;
-    padding: 6px 0 10px;
-    transition: color 0.15s;
-    position: relative;
+  .bnav{
+    flex:1;background:none;border:none;display:flex;flex-direction:column;
+    align-items:center;justify-content:center;gap:2px;color:var(--t2);
+    font-size:10px;font-family:var(--fd);font-weight:500;cursor:pointer;
+    padding:6px 0 10px;transition:color .15s;position:relative;
   }
-  .bnav-btn.active { color: var(--primary); }
-  .bnav-btn .material-icons-round { font-size: 22px; }
-  /* Active indicator pill */
-  .bnav-btn.active::before {
-    content: '';
-    position: absolute;
-    top: 8px;
-    width: 32px; height: 3px;
-    background: var(--primary);
-    border-radius: 2px;
+  .bnav.active{color:var(--primary)}
+  .bnav.active::before{
+    content:'';position:absolute;top:8px;
+    width:28px;height:3px;background:var(--primary);border-radius:2px;
   }
+  .bnav .material-icons-round{font-size:22px}
 
-  /* Infinite scroll sentinel */
-  #sentinel { height: 20px; }
-
-  /* ═══════════════════════════════════════════
-     BULK SELECT MODE
-  ═══════════════════════════════════════════ */
-  .select-bar {
-    position: fixed;
-    top: 0; left: 0; right: 0;
-    height: var(--nav-h);
-    background: #1A2E50;
-    display: flex;
-    align-items: center;
-    padding: 0 12px;
-    gap: 12px;
-    z-index: 110;
-    animation: fadeUp 0.2s var(--ease);
-  }
-  .sel-cancel {
-    background: rgba(255,255,255,0.15);
-    border: none; border-radius: 50%;
-    width: 36px; height: 36px;
-    display: flex; align-items: center; justify-content: center;
-    color: #fff; cursor: pointer; flex-shrink: 0;
-  }
-  .sel-cancel .material-icons-round { font-size: 20px; }
-  .sel-count {
-    flex: 1;
-    font-family: var(--ff-d);
-    font-size: 15px;
-    font-weight: 600;
-    color: #fff;
-  }
-  .sel-all {
-    background: rgba(255,255,255,0.15);
-    border: none; border-radius: 20px;
-    padding: 6px 14px;
-    font-family: var(--ff-d);
-    font-size: 12px;
-    font-weight: 500;
-    color: #fff;
-    cursor: pointer;
-  }
-
-  /* Delete action bar (above bottom nav in select mode) */
-  .del-action-bar {
-    position: fixed;
-    bottom: var(--bnav-h);
-    left: 0; right: 0;
-    background: var(--danger);
-    padding: 12px 16px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    z-index: 95;
-    animation: slideUp 0.25s var(--ease);
-  }
-  @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
-  .del-action-btn {
-    background: none;
-    border: none;
-    color: #fff;
-    font-family: var(--ff-d);
-    font-size: 15px;
-    font-weight: 600;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-  .del-action-btn .material-icons-round { font-size: 20px; }
-
-  /* Card in select mode */
-  .c-card.selectable { cursor: pointer; }
-  .c-card.selected {
-    border-color: var(--primary);
-    background: rgba(0,82,180,0.08);
-  }
-  [data-theme="dark"] .c-card.selected { background: rgba(25,118,210,0.15); }
-
-  .c-checkbox {
-    width: 22px; height: 22px;
-    border-radius: 50%;
-    border: 2px solid var(--inp-border);
-    display: flex; align-items: center; justify-content: center;
-    flex-shrink: 0;
-    transition: all 0.15s;
-    background: var(--inp-bg);
-  }
-  .c-card.selected .c-checkbox {
-    background: var(--primary);
-    border-color: var(--primary);
-  }
-  .c-checkbox .material-icons-round { font-size: 14px; color: #fff; display: none; }
-  .c-card.selected .c-checkbox .material-icons-round { display: block; }
+  /* Sentinel */
+  #sentinel{height:20px}
 
   /* ═══════════════════════════════════════════
      TOAST
   ═══════════════════════════════════════════ */
-  #toast {
-    position: fixed;
-    bottom: calc(var(--bnav-h) + 14px);
-    left: 50%;
-    transform: translateX(-50%) translateY(10px);
-    background: #1A2A4A;
-    color: #fff;
-    padding: 9px 20px;
-    border-radius: 20px;
-    font-size: 13px;
-    font-family: var(--ff-b);
-    z-index: 999;
-    white-space: nowrap;
-    box-shadow: 0 4px 16px rgba(0,0,0,0.3);
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.25s, transform 0.25s var(--ease);
+  #toast{
+    position:fixed;bottom:calc(var(--bnav-h) + 14px);left:50%;
+    transform:translateX(-50%) translateY(10px);
+    background:#1A2A4A;color:#fff;padding:9px 20px;border-radius:20px;
+    font-size:13px;font-family:var(--fb);z-index:999;white-space:nowrap;
+    box-shadow:0 4px 16px rgba(0,0,0,.3);opacity:0;pointer-events:none;
+    transition:opacity .25s,transform .25s var(--ease);
   }
-  #toast.show {
-    opacity: 1;
-    transform: translateX(-50%) translateY(0);
-  }
-  #toast.err { background: var(--danger); }
-  #toast.ok  { background: var(--success); }
+  #toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+  #toast.err{background:var(--danger)}
+  #toast.ok{background:var(--success)}
+
   </style>
 </head>
 <body>
 
-  <!-- ── SPLASH ─────────────────────────────── -->
-  <div id="splash" class="splash">
-    <div class="splash-bolt">⚡</div>
-    <div class="splash-name">A&amp;N Electricity</div>
-    <div class="splash-sub">Consumer Manager</div>
+<!-- SPLASH -->
+<div id="splash" class="splash">
+  <div class="splash-bolt">⚡</div>
+  <div class="splash-name">A&amp;N Electricity</div>
+  <div class="splash-sub">Consumer Manager</div>
+</div>
+
+<!-- NAVBAR -->
+<nav class="navbar" id="navbar">
+  <div class="nav-left">
+    <span class="nav-bolt">⚡</span>
+    <div>
+      <span class="nav-app">A&amp;N Electricity</span>
+      <span class="nav-office" id="navOffice">Loading…</span>
+    </div>
   </div>
-
-  <!-- ── NAVBAR ────────────────────────────── -->
-  <nav class="navbar">
-    <div class="nav-left">
-      <span class="nav-bolt">⚡</span>
-      <div>
-        <span class="nav-app">A&amp;N Electricity</span>
-        <span class="nav-office" id="navOffice">Loading…</span>
-      </div>
-    </div>
-    <div class="nav-right">
-      <button class="nav-btn hidden" id="selectBtn" onclick="enterSelectMode()" aria-label="Select consumers">
-        <span class="material-icons-round">checklist</span>
-      </button>
-      <button class="nav-btn" id="themeToggle" aria-label="Toggle theme">
-        <span class="material-icons-round" id="themeIcon">dark_mode</span>
-      </button>
-      <button class="nav-btn" id="userMenuBtn" aria-label="User menu">
-        <span class="material-icons-round">account_circle</span>
-      </button>
-    </div>
-  </nav>
-
-  <!-- ── USER MENU ──────────────────────────── -->
-  <div class="user-menu" id="userMenu">
-    <div class="u-avatar"><span class="material-icons-round">person</span></div>
-    <div class="u-name" id="uName">—</div>
-    <div class="u-role" id="uRole">—</div>
-    <div class="menu-divider"></div>
-    <button class="menu-item" onclick="openChangePass()">
-      <span class="material-icons-round">lock_reset</span>Change Password
+  <div class="nav-right">
+    <button class="nav-btn hidden" id="selectBtn" onclick="enterSelectMode()" aria-label="Select">
+      <span class="material-icons-round">checklist</span>
     </button>
-    <button class="menu-item" onclick="openAbout()">
-      <span class="material-icons-round">info_outline</span>About
+    <button class="nav-btn" id="themeToggle" aria-label="Theme">
+      <span class="material-icons-round" id="themeIcon">dark_mode</span>
     </button>
-    <div class="menu-divider"></div>
-    <button class="menu-item danger" onclick="handleLogout()">
-      <span class="material-icons-round">logout</span>Sign Out
+    <button class="nav-btn" id="userMenuBtn" aria-label="Profile">
+      <span class="material-icons-round">account_circle</span>
     </button>
   </div>
-  <div class="menu-overlay hidden" id="menuOverlay" onclick="closeUserMenu()"></div>
+</nav>
 
-  <!-- ── CHANGE PASSWORD SHEET ─────────────── -->
-  <div class="bottom-sheet" id="cpSheet">
-    <div class="sheet-handle"></div>
-    <div class="sheet-title">Change Password</div>
-    <div class="s-alert err" id="cpErr"><span class="material-icons-round">error_outline</span><span id="cpErrMsg"></span></div>
-    <div class="s-alert ok"  id="cpOk"><span class="material-icons-round">check_circle_outline</span>Password updated!</div>
-    <div class="s-field">
-      <label class="s-label">Current Password</label>
-      <div class="s-inp-wrap">
-        <span class="material-icons-round">lock_outline</span>
-        <input class="inp" type="password" id="cpCurrent" placeholder="Your current password" autocomplete="current-password">
-        <button class="eye-btn" onclick="toggleEye('cpCurrent','cpEye1')"><span class="material-icons-round" id="cpEye1">visibility_off</span></button>
-      </div>
+<!-- SELECT MODE BAR -->
+<div class="sel-bar hidden" id="selBar">
+  <button class="sel-cancel" onclick="exitSelectMode()">
+    <span class="material-icons-round">close</span>
+  </button>
+  <span class="sel-cnt" id="selCnt">Tap to select</span>
+  <button class="sel-all-btn" id="selAllBtn" onclick="toggleSelectAll()">Select All</button>
+</div>
+
+<!-- USER MENU -->
+<div class="user-menu" id="userMenu">
+  <div class="um-avatar"><span class="material-icons-round">person</span></div>
+  <div class="um-name" id="uName">—</div>
+  <div class="um-role" id="uRole">—</div>
+  <div class="menu-div"></div>
+  <button class="mi" onclick="openChangePass()">
+    <span class="material-icons-round">lock_reset</span>Change Password
+  </button>
+  <button class="mi" onclick="openAbout()">
+    <span class="material-icons-round">info_outline</span>About
+  </button>
+  <div class="menu-div"></div>
+  <button class="mi danger" onclick="handleLogout()">
+    <span class="material-icons-round">logout</span>Sign Out
+  </button>
+</div>
+<div class="menu-ov hidden" id="menuOv" onclick="closeUserMenu()"></div>
+
+<!-- CHANGE PASSWORD SHEET -->
+<div class="bottom-sheet" id="cpSheet">
+  <div class="sheet-handle"></div>
+  <div class="sheet-title">Change Password</div>
+  <div class="s-alert err" id="cpErr"><span class="material-icons-round">error_outline</span><span id="cpErrMsg"></span></div>
+  <div class="s-alert ok"  id="cpOk"><span class="material-icons-round">check_circle_outline</span>Password changed!</div>
+  <div class="sf">
+    <label class="sl">Current Password</label>
+    <div class="siw">
+      <span class="material-icons-round">lock_outline</span>
+      <input class="sinp" type="password" id="cpCur" placeholder="Current password" autocomplete="current-password">
+      <button class="eye" onclick="toggleEye('cpCur','cpE1')"><span class="material-icons-round" id="cpE1">visibility_off</span></button>
     </div>
-    <div class="s-field">
-      <label class="s-label">New Password</label>
-      <div class="s-inp-wrap">
-        <span class="material-icons-round">lock_outline</span>
-        <input class="inp" type="password" id="cpNew" placeholder="Min 8 characters" autocomplete="new-password" oninput="checkStrength(this.value)">
-        <button class="eye-btn" onclick="toggleEye('cpNew','cpEye2')"><span class="material-icons-round" id="cpEye2">visibility_off</span></button>
-      </div>
-      <div class="strength-wrap">
-        <div class="strength-bar"><div class="strength-fill" id="strengthFill"></div></div>
-        <div class="strength-text" id="strengthText"></div>
-      </div>
+  </div>
+  <div class="sf">
+    <label class="sl">New Password</label>
+    <div class="siw">
+      <span class="material-icons-round">lock_outline</span>
+      <input class="sinp" type="password" id="cpNew" placeholder="Min 8 characters" autocomplete="new-password" oninput="chkStrength(this.value)">
+      <button class="eye" onclick="toggleEye('cpNew','cpE2')"><span class="material-icons-round" id="cpE2">visibility_off</span></button>
     </div>
-    <div class="s-field">
-      <label class="s-label">Confirm New Password</label>
-      <div class="s-inp-wrap">
-        <span class="material-icons-round">lock_outline</span>
-        <input class="inp" type="password" id="cpConfirm" placeholder="Repeat new password" autocomplete="new-password">
-        <button class="eye-btn" onclick="toggleEye('cpConfirm','cpEye3')"><span class="material-icons-round" id="cpEye3">visibility_off</span></button>
-      </div>
+    <div class="strength-bar"><div class="strength-fill" id="sfi"></div></div>
+    <div class="strength-txt" id="stxt"></div>
+  </div>
+  <div class="sf">
+    <label class="sl">Confirm New Password</label>
+    <div class="siw">
+      <span class="material-icons-round">lock_outline</span>
+      <input class="sinp" type="password" id="cpCfm" placeholder="Repeat new password" autocomplete="new-password">
+      <button class="eye" onclick="toggleEye('cpCfm','cpE3')"><span class="material-icons-round" id="cpE3">visibility_off</span></button>
     </div>
-    <button class="btn-sheet" id="cpBtn" onclick="submitChangePass()">
-      <span class="btn-lbl">Update Password</span>
-      <div class="spin"></div>
+  </div>
+  <button class="btn-sh" id="cpBtn" onclick="submitCP()">
+    <span class="bl">Update Password</span><div class="spin"></div>
+  </button>
+</div>
+
+<!-- ABOUT SHEET -->
+<div class="bottom-sheet" id="aboutSheet">
+  <div class="sheet-handle"></div>
+  <div class="ab-logo">⚡</div>
+  <div class="ab-name">A&amp;N Electricity</div>
+  <div class="ab-ver">Consumer Manager v1.0.0</div>
+  <div class="ab-row">
+    <span class="material-icons-round">business</span>
+    <div><div class="ab-key">Department</div><div class="ab-val">A&amp;N Islands Electricity Department</div></div>
+  </div>
+  <div class="ab-row">
+    <span class="material-icons-round">location_on</span>
+    <div><div class="ab-key">Office</div><div class="ab-val" id="aboutOffice">—</div></div>
+  </div>
+  <div class="ab-row">
+    <span class="material-icons-round">storage</span>
+    <div><div class="ab-key">Data</div><div class="ab-val">Google Sheets · Private &amp; Secure</div></div>
+  </div>
+  <div class="ab-row">
+    <span class="material-icons-round">offline_bolt</span>
+    <div><div class="ab-key">Platform</div><div class="ab-val">PWA · Works Offline · GitHub Pages</div></div>
+  </div>
+</div>
+
+<!-- CONSUMER DETAIL SHEET -->
+<div class="bottom-sheet" id="detailSheet">
+  <div class="sheet-handle"></div>
+  <div class="det-name" id="detName">—</div>
+  <div class="det-conno" id="detConno">—</div>
+  <div id="detFields"></div>
+  <div class="det-actions" id="detActions"></div>
+</div>
+
+<!-- DELETE CONFIRM SHEET -->
+<div class="bottom-sheet" id="delSheet">
+  <div class="sheet-handle"></div>
+  <div class="del-ico"><span class="material-icons-round">delete_forever</span></div>
+  <div class="del-ttl">Delete Consumer?</div>
+  <div class="del-sub">This cannot be undone.<span class="del-who" id="delWho"></span></div>
+  <button class="btn-del-confirm" onclick="doDelete()">Yes, Delete</button>
+  <button class="btn-cancel" onclick="closeSheet()">Cancel</button>
+</div>
+
+<!-- BACKDROP -->
+<div class="backdrop" id="backdrop" onclick="closeSheet()"></div>
+
+<!-- SEARCH SECTION -->
+<div class="search-sec" id="searchSec">
+  <div class="search-wrap">
+    <span class="material-icons-round s-ico">search</span>
+    <input class="search-inp" type="search" id="searchInp"
+           placeholder="Name, ConNo, meter, phone…"
+           autocomplete="off" autocorrect="off" autocapitalize="none">
+    <button class="s-clr hidden" id="sClear" onclick="clearSearch()">
+      <span class="material-icons-round">close</span>
     </button>
   </div>
-
-  <!-- ── ABOUT SHEET ────────────────────────── -->
-  <div class="bottom-sheet" id="aboutSheet">
-    <div class="sheet-handle"></div>
-    <div class="about-logo">⚡</div>
-    <div class="about-app">A&amp;N Electricity</div>
-    <div class="about-ver">Consumer Manager v1.0.0</div>
-    <div class="about-row">
-      <span class="material-icons-round">business</span>
-      <div><div class="about-key">Department</div><div class="about-val">A&amp;N Islands Electricity Department</div></div>
-    </div>
-    <div class="about-row">
-      <span class="material-icons-round">location_on</span>
-      <div><div class="about-key">Office</div><div class="about-val" id="aboutOffice">—</div></div>
-    </div>
-    <div class="about-row">
-      <span class="material-icons-round">storage</span>
-      <div><div class="about-key">Data</div><div class="about-val">Stored in Google Sheets · Private &amp; Secure</div></div>
-    </div>
-    <div class="about-row">
-      <span class="material-icons-round">code</span>
-      <div><div class="about-key">Platform</div><div class="about-val">Web App · GitHub Pages · Works Offline</div></div>
-    </div>
-  </div>
-
-  <!-- ── DELETE CONFIRM SHEET ──────────────── -->
-  <div class="bottom-sheet" id="delSheet">
-    <div class="sheet-handle"></div>
-    <div class="del-icon"><span class="material-icons-round">delete_forever</span></div>
-    <div class="del-title">Delete Consumer?</div>
-    <div class="del-sub">This cannot be undone.<span class="del-name" id="delName"></span></div>
-    <button class="btn-del-confirm" onclick="doDelete()">Yes, Delete</button>
-    <button class="btn-cancel" onclick="closeSheet()">Cancel</button>
-  </div>
-
-  <!-- ── SHEET BACKDROP ────────────────────── -->
-  <div class="backdrop" id="backdrop" onclick="closeSheet()"></div>
-
-  <!-- ── SEARCH SECTION ─────────────────────── -->
-  <div class="search-section">
-    <div class="search-wrap">
-      <span class="material-icons-round s-ico">search</span>
-      <input class="search-inp" type="search" id="searchInp"
-             placeholder="Name, ConNo, meter, phone…"
-             autocomplete="off" autocorrect="off" autocapitalize="none">
-      <button class="s-clear hidden" id="sClear" onclick="clearSearch()">
-        <span class="material-icons-round">close</span>
-      </button>
-    </div>
-    <div class="chips-outer">
+  <div class="chips-wrap">
     <div class="chips" id="chips">
       <button class="chip active" onclick="setArea(this,'ALL')">All</button>
       <button class="chip" onclick="setArea(this,'AHS')">AHS</button>
@@ -1158,821 +686,799 @@
       <button class="chip" onclick="setArea(this,'RJM')">RJM</button>
       <button class="chip" onclick="setArea(this,'PAO1')">PAO1</button>
     </div>
-    </div>
   </div>
+</div>
 
-  <!-- ── SYNC BAR ───────────────────────────── -->
-  <div class="sync-bar">
+<!-- MAIN -->
+<main class="main" id="main">
+  <!-- Sync + count bar (scrolls with content) -->
+  <div class="sync-row">
     <span class="sync-dot syncing" id="syncDot"></span>
-    <span class="sync-text" id="syncText">Loading…</span>
-    <span class="cnt-text"  id="cntText"></span>
-    <button class="refresh-btn" id="refreshBtn" onclick="refreshData()" aria-label="Refresh">
+    <span class="sync-txt" id="syncTxt">Loading…</span>
+    <span class="cnt-txt"  id="cntTxt"></span>
+    <button class="refresh-btn" id="refreshBtn" onclick="refreshData()">
       <span class="material-icons-round">refresh</span>
     </button>
   </div>
 
-  <!-- ── MAIN LIST ──────────────────────────── -->
-  <main class="main">
-    <div id="consumerList"></div>
-    <div id="sentinel"></div>
-    <div class="empty-state hidden" id="emptyState">
-      <span class="material-icons-round" id="emptyIcon">search_off</span>
-      <div class="empty-title" id="emptyTitle">No consumers found</div>
-      <div class="empty-sub"  id="emptySub">Try a different name or area</div>
-    </div>
-  </main>
-
-  <!-- ── BULK SELECT BAR (replaces navbar in select mode) ── -->
-  <div class="select-bar hidden" id="selectBar">
-    <button class="sel-cancel" onclick="exitSelectMode()">
-      <span class="material-icons-round">close</span>
-    </button>
-    <span class="sel-count" id="selCount">0 selected</span>
-    <button class="sel-all" onclick="toggleSelectAll()">Select All</button>
+  <div id="consumerList"></div>
+  <div id="sentinel"></div>
+  <div class="empty-state hidden" id="emptyState">
+    <span class="material-icons-round" id="emptyIco">people_outline</span>
+    <div class="empty-title" id="emptyTtl">No consumers yet</div>
+    <div class="empty-sub"  id="emptySub">Tap + to add the first consumer</div>
   </div>
+</main>
 
-  <!-- ── DELETE ACTION BAR ──────────────────────── -->
-  <div class="del-action-bar hidden" id="delActionBar">
-    <button class="del-action-btn" onclick="deleteSelected()">
-      <span class="material-icons-round">delete</span>
-      Delete Selected (<span id="delSelCount">0</span>)
-    </button>
-  </div>
-
-  <!-- ── FAB ───────────────────────────────────── -->
-  <button class="fab" id="fabBtn" onclick="openAddForm()" aria-label="Add consumer">
-    <span class="material-icons-round">add</span>
+<!-- DELETE ACTION BAR (select mode) -->
+<div class="del-bar hidden" id="delBar">
+  <button class="del-bar-btn" onclick="bulkDeleteConfirm()">
+    <span class="material-icons-round">delete</span>
+    Delete Selected (<span id="delBarCnt">0</span>)
   </button>
+</div>
 
-  <!-- ── BOTTOM NAV ─────────────────────────── -->
-  <nav class="bottom-nav">
-    <button class="bnav-btn active" id="bnav-consumers" onclick="switchTab('consumers')">
-      <span class="material-icons-round">people</span>
-      <span>Consumers</span>
-    </button>
-    <button class="bnav-btn" id="bnav-activity" onclick="switchTab('activity')">
-      <span class="material-icons-round">history</span>
-      <span>Activity</span>
-    </button>
-    <button class="bnav-btn hidden" id="bnav-admin" onclick="switchTab('admin')">
-      <span class="material-icons-round">manage_accounts</span>
-      <span>Admin</span>
-    </button>
-  </nav>
+<!-- FAB -->
+<button class="fab" id="fabBtn" onclick="openAddForm()">
+  <span class="material-icons-round">add</span>
+</button>
 
-  <!-- ── TOAST ─────────────────────────────── -->
-  <div id="toast"></div>
+<!-- BOTTOM NAV -->
+<nav class="bottom-nav">
+  <button class="bnav active" id="bnav-consumers" onclick="switchTab('consumers')">
+    <span class="material-icons-round">people</span><span>Consumers</span>
+  </button>
+  <button class="bnav" id="bnav-activity" onclick="switchTab('activity')">
+    <span class="material-icons-round">history</span><span>Activity</span>
+  </button>
+  <button class="bnav hidden" id="bnav-admin" onclick="switchTab('admin')">
+    <span class="material-icons-round">manage_accounts</span><span>Admin</span>
+  </button>
+</nav>
 
-  <script src="./db.js"></script>
-  <script>
-  'use strict';
+<div id="toast"></div>
 
-  /* ── CONFIG ───────────────────────────────────────────────────────── */
-  const API_URL   = 'https://script.google.com/macros/s/AKfycbyeO7pIZrT1WKPHHuR8LKxhPKgf4uELmkSkIgUefNwT88JdCBiAoTAfgKTyCBKEMmBowQ/exec';
-  const PAGE_SIZE = 30;
+<script src="./db.js"></script>
+<script>
+'use strict';
 
-  /* ── STATE ────────────────────────────────────────────────────────── */
-  let session    = null;
-  let isAdmin    = false;
-  let masterList = [];
-  let filtered   = [];
-  let displayedN = 0;
-  let activeArea = 'ALL';
-  let searchQ    = '';
-  let searchT    = null;
-  let toastT     = null;
-  let delRowIdx  = 0;
-  let delConNo   = '';
-  let delName    = '';
-  let selectMode  = false;
-  let selectedSet = new Set(); // stores conNo of selected cards
-  let scrollObs  = null;
+/* ── CONFIG ──────────────────────────────────────────────── */
+const API_URL   = 'https://script.google.com/macros/s/AKfycbyeO7pIZrT1WKPHHuR8LKxhPKgf4uELmkSkIgUefNwT88JdCBiAoTAfgKTyCBKEMmBowQ/exec';
+const PAGE_SIZE = 30;
 
-  /* ── DOM ──────────────────────────────────────────────────────────── */
-  const $ = id => document.getElementById(id);
+/* ── STATE ───────────────────────────────────────────────── */
+let session     = null;
+let isAdmin     = false;
+let masterList  = [];
+let filtered    = [];
+let displayedN  = 0;
+let activeArea  = 'ALL';
+let searchQ     = '';
+let searchT     = null;
+let toastT      = null;
+let activeSheet = null;
 
-  /* ══════════════════════════════════════════════════════════════════
-     INIT
-  ══════════════════════════════════════════════════════════════════ */
-  async function init() {
-    session = AN_DB.getSession();
-    if (!session?.token) { location.replace('./login.html'); return; }
-    if (session.role === 'superadmin' || session.role === 'SuperAdmin') {
-      location.replace('./superadmin.html'); return;
-    }
+// Select mode
+let selectMode  = false;
+let selectedSet = new Set();
 
-    isAdmin = (session.role === 'admin' || session.role === 'Admin');
+// Delete targets
+let delRowIdx = 0, delConNo = '', delName = '';
 
-    // SW
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('./sw.js').catch(() => {});
-      navigator.serviceWorker.addEventListener('message', onSWMsg);
-    }
+// Long press
+let pressTimer = null;
+let pressPos   = null;
 
-    window.addEventListener('online',  onOnline);
-    window.addEventListener('offline', onOffline);
+/* ── DOM ─────────────────────────────────────────────────── */
+const $ = id => document.getElementById(id);
 
-    // Theme
-    applyTheme(localStorage.getItem('an_elect_theme') || 'dark');
-
-    // Navbar
-    $('navOffice').textContent = session.officeName || 'My Office';
-    $('uName').textContent     = session.fullName   || session.username;
-    $('uRole').textContent     = session.role;
-    $('aboutOffice').textContent = session.officeName || 'My Office';
-
-    // Admin tab + select button
-    if (isAdmin) {
-      $('bnav-admin').classList.remove('hidden');
-      $('selectBtn').classList.remove('hidden');
-    }
-
-    // Store API URL for SW sync
-    await AN_DB.setApiUrl(API_URL);
-
-    // Infinite scroll observer
-    scrollObs = new IntersectionObserver(entries => {
-      if (entries[0].isIntersecting && displayedN < filtered.length) appendCards();
-    }, { threshold: 0.1 });
-    scrollObs.observe($('sentinel'));
-
-    // Load data
-    await loadConsumers();
-
-    // Hide splash
-    hideSplash();
+/* ════════════════════════════════════════════════════════════
+   INIT
+════════════════════════════════════════════════════════════ */
+async function init() {
+  session = AN_DB.getSession();
+  if (!session?.token) { location.replace('./login.html'); return; }
+  if (session.role === 'superadmin' || session.role === 'SuperAdmin') {
+    location.replace('./superadmin.html'); return;
   }
 
-  /* ── Splash ────────────────────────────────────────────────────── */
-  function hideSplash() {
-    const s = $('splash');
-    s.classList.add('fade');
-    setTimeout(() => s.style.display = 'none', 380);
+  isAdmin = session.role === 'admin' || session.role === 'Admin';
+
+  // Service Worker
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('./sw.js').catch(() => {});
+    navigator.serviceWorker.addEventListener('message', onSWMsg);
   }
 
-  /* ══════════════════════════════════════════════════════════════════
-     LOAD CONSUMERS
-  ══════════════════════════════════════════════════════════════════ */
-  async function loadConsumers() {
-    setRefreshSpin(true);
-    renderSkeleton();
-    setSyncStatus('syncing', 'Loading…');
+  window.addEventListener('online',  onOnline);
+  window.addEventListener('offline', onOffline);
 
-    // A: Show cache instantly
-    const cached = await AN_DB.getAllConsumers();
-    if (cached.length) {
-      masterList = cached;
-      applyFilters();
-      setSyncStatus('syncing', 'Refreshing…');
-    }
+  // Theme
+  applyTheme(localStorage.getItem('an_elect_theme') || 'dark');
 
-    // B: Fetch fresh from Apps Script
-    if (!navigator.onLine) {
-      setRefreshSpin(false);
-      if (!cached.length) showError('No cached data. Connect to internet first.');
-      setSyncStatus('offline', 'Offline — showing cached data');
-      return;
-    }
+  // Fill UI
+  $('navOffice').textContent    = session.officeName || 'My Office';
+  $('uName').textContent        = session.fullName   || session.username;
+  $('uRole').textContent        = session.role;
+  $('aboutOffice').textContent  = session.officeName || 'My Office';
 
-    try {
-      const res = await fetch(API_URL, {
-        method:  'POST',
-        headers: { 'Content-Type': 'text/plain' },
-        body: JSON.stringify({
-          action:    'getConsumers',
-          token:     session.token,
-          officeId:  session.officeId,
-          sheetName: 'CONSUMER DATA ALL'
-        })
-      });
+  if (isAdmin) {
+    $('bnav-admin').classList.remove('hidden');
+    $('selectBtn').classList.remove('hidden');
+  }
 
-      const json = await res.json();
+  await AN_DB.setApiUrl(API_URL);
 
-      if (json.success && Array.isArray(json.data)) {
-        const list = json.data.map(normalize);
-        await AN_DB.setAllConsumers(list);
-        await AN_DB.setLastSync(Date.now());
-        masterList = list;
-        applyFilters();
-        setSyncStatus('online', `Synced ${timeAgo(Date.now())}`);
-      } else if (json.code === 'UNAUTHORIZED' || json.error === 'SESSION_EXPIRED') {
-        await AN_DB.clearSession();
-        alert('Session expired. Please log in again.');
-        location.replace('./login.html');
-      } else {
-        setSyncStatus('online', 'Loaded from cache');
-        console.warn('[App]', json.message || json.error);
-      }
+  // Adjust layout dynamically
+  adjustLayout();
+  window.addEventListener('resize', adjustLayout);
+  document.fonts.ready.then(adjustLayout);
 
-    } catch (err) {
-      console.error('[App] Fetch error:', err);
-      if (!cached.length) showError('Could not connect. Check your internet.');
-      setSyncStatus('offline', 'Offline — showing cached data');
-    }
+  // Infinite scroll
+  new IntersectionObserver(entries => {
+    if (entries[0].isIntersecting && displayedN < filtered.length) appendCards();
+  }, { threshold: 0.1 }).observe($('sentinel'));
 
+  await loadConsumers();
+  hideSplash();
+}
+
+function adjustLayout() {
+  const navH    = $('navbar').offsetHeight;
+  const searchH = $('searchSec').offsetHeight;
+  $('main').style.paddingTop = (navH + searchH + 4) + 'px';
+}
+
+function hideSplash() {
+  const s = $('splash');
+  s.classList.add('out');
+  setTimeout(() => s.style.display = 'none', 400);
+}
+
+/* ════════════════════════════════════════════════════════════
+   LOAD CONSUMERS
+════════════════════════════════════════════════════════════ */
+async function loadConsumers() {
+  setRefreshSpin(true);
+  renderSkeleton();
+  setSync('syncing', 'Loading…');
+
+  const cached = await AN_DB.getAllConsumers();
+  if (cached.length) {
+    masterList = cached;
+    applyFilters();
+    setSync('syncing', 'Refreshing…');
+  }
+
+  if (!navigator.onLine) {
     setRefreshSpin(false);
+    if (!cached.length) showErr('No cached data. Connect to internet first.');
+    setSync('offline', 'Offline — showing cached data');
+    return;
   }
 
-  function refreshData() { loadConsumers(); }
+  try {
+    const res  = await fetch(API_URL, {
+      method: 'POST', headers: { 'Content-Type': 'text/plain' },
+      body: JSON.stringify({
+        action: 'getConsumers', token: session.token,
+        officeId: session.officeId, sheetName: 'CONSUMER DATA ALL'
+      })
+    });
+    const json = await res.json();
 
-  /* ── Normalize ────────────────────────────────────────────────── */
-  function normalize(c) {
-    // Robust key lookup — tries multiple variations of field name
-    function get(...keys) {
-      for (const k of keys) {
-        const v = c[k];
-        if (v !== undefined && v !== null && String(v).trim() !== '') return String(v).trim();
-      }
-      return '';
-    }
-    return {
-      _rowIndex:    c._rowIndex || 0,
-      sNo:          get('S.No.', 'sNo', 'SNo'),
-      conNo:        get('ConNo', 'conNo', 'CONNO'),
-      consumerName: get('ConsumerName', 'consumerName', 'Consumer Name', 'consumer_name'),
-      address:      get('Address', 'address', 'ADDRESS'),
-      labNo:        get('LabNo', 'labNo', 'Lab No'),
-      meterNo:      get('MeterNo', 'meterNo', 'Meter No', 'METERNO'),
-      transfCode:   get('TransfCode', 'transfCode', 'Transf Code', 'AreaCode', 'areaCode'),
-      phoneNo:      get('PhoneNo', 'phoneNo', 'Phone', 'phone'),
-      status:       get('Status', 'status') || 'Active',
-      lastEditedBy: get('LastEditedBy', 'lastEditedBy'),
-      lastEditedAt: get('LastEditedAt', 'lastEditedAt'),
-      createdAt:    get('CreatedAt', 'createdAt'),
-    };
-  }
-
-  /* ══════════════════════════════════════════════════════════════════
-     FILTER + RENDER
-  ══════════════════════════════════════════════════════════════════ */
-  function applyFilters() {
-    filtered = masterList;
-
-    if (activeArea !== 'ALL') {
-      filtered = filtered.filter(c => c.transfCode === activeArea);
-    }
-    if (searchQ.trim()) {
-      const q = searchQ.toLowerCase().trim();
-      filtered = filtered.filter(c =>
-        (c.consumerName || '').toLowerCase().includes(q) ||
-        (c.conNo        || '').toLowerCase().includes(q) ||
-        (c.meterNo      || '').toLowerCase().includes(q) ||
-        (c.phoneNo      || '').includes(q) ||
-        (c.address      || '').toLowerCase().includes(q)
-      );
-    }
-
-    $('cntText').textContent = filtered.length
-      ? `${filtered.length} consumer${filtered.length !== 1 ? 's' : ''}`
-      : '';
-
-    if (!filtered.length) {
-      $('consumerList').innerHTML = '';
-      $('emptyState').classList.remove('hidden');
-      if (searchQ || activeArea !== 'ALL') {
-        $('emptyIcon').textContent  = 'search_off';
-        $('emptyTitle').textContent = 'No results';
-        $('emptySub').textContent   = 'Try a different name, ConNo, or area filter';
-      } else {
-        $('emptyIcon').textContent  = 'people_outline';
-        $('emptyTitle').textContent = 'No consumers yet';
-        $('emptySub').textContent   = 'Tap + to add the first consumer';
-      }
-      return;
-    }
-
-    $('emptyState').classList.add('hidden');
-    displayedN = 0;
-    $('consumerList').innerHTML = '';
-    appendCards();
-  }
-
-  function appendCards() {
-    const frag = document.createDocumentFragment();
-    const end  = Math.min(displayedN + PAGE_SIZE, filtered.length);
-    for (let i = displayedN; i < end; i++) {
-      const card = makeCard(filtered[i]);
-      // Stagger animation
-      card.style.animationDelay = ((i - displayedN) * 0.04) + 's';
-      frag.appendChild(card);
-    }
-    $('consumerList').appendChild(frag);
-    displayedN = end;
-  }
-
-  function makeCard(c) {
-    const div = document.createElement('div');
-    div.className = 'c-card ripple-host' + (selectMode ? ' selectable' : '');
-    if (selectMode && selectedSet.has(c.conNo)) div.classList.add('selected');
-
-    const status      = (c.status || 'Active').toLowerCase();
-    const statusLabel = c.status || 'Active';
-    const phone  = c.phoneNo  ? `<div class="c-meta-item"><span class="material-icons-round">phone</span>${esc(c.phoneNo)}</div>` : '';
-    const meter  = c.meterNo  ? `<div class="c-meta-item"><span class="material-icons-round">electric_meter</span>${esc(c.meterNo)}</div>` : '';
-    const addr   = c.address  ? `<div class="c-meta-item"><span class="material-icons-round">location_on</span>${esc(c.address)}</div>` : '';
-    const area   = c.transfCode ? `<span class="area-badge">${esc(c.transfCode)}</span>` : '';
-    const delBtn = isAdmin && !selectMode
-      ? `<button class="btn-c btn-del" onclick="confirmDelete(${c._rowIndex},'${esc(c.conNo)}','${esc(c.consumerName)}')">
-           <span class="material-icons-round">delete</span>Delete
-         </button>` : '';
-    const checkbox = selectMode
-      ? `<div class="c-checkbox"><span class="material-icons-round">check</span></div>` : '';
-
-    div.innerHTML = `
-      <div class="c-row1" style="gap:8px">
-        ${checkbox}
-        <span class="c-conno" style="flex:1">${esc(c.conNo || '—')}</span>
-        <div class="c-badges">
-          ${area}
-          <span class="status-badge ${status}">${esc(statusLabel)}</span>
-        </div>
-      </div>
-      <div class="c-name">${esc(c.consumerName || '—')}</div>
-      <div class="c-meta">${meter}${phone}${addr}</div>
-      ${selectMode ? '' : `
-      <div class="c-actions">
-        <button class="btn-c btn-edit ripple-host" onclick="openEditForm('${esc(c.conNo)}')">
-          <span class="material-icons-round">edit</span>Edit
-        </button>
-        ${delBtn}
-      </div>`}
-    `;
-
-    if (selectMode) {
-      div.addEventListener('click', () => toggleCardSelect(c.conNo, div));
+    if (json.success && Array.isArray(json.data)) {
+      const list = json.data.map(normalize);
+      await AN_DB.setAllConsumers(list);
+      await AN_DB.setLastSync(Date.now());
+      masterList = list;
+      applyFilters();
+      setSync('online', `Synced ${timeAgo(Date.now())}`);
+    } else if (json.code === 'UNAUTHORIZED' || json.error === 'SESSION_EXPIRED') {
+      await AN_DB.clearSession();
+      alert('Session expired. Please log in again.');
+      location.replace('./login.html');
     } else {
-      div.addEventListener('pointerdown', e => addRipple(div, e));
+      setSync('online', 'Loaded from cache');
+      console.warn('[App]', json.message || json.error);
     }
-    return div;
+  } catch (err) {
+    if (!cached.length) showErr('Could not connect. Check your internet.');
+    setSync('offline', 'Offline — showing cached data');
   }
 
-  function renderSkeleton() {
-    $('emptyState').classList.add('hidden');
-    $('consumerList').innerHTML = Array(6).fill(`
-      <div class="skeleton">
-        <div class="sk-row">
-          <div class="sk sk-h" style="width:30%"></div>
-          <div class="sk sk-h" style="width:20%"></div>
-        </div>
-        <div class="sk sk-m" style="width:65%"></div>
-        <div class="sk sk-s" style="width:45%"></div>
-      </div>`).join('');
-  }
+  setRefreshSpin(false);
+}
 
-  /* ══════════════════════════════════════════════════════════════════
-     SEARCH
-  ══════════════════════════════════════════════════════════════════ */
-  $('searchInp').addEventListener('input', e => {
-    searchQ = e.target.value;
-    $('sClear').classList.toggle('hidden', !searchQ);
-    clearTimeout(searchT);
-    searchT = setTimeout(applyFilters, 280);
-  });
+function refreshData() { loadConsumers(); }
 
-  function clearSearch() {
-    $('searchInp').value = '';
-    searchQ = '';
-    $('sClear').classList.add('hidden');
-    applyFilters();
-  }
-
-  /* ── Area filter ─────────────────────────────────────────────── */
-  function setArea(el, code) {
-    activeArea = code;
-    document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
-    el.classList.add('active');
-    applyFilters();
-  }
-
-  /* ══════════════════════════════════════════════════════════════════
-     THEME
-  ══════════════════════════════════════════════════════════════════ */
-  function applyTheme(t) {
-    document.documentElement.setAttribute('data-theme', t);
-    $('themeIcon').textContent  = t === 'dark' ? 'dark_mode' : 'light_mode';
-    $('themeColorMeta').content = t === 'dark' ? '#0D1D36'  : '#0052B4';
-    localStorage.setItem('an_elect_theme', t);
-  }
-
-  $('themeToggle').addEventListener('click', () => {
-    applyTheme(
-      document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark'
-    );
-  });
-
-  /* ══════════════════════════════════════════════════════════════════
-     USER MENU
-  ══════════════════════════════════════════════════════════════════ */
-  $('userMenuBtn').addEventListener('click', () => {
-    const open = $('userMenu').classList.contains('show');
-    if (open) closeUserMenu();
-    else {
-      $('userMenu').classList.add('show');
-      $('menuOverlay').classList.remove('hidden');
-    }
-  });
-
-  function closeUserMenu() {
-    $('userMenu').classList.remove('show');
-    $('menuOverlay').classList.add('hidden');
-  }
-
-  /* ══════════════════════════════════════════════════════════════════
-     CHANGE PASSWORD
-  ══════════════════════════════════════════════════════════════════ */
-  function openChangePass() {
-    closeUserMenu();
-    $('cpCurrent').value = '';
-    $('cpNew').value     = '';
-    $('cpConfirm').value = '';
-    $('cpErr').classList.remove('show');
-    $('cpOk').classList.remove('show');
-    resetStrength();
-    openSheet('cpSheet');
-  }
-
-  function checkStrength(val) {
-    const fill = $('strengthFill');
-    const text = $('strengthText');
-    if (!val) { resetStrength(); return; }
-
-    let score = 0;
-    if (val.length >= 8)  score++;
-    if (/[A-Z]/.test(val)) score++;
-    if (/[0-9]/.test(val)) score++;
-    if (/[^A-Za-z0-9]/.test(val)) score++;
-
-    const levels = [
-      { w: '25%',  bg: '#F44336', t: 'Too weak' },
-      { w: '50%',  bg: '#FF9800', t: 'Weak' },
-      { w: '75%',  bg: '#FFC107', t: 'Good' },
-      { w: '100%', bg: '#4CAF50', t: 'Strong ✓' },
-    ];
-    const l = levels[score - 1] || levels[0];
-    fill.style.width      = l.w;
-    fill.style.background = l.bg;
-    text.textContent      = l.t;
-  }
-
-  function resetStrength() {
-    $('strengthFill').style.width = '0%';
-    $('strengthText').textContent = '';
-  }
-
-  async function submitChangePass() {
-    const cur  = $('cpCurrent').value.trim();
-    const nw   = $('cpNew').value.trim();
-    const conf = $('cpConfirm').value.trim();
-
-    $('cpErr').classList.remove('show');
-    $('cpOk').classList.remove('show');
-
-    if (!cur || !nw || !conf) { showCpErr('All fields are required.'); return; }
-    if (nw.length < 8)        { showCpErr('New password must be at least 8 characters.'); return; }
-    if (nw !== conf)           { showCpErr('New passwords do not match.'); return; }
-
-    const btn = $('cpBtn');
-    btn.classList.add('loading');
-
-    try {
-      const res  = await fetch(API_URL, {
-        method:  'POST',
-        headers: { 'Content-Type': 'text/plain' },
-        body: JSON.stringify({
-          action:          'changePassword',
-          username:        session.username,
-          currentPassword: cur,
-          newPassword:     nw
-        })
-      });
-      const json = await res.json();
-
-      if (json.success) {
-        $('cpOk').classList.add('show');
-        $('cpCurrent').value = '';
-        $('cpNew').value     = '';
-        $('cpConfirm').value = '';
-        resetStrength();
-        setTimeout(closeSheet, 2000);
-      } else {
-        showCpErr(json.message || 'Password change failed.');
+/* ── Normalize ────────────────────────────────────────────── */
+function normalize(c) {
+  function get(...keys) {
+    for (const k of keys) {
+      const v = c[k];
+      if (v !== undefined && v !== null && String(v).trim() !== '' && String(v) !== '0') {
+        return String(v).trim();
       }
-    } catch {
-      showCpErr('Network error. Try again.');
     }
+    return '';
+  }
+  // Keep meterNo even if 0 for some records
+  const meterRaw = c['MeterNo'] || c.meterNo || c['Meter No'] || '';
+  return {
+    _rowIndex:    c._rowIndex || 0,
+    sNo:          get('S.No.','sNo'),
+    conNo:        get('ConNo','conNo'),
+    consumerName: get('ConsumerName','Consumer Name','consumerName','consumer_name'),
+    address:      get('Address','address'),
+    labNo:        get('LabNo','labNo','Lab No'),
+    meterNo:      meterRaw ? String(meterRaw).trim() : '',
+    transfCode:   get('TransfCode','transfCode','Transf Code','AreaCode','areaCode'),
+    phoneNo:      get('PhoneNo','phoneNo','Phone','phone'),
+    status:       get('Status','status') || 'Active',
+    lastEditedBy: get('LastEditedBy','lastEditedBy'),
+    lastEditedAt: get('LastEditedAt','lastEditedAt'),
+    createdAt:    get('CreatedAt','createdAt'),
+  };
+}
 
-    btn.classList.remove('loading');
+/* ════════════════════════════════════════════════════════════
+   FILTER + RENDER
+════════════════════════════════════════════════════════════ */
+function applyFilters() {
+  filtered = masterList;
+
+  if (activeArea !== 'ALL') {
+    filtered = filtered.filter(c => c.transfCode === activeArea);
+  }
+  if (searchQ.trim()) {
+    const q = searchQ.toLowerCase().trim();
+    filtered = filtered.filter(c =>
+      (c.consumerName || '').toLowerCase().includes(q) ||
+      (c.conNo        || '').toLowerCase().includes(q) ||
+      (c.meterNo      || '').includes(q) ||
+      (c.phoneNo      || '').includes(q) ||
+      (c.address      || '').toLowerCase().includes(q)
+    );
   }
 
-  function showCpErr(msg) {
-    $('cpErrMsg').textContent = msg;
-    $('cpErr').classList.add('show');
+  $('cntTxt').textContent = filtered.length
+    ? `${filtered.length} consumer${filtered.length !== 1 ? 's' : ''}` : '';
+
+  if (!filtered.length) {
+    $('consumerList').innerHTML = '';
+    $('emptyState').classList.remove('hidden');
+    if (searchQ || activeArea !== 'ALL') {
+      $('emptyIco').textContent = 'search_off';
+      $('emptyTtl').textContent = 'No results';
+      $('emptySub').textContent = 'Try a different search or area filter';
+    } else {
+      $('emptyIco').textContent = 'people_outline';
+      $('emptyTtl').textContent = 'No consumers yet';
+      $('emptySub').textContent = 'Tap + to add the first consumer';
+    }
+    return;
   }
 
-  /* ── About ──────────────────────────────────────────────────── */
-  function openAbout() {
-    closeUserMenu();
-    openSheet('aboutSheet');
+  $('emptyState').classList.add('hidden');
+  displayedN = 0;
+  $('consumerList').innerHTML = '';
+  appendCards();
+}
+
+function appendCards() {
+  const frag = document.createDocumentFragment();
+  const end  = Math.min(displayedN + PAGE_SIZE, filtered.length);
+  for (let i = displayedN; i < end; i++) {
+    const card = makeCard(filtered[i]);
+    card.style.animationDelay = ((i - displayedN) * 0.035) + 's';
+    frag.appendChild(card);
+  }
+  $('consumerList').appendChild(frag);
+  displayedN = end;
+}
+
+/* ── Build card ────────────────────────────────────────────── */
+function makeCard(c) {
+  const div   = document.createElement('div');
+  div.className = 'c-card';
+  div.dataset.conno = c.conNo;
+  if (selectMode && selectedSet.has(c.conNo)) div.classList.add('selected');
+
+  const status = (c.status || 'Active').toLowerCase();
+  const area   = c.transfCode ? `<span class="area-badge">${esc(c.transfCode)}</span>` : '';
+  const meter  = c.meterNo   ? `<div class="c-mi"><span class="material-icons-round">electric_meter</span>${esc(c.meterNo)}</div>` : '';
+  const phone  = c.phoneNo   ? `<div class="c-mi"><span class="material-icons-round">phone</span>${esc(c.phoneNo)}</div>` : '';
+  const addr   = c.address   ? `<div class="c-mi"><span class="material-icons-round">location_on</span>${esc(c.address).substring(0,30)}</div>` : '';
+  const check  = selectMode  ? `<div class="c-check"><span class="material-icons-round">check</span></div>` : '';
+  const arrow  = selectMode  ? '' : `<span class="c-arrow material-icons-round">chevron_right</span>`;
+
+  div.innerHTML = `
+    <div class="c-inner">
+      ${check}
+      <div class="c-body">
+        <div class="c-row1">
+          <span class="c-conno">${esc(c.conNo || '—')}</span>
+          ${area}
+          <span class="status-badge ${status}">${esc(c.status || 'Active')}</span>
+        </div>
+        <div class="c-name">${esc(c.consumerName || '—')}</div>
+        <div class="c-meta">${meter}${phone}${addr}</div>
+      </div>
+      ${arrow}
+    </div>`;
+
+  if (selectMode) {
+    div.addEventListener('click', () => toggleCard(c.conNo, div));
+  } else {
+    // Tap → detail view
+    div.addEventListener('click', () => openDetail(c));
+    // Long press → select mode
+    attachLongPress(div, () => {
+      if (!isAdmin) return;
+      enterSelectMode();
+      toggleCard(c.conNo, div);
+    });
+    // Ripple
+    div.addEventListener('pointerdown', e => addRipple(div, e));
   }
 
-  /* ══════════════════════════════════════════════════════════════════
-     LOGOUT
-  ══════════════════════════════════════════════════════════════════ */
-  async function handleLogout() {
-    closeUserMenu();
-    try {
-      await fetch(API_URL, {
-        method:  'POST',
-        headers: { 'Content-Type': 'text/plain' },
-        body: JSON.stringify({ action: 'logout', token: session.token })
-      });
-    } catch { /* ignore */ }
-    await AN_DB.clearAllData();
-    await AN_DB.clearSession();
-    location.replace('./login.html');
-  }
+  return div;
+}
 
-  /* ══════════════════════════════════════════════════════════════════
-     DELETE (custom confirm sheet)
-  ══════════════════════════════════════════════════════════════════ */
-  function confirmDelete(rowIndex, conNo, name) {
-    delRowIdx = rowIndex;
-    delConNo  = conNo;
-    delName   = name;
-    $('delName').textContent = name;
-    openSheet('delSheet');
-  }
+function renderSkeleton() {
+  $('emptyState').classList.add('hidden');
+  $('consumerList').innerHTML = Array(6).fill(`
+    <div class="skeleton">
+      <div class="sk-row"><div class="sk" style="width:30%;height:11px"></div><div class="sk" style="width:18%;height:11px"></div></div>
+      <div class="sk" style="width:60%;height:14px;margin-bottom:8px"></div>
+      <div class="sk" style="width:40%;height:11px"></div>
+    </div>`).join('');
+}
 
-  async function doDelete() {
-    closeSheet();
+/* ════════════════════════════════════════════════════════════
+   CONSUMER DETAIL SHEET
+════════════════════════════════════════════════════════════ */
+function openDetail(c) {
+  $('detName').textContent  = c.consumerName || '—';
+  $('detConno').textContent = 'Consumer No: ' + (c.conNo || '—');
+
+  const fields = [
+    { label: 'Meter No',    value: c.meterNo     || '—' },
+    { label: 'Area Code',   value: c.transfCode  || '—' },
+    { label: 'Address',     value: c.address     || '—' },
+    { label: 'Lab No',      value: c.labNo       || '—' },
+    { label: 'Phone',       value: c.phoneNo     || '—' },
+    { label: 'Status',      value: c.status      || 'Active', isStatus: true },
+    { label: 'Last Edited', value: c.lastEditedBy ? `${c.lastEditedBy}` : '—' },
+  ];
+
+  $('detFields').innerHTML = fields.map(f => {
+    const val = f.isStatus
+      ? `<span class="det-badge ${(f.value||'').toLowerCase()}">${esc(f.value)}</span>`
+      : `<span class="det-value">${esc(f.value)}</span>`;
+    return `<div class="det-field"><span class="det-label">${f.label}</span>${val}</div>`;
+  }).join('');
+
+  const delBtn = isAdmin
+    ? `<button class="det-btn det-del" onclick="confirmDelete(${c._rowIndex},'${esc(c.conNo)}','${esc(c.consumerName)}')">
+         <span class="material-icons-round">delete</span>Delete
+       </button>` : '';
+
+  $('detActions').innerHTML = `
+    <button class="det-btn det-edit" onclick="openEditForm('${esc(c.conNo)}')">
+      <span class="material-icons-round">edit</span>Edit
+    </button>
+    ${delBtn}`;
+
+  openSheet('detailSheet');
+}
+
+/* ════════════════════════════════════════════════════════════
+   SEARCH
+════════════════════════════════════════════════════════════ */
+$('searchInp').addEventListener('input', e => {
+  searchQ = e.target.value;
+  $('sClear').classList.toggle('hidden', !searchQ);
+  clearTimeout(searchT);
+  searchT = setTimeout(applyFilters, 280);
+});
+
+function clearSearch() {
+  $('searchInp').value = '';
+  searchQ = '';
+  $('sClear').classList.add('hidden');
+  applyFilters();
+}
+
+function setArea(el, code) {
+  activeArea = code;
+  document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  applyFilters();
+}
+
+/* ════════════════════════════════════════════════════════════
+   THEME
+════════════════════════════════════════════════════════════ */
+function applyTheme(t) {
+  document.documentElement.setAttribute('data-theme', t);
+  $('themeIcon').textContent  = t === 'dark' ? 'dark_mode' : 'light_mode';
+  $('themeColorMeta').content = t === 'dark' ? '#0D1D36'  : '#0052B4';
+  localStorage.setItem('an_elect_theme', t);
+}
+$('themeToggle').addEventListener('click', () => {
+  applyTheme(document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
+});
+
+/* ════════════════════════════════════════════════════════════
+   USER MENU
+════════════════════════════════════════════════════════════ */
+$('userMenuBtn').addEventListener('click', () => {
+  const open = $('userMenu').classList.contains('show');
+  if (open) closeUserMenu();
+  else { $('userMenu').classList.add('show'); $('menuOv').classList.remove('hidden'); }
+});
+function closeUserMenu() {
+  $('userMenu').classList.remove('show');
+  $('menuOv').classList.add('hidden');
+}
+
+/* ════════════════════════════════════════════════════════════
+   CHANGE PASSWORD
+════════════════════════════════════════════════════════════ */
+function openChangePass() {
+  closeUserMenu();
+  $('cpCur').value = $('cpNew').value = $('cpCfm').value = '';
+  $('cpErr').classList.remove('show');
+  $('cpOk').classList.remove('show');
+  $('sfi').style.width = '0%'; $('stxt').textContent = '';
+  openSheet('cpSheet');
+}
+
+function chkStrength(v) {
+  const fi = $('sfi'), tx = $('stxt');
+  if (!v) { fi.style.width = '0%'; tx.textContent = ''; return; }
+  let s = 0;
+  if (v.length >= 8) s++;
+  if (/[A-Z]/.test(v)) s++;
+  if (/[0-9]/.test(v)) s++;
+  if (/[^A-Za-z0-9]/.test(v)) s++;
+  const L = [
+    { w:'25%', b:'#F44336', t:'Too weak' },
+    { w:'50%', b:'#FF9800', t:'Weak' },
+    { w:'75%', b:'#FFC107', t:'Good' },
+    { w:'100%',b:'#4CAF50', t:'Strong ✓' },
+  ][s - 1] || { w:'25%', b:'#F44336', t:'Too weak' };
+  fi.style.width = L.w; fi.style.background = L.b; tx.textContent = L.t;
+}
+
+async function submitCP() {
+  const cur = $('cpCur').value.trim();
+  const nw  = $('cpNew').value.trim();
+  const cfm = $('cpCfm').value.trim();
+  $('cpErr').classList.remove('show'); $('cpOk').classList.remove('show');
+  if (!cur || !nw || !cfm) { showCpErr('All fields are required.'); return; }
+  if (nw.length < 8) { showCpErr('Min 8 characters.'); return; }
+  if (nw !== cfm) { showCpErr('Passwords do not match.'); return; }
+  const btn = $('cpBtn'); btn.classList.add('loading');
+  try {
+    const res  = await fetch(API_URL, {
+      method: 'POST', headers: { 'Content-Type': 'text/plain' },
+      body: JSON.stringify({ action: 'changePassword', username: session.username,
+                             currentPassword: cur, newPassword: nw })
+    });
+    const json = await res.json();
+    if (json.success) { $('cpOk').classList.add('show'); setTimeout(closeSheet, 2000); }
+    else showCpErr(json.message || 'Failed.');
+  } catch { showCpErr('Network error.'); }
+  btn.classList.remove('loading');
+}
+
+function showCpErr(msg) { $('cpErrMsg').textContent = msg; $('cpErr').classList.add('show'); }
+
+function openAbout() { closeUserMenu(); openSheet('aboutSheet'); }
+
+/* ════════════════════════════════════════════════════════════
+   LOGOUT
+════════════════════════════════════════════════════════════ */
+async function handleLogout() {
+  closeUserMenu();
+  try {
+    await fetch(API_URL, { method:'POST', headers:{'Content-Type':'text/plain'},
+      body: JSON.stringify({ action:'logout', token:session.token }) });
+  } catch {}
+  await AN_DB.clearAllData();
+  await AN_DB.clearSession();
+  location.replace('./login.html');
+}
+
+/* ════════════════════════════════════════════════════════════
+   SELECT MODE
+════════════════════════════════════════════════════════════ */
+function enterSelectMode() {
+  if (!isAdmin) return;
+  selectMode = true;
+  selectedSet.clear();
+  $('selBar').classList.remove('hidden');
+  $('navbar').classList.add('hidden');
+  $('fabBtn').classList.add('hidden');
+  updateSelUI();
+  applyFilters();
+}
+
+function exitSelectMode() {
+  selectMode = false;
+  selectedSet.clear();
+  $('selBar').classList.add('hidden');
+  $('navbar').classList.remove('hidden');
+  $('fabBtn').classList.remove('hidden');
+  $('delBar').classList.add('hidden');
+  applyFilters();
+}
+
+function toggleCard(conNo, el) {
+  if (selectedSet.has(conNo)) { selectedSet.delete(conNo); el.classList.remove('selected'); }
+  else { selectedSet.add(conNo); el.classList.add('selected'); }
+  updateSelUI();
+}
+
+function toggleSelectAll() {
+  const allSelected = selectedSet.size === filtered.length;
+  selectedSet.clear();
+  if (!allSelected) filtered.forEach(c => selectedSet.add(c.conNo));
+  document.querySelectorAll('.c-card').forEach(card => {
+    card.classList.toggle('selected', !allSelected);
+  });
+  updateSelUI();
+}
+
+function updateSelUI() {
+  const n = selectedSet.size;
+  $('selCnt').textContent    = n === 0 ? 'Tap to select' : `${n} selected`;
+  $('delBarCnt').textContent = n;
+  $('delBar').classList.toggle('hidden', n === 0);
+  $('selAllBtn').textContent = n === filtered.length ? 'Deselect All' : 'Select All';
+}
+
+/* ── Bulk delete ──────────────────────────────────────────── */
+function bulkDeleteConfirm() {
+  const n = selectedSet.size;
+  if (!n) return;
+  $('delWho').textContent = `${n} consumer${n !== 1 ? 's' : ''} will be permanently deleted.`;
+  // Store the set snapshot
+  openSheet('delSheet');
+  // Override doDelete for bulk
+  window._bulkDelete = true;
+}
+
+async function doDelete() {
+  closeSheet();
+  if (window._bulkDelete) {
+    window._bulkDelete = false;
+    await executeBulkDelete();
+  } else {
+    await executeSingleDelete();
+  }
+}
+
+async function executeBulkDelete() {
+  const conNos = [...selectedSet];
+  if (!conNos.length) return;
+
+  toast(`Deleting ${conNos.length} consumers…`);
+
+  // Get full consumer objects, sort by _rowIndex DESC (delete bottom to top to preserve indices)
+  const toDelete = conNos
+    .map(conNo => masterList.find(c => c.conNo === conNo))
+    .filter(Boolean)
+    .sort((a, b) => b._rowIndex - a._rowIndex);
+
+  let deleted = 0, failed = 0;
+
+  for (const c of toDelete) {
     try {
       if (navigator.onLine) {
         const res  = await fetch(API_URL, {
-          method:  'POST',
-          headers: { 'Content-Type': 'text/plain' },
+          method: 'POST', headers: { 'Content-Type': 'text/plain' },
           body: JSON.stringify({
-            action:       'deleteConsumer',
-            token:        session.token,
-            officeId:     session.officeId,
-            sheetName:    'CONSUMER DATA ALL',
-            rowIndex:     delRowIdx,
-            conNo:        delConNo,
-            consumerName: delName
+            action: 'deleteConsumer', token: session.token,
+            officeId: session.officeId, sheetName: 'CONSUMER DATA ALL',
+            rowIndex: c._rowIndex, conNo: c.conNo, consumerName: c.consumerName
           })
         });
         const json = await res.json();
         if (json.success) {
-          await AN_DB.deleteConsumer(delConNo);
-          masterList = masterList.filter(c => c.conNo !== delConNo);
-          applyFilters();
-          toast('Consumer deleted', 'ok');
-        } else {
-          toast(json.error || json.message || 'Delete failed', 'err');
-        }
+          await AN_DB.deleteConsumer(c.conNo);
+          masterList = masterList.filter(x => x.conNo !== c.conNo);
+          deleted++;
+        } else { failed++; }
       } else {
+        await AN_DB.deleteConsumer(c.conNo);
+        await AN_DB.addPendingChange('deleteConsumer',
+          { rowIndex: c._rowIndex, conNo: c.conNo }, session.officeId);
+        masterList = masterList.filter(x => x.conNo !== c.conNo);
+        deleted++;
+      }
+    } catch { failed++; }
+  }
+
+  exitSelectMode();
+  toast(
+    `Deleted ${deleted}${failed ? ` · ${failed} failed` : ''}`,
+    deleted > 0 ? 'ok' : 'err'
+  );
+
+  if (!navigator.onLine) AN_DB.requestSync();
+}
+
+/* Single delete (from detail sheet) */
+function confirmDelete(rowIdx, conNo, name) {
+  closeSheet(); // close detail
+  delRowIdx = rowIdx; delConNo = conNo; delName = name;
+  window._bulkDelete = false;
+  $('delWho').textContent = name;
+  setTimeout(() => openSheet('delSheet'), 150);
+}
+
+async function executeSingleDelete() {
+  try {
+    if (navigator.onLine) {
+      const res  = await fetch(API_URL, {
+        method: 'POST', headers: { 'Content-Type': 'text/plain' },
+        body: JSON.stringify({
+          action: 'deleteConsumer', token: session.token,
+          officeId: session.officeId, sheetName: 'CONSUMER DATA ALL',
+          rowIndex: delRowIdx, conNo: delConNo, consumerName: delName
+        })
+      });
+      const json = await res.json();
+      if (json.success) {
         await AN_DB.deleteConsumer(delConNo);
-        await AN_DB.addPendingChange('deleteConsumer', { rowIndex: delRowIdx, conNo: delConNo }, session.officeId);
-        await AN_DB.requestSync();
         masterList = masterList.filter(c => c.conNo !== delConNo);
         applyFilters();
-        toast('Deleted offline — will sync when online');
-        updateSyncDot();
-      }
-    } catch (err) {
-      console.error('[App] Delete error:', err);
-      toast('Error deleting consumer', 'err');
-    }
-  }
-
-  /* ══════════════════════════════════════════════════════════════════
-     BULK SELECT MODE (Admin only)
-  ══════════════════════════════════════════════════════════════════ */
-  function enterSelectMode() {
-    if (!isAdmin) return;
-    selectMode = true;
-    selectedSet.clear();
-    $('selectBar').classList.remove('hidden');
-    $('navbar').classList.add('hidden');
-    $('fabBtn').classList.add('hidden');
-    updateSelCount();
-    // Re-render cards with checkboxes
-    applyFilters();
-  }
-
-  function exitSelectMode() {
-    selectMode = false;
-    selectedSet.clear();
-    $('selectBar').classList.add('hidden');
-    $('navbar').classList.remove('hidden');
-    $('fabBtn').classList.remove('hidden');
-    $('delActionBar').classList.add('hidden');
-    applyFilters();
-  }
-
-  function toggleCardSelect(conNo, card) {
-    if (selectedSet.has(conNo)) {
-      selectedSet.delete(conNo);
-      card.classList.remove('selected');
+        toast('Consumer deleted', 'ok');
+      } else { toast(json.error || 'Delete failed', 'err'); }
     } else {
-      selectedSet.add(conNo);
-      card.classList.add('selected');
+      await AN_DB.deleteConsumer(delConNo);
+      await AN_DB.addPendingChange('deleteConsumer',
+        { rowIndex: delRowIdx, conNo: delConNo }, session.officeId);
+      masterList = masterList.filter(c => c.conNo !== delConNo);
+      applyFilters();
+      toast('Deleted offline — will sync when online');
+      AN_DB.requestSync();
     }
-    updateSelCount();
+  } catch { toast('Error deleting', 'err'); }
+}
+
+/* ════════════════════════════════════════════════════════════
+   ADD / EDIT STUBS
+════════════════════════════════════════════════════════════ */
+function openAddForm()       { toast('Add Consumer — coming in Step 6!'); }
+function openEditForm(conNo) { closeSheet(); toast('Edit Consumer — coming in Step 6!'); }
+
+/* ════════════════════════════════════════════════════════════
+   TABS
+════════════════════════════════════════════════════════════ */
+function switchTab(tab) {
+  document.querySelectorAll('.bnav').forEach(b => b.classList.remove('active'));
+  $(`bnav-${tab}`)?.classList.add('active');
+  if (tab === 'activity') toast('Activity Log — coming soon!');
+  if (tab === 'admin')    toast('Admin Panel — coming soon!');
+}
+
+/* ════════════════════════════════════════════════════════════
+   SYNC
+════════════════════════════════════════════════════════════ */
+function setSync(type, txt) {
+  $('syncDot').className    = `sync-dot ${type}`;
+  $('syncTxt').textContent  = txt;
+}
+function setRefreshSpin(on) {
+  $('refreshBtn').classList.toggle('spin', on);
+}
+function onOnline()  { setSync('syncing','Back online — syncing…'); AN_DB.requestSync(); setTimeout(loadConsumers,600); }
+function onOffline() { setSync('offline','Offline — edits save locally'); }
+function onSWMsg({ data }) {
+  if (!data) return;
+  if (data.type === 'SYNC_COMPLETE') { setSync('online', `${data.synced} change${data.synced!==1?'s':''} synced`); loadConsumers(); }
+  if (data.type === 'SYNC_FAILED')   { setSync('pending','Sync failed — will retry'); }
+}
+
+/* ════════════════════════════════════════════════════════════
+   SHEETS
+════════════════════════════════════════════════════════════ */
+function openSheet(id) {
+  if (activeSheet) $(activeSheet).classList.remove('open');
+  activeSheet = id;
+  $(id).classList.add('open');
+  $('backdrop').classList.add('show');
+  // Prevent backdrop from closing delete confirm in bulk mode
+  if (id === 'delSheet') {
+    $('backdrop').onclick = null;
+  } else {
+    $('backdrop').onclick = closeSheet;
   }
+}
 
-  function toggleSelectAll() {
-    const allSelected = selectedSet.size === filtered.length;
-    selectedSet.clear();
-    if (!allSelected) filtered.forEach(c => selectedSet.add(c.conNo));
-    document.querySelectorAll('.c-card').forEach(card => {
-      card.classList.toggle('selected', !allSelected);
-    });
-    updateSelCount();
-  }
+function closeSheet() {
+  if (activeSheet) { $(activeSheet).classList.remove('open'); activeSheet = null; }
+  $('backdrop').classList.remove('show');
+  $('backdrop').onclick = closeSheet;
+  window._bulkDelete = false;
+}
 
-  function updateSelCount() {
-    const n = selectedSet.size;
-    $('selCount').textContent = n === 0 ? 'Tap to select' : `${n} selected`;
-    $('delSelCount').textContent = n;
-    $('delActionBar').classList.toggle('hidden', n === 0);
-    const selAllBtn = document.querySelector('.sel-all');
-    if (selAllBtn) selAllBtn.textContent = selectedSet.size === filtered.length ? 'Deselect All' : 'Select All';
-  }
+function toggleEye(inputId, iconId) {
+  const inp = $(inputId), icon = $(iconId);
+  const show = inp.type === 'password';
+  inp.type = show ? 'text' : 'password';
+  icon.textContent = show ? 'visibility' : 'visibility_off';
+}
 
-  async function deleteSelected() {
-    if (!selectedSet.size) return;
-    const count = selectedSet.size;
-    const conNos = [...selectedSet];
-
-    closeSheet();
-    toast(`Deleting ${count} consumers…`);
-
-    let deleted = 0;
-    let failed  = 0;
-
-    for (const conNo of conNos) {
-      const consumer = masterList.find(c => c.conNo === conNo);
-      if (!consumer) continue;
-      try {
-        if (navigator.onLine) {
-          const res = await fetch(API_URL, {
-            method:  'POST',
-            headers: { 'Content-Type': 'text/plain' },
-            body: JSON.stringify({
-              action:       'deleteConsumer',
-              token:        session.token,
-              officeId:     session.officeId,
-              sheetName:    'CONSUMER DATA ALL',
-              rowIndex:     consumer._rowIndex,
-              conNo:        consumer.conNo,
-              consumerName: consumer.consumerName
-            })
-          });
-          const json = await res.json();
-          if (json.success) {
-            await AN_DB.deleteConsumer(conNo);
-            masterList = masterList.filter(c => c.conNo !== conNo);
-            deleted++;
-          } else { failed++; }
-        } else {
-          await AN_DB.deleteConsumer(conNo);
-          await AN_DB.addPendingChange('deleteConsumer', { rowIndex: consumer._rowIndex, conNo }, session.officeId);
-          masterList = masterList.filter(c => c.conNo !== conNo);
-          deleted++;
-        }
-      } catch { failed++; }
+/* ════════════════════════════════════════════════════════════
+   LONG PRESS
+════════════════════════════════════════════════════════════ */
+function attachLongPress(el, cb) {
+  el.addEventListener('pointerdown', e => {
+    pressPos = { x: e.clientX, y: e.clientY };
+    pressTimer = setTimeout(() => {
+      if (navigator.vibrate) navigator.vibrate(50);
+      pressTimer = null;
+      cb();
+    }, 500);
+  });
+  el.addEventListener('pointermove', e => {
+    if (!pressPos) return;
+    if (Math.abs(e.clientX - pressPos.x) > 12 || Math.abs(e.clientY - pressPos.y) > 12) {
+      clearTimeout(pressTimer); pressTimer = null; pressPos = null;
     }
+  });
+  ['pointerup','pointercancel','pointerleave'].forEach(evt => {
+    el.addEventListener(evt, () => { clearTimeout(pressTimer); pressTimer = null; pressPos = null; });
+  });
+}
 
-    exitSelectMode();
-    toast(`Deleted ${deleted}${failed ? `, ${failed} failed` : ''}`, deleted > 0 ? 'ok' : 'err');
-  }
+/* ════════════════════════════════════════════════════════════
+   ERROR + RIPPLE + TOAST + UTILS
+════════════════════════════════════════════════════════════ */
+function showErr(msg) {
+  $('consumerList').innerHTML =
+    `<div class="err-bar"><span class="material-icons-round">warning_amber</span>${esc(msg)}</div>`;
+}
 
-  /* ══════════════════════════════════════════════════════════════════
-     ADD / EDIT STUBS (Step 6)
-  ══════════════════════════════════════════════════════════════════ */
-  function openAddForm()       { toast('Add Consumer — coming in next step!'); }
-  function openEditForm(conNo) { toast('Edit Consumer — coming in next step!'); }
+function addRipple(el, e) {
+  const r  = el.getBoundingClientRect();
+  const sz = Math.max(r.width, r.height) * 1.4;
+  const rip = document.createElement('span');
+  rip.className = 'ripple';
+  rip.style.cssText = `width:${sz}px;height:${sz}px;left:${e.clientX-r.left-sz/2}px;top:${e.clientY-r.top-sz/2}px;`;
+  el.appendChild(rip);
+  setTimeout(() => rip.remove(), 600);
+}
 
-  /* ══════════════════════════════════════════════════════════════════
-     BOTTOM TABS
-  ══════════════════════════════════════════════════════════════════ */
-  function switchTab(tab) {
-    document.querySelectorAll('.bnav-btn').forEach(b => b.classList.remove('active'));
-    $(`bnav-${tab}`)?.classList.add('active');
-    if (tab === 'activity') toast('Activity Log — coming soon!');
-    if (tab === 'admin')    toast('Admin Panel — coming soon!');
-  }
+function toast(msg, type = '') {
+  const el = $('toast');
+  el.textContent = msg;
+  el.className = `show ${type}`.trim();
+  clearTimeout(toastT);
+  toastT = setTimeout(() => { el.className = type.trim(); }, 2800);
+}
 
-  /* ══════════════════════════════════════════════════════════════════
-     SHEET HELPERS
-  ══════════════════════════════════════════════════════════════════ */
-  let activeSheet = null;
+function esc(s) {
+  return String(s??'')
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
 
-  function openSheet(id) {
-    if (activeSheet) $(activeSheet).classList.remove('open');
-    activeSheet = id;
-    $(id).classList.add('open');
-    $('backdrop').classList.add('show');
-  }
+function timeAgo(ts) {
+  const d = Date.now() - ts;
+  if (d < 60000)   return 'just now';
+  if (d < 3600000) return `${Math.floor(d/60000)}m ago`;
+  return `${Math.floor(d/3600000)}h ago`;
+}
 
-  function closeSheet() {
-    if (activeSheet) { $(activeSheet).classList.remove('open'); activeSheet = null; }
-    $('backdrop').classList.remove('show');
-  }
-
-  /* ── Eye toggle for password inputs ── */
-  function toggleEye(inputId, iconId) {
-    const inp  = $(inputId);
-    const icon = $(iconId);
-    const show = inp.type === 'password';
-    inp.type         = show ? 'text'       : 'password';
-    icon.textContent = show ? 'visibility' : 'visibility_off';
-  }
-
-  /* ══════════════════════════════════════════════════════════════════
-     SYNC STATUS
-  ══════════════════════════════════════════════════════════════════ */
-  function setSyncStatus(type, text) {
-    $('syncDot').className   = `sync-dot ${type}`;
-    $('syncText').textContent = text;
-  }
-
-  async function updateSyncDot() {
-    const n = await AN_DB.getPendingCount();
-    if (n > 0) setSyncStatus('pending', `${n} pending — will sync`);
-  }
-
-  function setRefreshSpin(on) {
-    $('refreshBtn').classList.toggle('spinning', on);
-  }
-
-  function onOnline()  {
-    setSyncStatus('syncing', 'Back online — syncing…');
-    AN_DB.requestSync();
-    setTimeout(loadConsumers, 600);
-  }
-  function onOffline() { setSyncStatus('offline', 'Offline — edits save locally'); }
-
-  function onSWMsg({ data }) {
-    if (!data) return;
-    if (data.type === 'SYNC_COMPLETE') {
-      setSyncStatus('online', `${data.synced} change${data.synced !== 1 ? 's' : ''} synced`);
-      loadConsumers();
-    }
-    if (data.type === 'SYNC_FAILED') { setSyncStatus('pending', 'Sync failed — will retry'); }
-  }
-
-  /* ── Error bar ────────────────────────────────────────────────── */
-  function showError(msg) {
-    $('consumerList').innerHTML =
-      `<div class="err-bar"><span class="material-icons-round">warning_amber</span>${esc(msg)}</div>`;
-  }
-
-  /* ══════════════════════════════════════════════════════════════════
-     RIPPLE EFFECT
-  ══════════════════════════════════════════════════════════════════ */
-  function addRipple(el, e) {
-    const rect   = el.getBoundingClientRect();
-    const size   = Math.max(rect.width, rect.height) * 1.5;
-    const x      = e.clientX - rect.left - size / 2;
-    const y      = e.clientY - rect.top  - size / 2;
-    const ripple = document.createElement('span');
-    ripple.className = 'ripple';
-    ripple.style.cssText =
-      `width:${size}px;height:${size}px;left:${x}px;top:${y}px;`;
-    el.appendChild(ripple);
-    setTimeout(() => ripple.remove(), 600);
-  }
-
-  /* ══════════════════════════════════════════════════════════════════
-     TOAST
-  ══════════════════════════════════════════════════════════════════ */
-  function toast(msg, type = '') {
-    const el = $('toast');
-    el.textContent = msg;
-    el.className = `show ${type}`.trim();
-    clearTimeout(toastT);
-    toastT = setTimeout(() => { el.className = type.trim(); }, 2800);
-  }
-
-  /* ══════════════════════════════════════════════════════════════════
-     UTILS
-  ══════════════════════════════════════════════════════════════════ */
-  function esc(s) {
-    return String(s ?? '')
-      .replace(/&/g,'&amp;').replace(/</g,'&lt;')
-      .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-  }
-
-  function timeAgo(ts) {
-    const d = Date.now() - ts;
-    if (d < 60000)    return 'just now';
-    if (d < 3600000)  return `${Math.floor(d / 60000)}m ago`;
-    return `${Math.floor(d / 3600000)}h ago`;
-  }
-
-  /* ── START ─────────────────────────────────────────────────────── */
-  init();
-  </script>
+/* ── START ─────────────────────────────────────────────────── */
+init();
+</script>
 </body>
 </html>
