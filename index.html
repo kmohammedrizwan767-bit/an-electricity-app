@@ -15,7 +15,7 @@
   <style>
 
   /* ═══════════════════════════════════════════
-     TOKENS
+     TOKENS — Tuned for readability at low brightness
   ═══════════════════════════════════════════ */
   :root {
     --primary:#0052B4; --primary-l:#1976D2; --primary-d:#003A82;
@@ -23,38 +23,39 @@
     --bg:#EEF2F7;     --card:#FFFFFF;       --card-b:#D1DCF0;
     --t1:#1A1A2E;     --t2:#5A6A85;
     --inp:#F4F7FF;    --inp-b:#C5D0E8;
-    --nav-h:56px;     --search-h:100px;     --bnav-h:64px;
+    --nav-h:56px;     --bnav-h:64px;
     --r:20px; --ri:12px; --rb:12px;
     --fd:'Poppins',sans-serif; --fb:'Roboto',sans-serif;
     --ease:cubic-bezier(.4,0,.2,1); --d:.22s;
     --sh:0 2px 12px rgba(0,82,180,.08);
-    --sh-lg:0 8px 32px rgba(0,82,180,.15);
+    --sh-lg:0 8px 32px rgba(0,82,180,.14);
   }
   [data-theme=dark]{
-    --bg:#080F1E; --card:#0D1D36; --card-b:#1A2E50;
-    --t1:#E8F0FE; --t2:#7A99CC;
-    --inp:#081428; --inp-b:#1A2E50;
-    --sh:0 2px 12px rgba(0,0,0,.35);
-    --sh-lg:0 8px 32px rgba(0,0,0,.4);
+    --bg:#060C18;     --card:#0F1F3C;    --card-b:#1E3868;
+    --t1:#EEF4FF;     --t2:#9CB8DC;
+    --inp:#081428;    --inp-b:#1E3868;
+    --sh:0 2px 16px rgba(0,0,0,.45);
+    --sh-lg:0 8px 32px rgba(0,0,0,.5);
   }
 
   /* ═══════════════════════════════════════════
      RESET
   ═══════════════════════════════════════════ */
   *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  html{overscroll-behavior:none}  /* Prevent accidental browser refresh */
   body{
     font-family:var(--fb);background:var(--bg);color:var(--t1);
     min-height:100vh;overflow-x:hidden;
     -webkit-font-smoothing:antialiased;-webkit-tap-highlight-color:transparent;
+    -webkit-text-size-adjust:100%;
   }
   .hidden{display:none!important}
 
-  /* Smooth theme transition on key elements only */
+  /* Smooth theme transitions on key elements */
   .navbar,.search-sec,.bottom-nav,.c-card,.skeleton,
-  .user-menu,.bottom-sheet,.search-wrap,.chip{
+  .user-menu,.bottom-sheet,.search-wrap,.chip,.f-pill{
     transition:background-color var(--d) var(--ease),
-               border-color var(--d) var(--ease),
-               color var(--d) var(--ease);
+               border-color var(--d) var(--ease),color var(--d) var(--ease);
   }
 
   /* ═══════════════════════════════════════════
@@ -70,6 +71,20 @@
   @keyframes bolt{from{transform:scale(.92)}to{transform:scale(1.06)}}
   .splash-name{font-family:var(--fd);font-size:20px;font-weight:700;color:#fff}
   .splash-sub{font-size:12px;color:rgba(255,255,255,.45)}
+
+  /* ═══════════════════════════════════════════
+     UPDATE BANNER
+  ═══════════════════════════════════════════ */
+  .update-banner{
+    background:var(--primary);color:#fff;padding:10px 16px;
+    display:flex;align-items:center;justify-content:space-between;gap:12px;
+    font-size:13px;font-family:var(--fd);font-weight:500;
+  }
+  .upd-btn{
+    background:rgba(255,255,255,.2);border:none;color:#fff;
+    padding:5px 12px;border-radius:10px;font-size:12px;
+    font-family:var(--fd);font-weight:600;cursor:pointer;white-space:nowrap;
+  }
 
   /* ═══════════════════════════════════════════
      BACKDROP + SHEETS
@@ -89,58 +104,44 @@
     max-height:92vh;overflow-y:auto;
   }
   .bottom-sheet.open{transform:translateY(0)}
-  .sheet-handle{width:40px;height:4px;background:var(--card-b);border-radius:2px;margin:10px auto 18px}
-  .sheet-title{
-    font-family:var(--fd);font-size:16px;font-weight:700;
-    color:var(--t1);margin-bottom:18px;text-align:center;
+  .sheet-handle{
+    width:40px;height:4px;background:var(--card-b);border-radius:2px;
+    margin:10px auto 18px;cursor:grab;
   }
+  .sheet-title{font-family:var(--fd);font-size:16px;font-weight:700;color:var(--t1);margin-bottom:18px;text-align:center}
 
-  /* ── Sheet form ── */
+  /* Sheet form */
   .sf{margin-bottom:13px}
-  .sl{font-size:11px;font-family:var(--fd);font-weight:500;color:var(--t2);
-      margin-bottom:5px;display:block;text-transform:uppercase;letter-spacing:.4px}
-  .siw{display:flex;align-items:center;background:var(--inp);border:1.5px solid var(--inp-b);
-       border-radius:var(--ri);padding:0 12px;height:46px;gap:8px}
+  .sl{font-size:11px;font-family:var(--fd);font-weight:500;color:var(--t2);margin-bottom:5px;display:block;text-transform:uppercase;letter-spacing:.4px}
+  .siw{display:flex;align-items:center;background:var(--inp);border:1.5px solid var(--inp-b);border-radius:var(--ri);padding:0 12px;height:46px;gap:8px}
   .siw:focus-within{border-color:var(--primary)}
   .siw .material-icons-round{color:var(--t2);font-size:18px;flex-shrink:0}
   .sinp{flex:1;background:none;border:none;outline:none;font-family:var(--fb);font-size:14px;color:var(--t1)}
   .sinp::placeholder{color:var(--t2)}
   .eye{background:none;border:none;color:var(--t2);cursor:pointer;display:flex;padding:2px}
   .eye .material-icons-round{font-size:18px}
-
   .strength-bar{height:3px;border-radius:2px;background:var(--inp-b);overflow:hidden;margin-top:5px}
   .strength-fill{height:100%;border-radius:2px;transition:width .3s,background .3s;width:0}
   .strength-txt{font-size:11px;color:var(--t2);margin-top:3px}
-
-  .s-alert{border-radius:10px;padding:10px 14px;display:none;align-items:center;
-            gap:8px;font-size:13px;margin-bottom:12px;line-height:1.5}
+  .s-alert{border-radius:10px;padding:10px 14px;display:none;align-items:center;gap:8px;font-size:13px;margin-bottom:12px;line-height:1.5}
   .s-alert.show{display:flex}
   .s-alert.err{background:rgba(211,47,47,.1);color:var(--danger);border:1px solid rgba(211,47,47,.2)}
   .s-alert.ok{background:rgba(46,125,50,.1);color:var(--success);border:1px solid rgba(46,125,50,.2)}
   .s-alert .material-icons-round{font-size:16px;flex-shrink:0}
-
   .btn-sh{
     width:100%;background:var(--primary);color:#fff;border:none;
-    border-radius:var(--rb);height:48px;font-family:var(--fd);font-size:15px;
-    font-weight:600;cursor:pointer;margin-top:8px;
-    display:flex;align-items:center;justify-content:center;gap:8px;
-    transition:opacity .2s;position:relative;overflow:hidden;
+    border-radius:var(--rb);height:48px;font-family:var(--fd);font-size:15px;font-weight:600;
+    cursor:pointer;margin-top:8px;display:flex;align-items:center;justify-content:center;gap:8px;
+    transition:opacity .2s;
   }
   .btn-sh:active{opacity:.85}
-  .btn-sh .spin{
-    width:18px;height:18px;border:2px solid rgba(255,255,255,.4);
-    border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;display:none;
-  }
+  .btn-sh .spin{width:18px;height:18px;border:2px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;display:none}
   .btn-sh.loading .spin{display:block}
   .btn-sh.loading .bl{display:none}
   @keyframes spin{to{transform:rotate(360deg)}}
-  .btn-cancel{
-    width:100%;background:var(--inp);border:1.5px solid var(--inp-b);
-    border-radius:var(--rb);height:44px;font-family:var(--fd);font-size:14px;
-    font-weight:500;color:var(--t1);cursor:pointer;margin-top:8px;
-  }
+  .btn-cancel{width:100%;background:var(--inp);border:1.5px solid var(--inp-b);border-radius:var(--rb);height:44px;font-family:var(--fd);font-size:14px;font-weight:500;color:var(--t1);cursor:pointer;margin-top:8px}
 
-  /* ── About sheet ── */
+  /* About sheet */
   .ab-logo{text-align:center;font-size:48px;margin-bottom:8px}
   .ab-name{text-align:center;font-family:var(--fd);font-size:17px;font-weight:700;color:var(--t1);margin-bottom:3px}
   .ab-ver{text-align:center;font-size:12px;color:var(--t2);margin-bottom:18px}
@@ -150,45 +151,47 @@
   .ab-key{font-size:10px;color:var(--t2);font-family:var(--fd);font-weight:500;text-transform:uppercase}
   .ab-val{font-size:13px;color:var(--t1);margin-top:1px}
 
-  /* ── Delete confirm sheet ── */
+  /* Delete confirm */
   .del-ico{text-align:center;margin-bottom:10px}
   .del-ico .material-icons-round{font-size:44px;color:var(--danger)}
   .del-ttl{text-align:center;font-family:var(--fd);font-size:16px;font-weight:700;color:var(--t1);margin-bottom:6px}
   .del-sub{text-align:center;font-size:13px;color:var(--t2);margin-bottom:20px;line-height:1.5}
   .del-who{font-weight:600;color:var(--danger);display:block;margin-top:4px;font-size:14px}
-  .btn-del-confirm{
-    width:100%;background:var(--danger);color:#fff;border:none;
-    border-radius:var(--rb);height:48px;font-family:var(--fd);font-size:15px;
-    font-weight:600;cursor:pointer;margin-bottom:10px;transition:opacity .2s;
-  }
+  .btn-del-confirm{width:100%;background:var(--danger);color:#fff;border:none;border-radius:var(--rb);height:48px;font-family:var(--fd);font-size:15px;font-weight:600;cursor:pointer;margin-bottom:10px;transition:opacity .2s}
   .btn-del-confirm:active{opacity:.8}
 
-  /* ── Consumer detail sheet ── */
+  /* Consumer detail sheet */
   .det-name{font-family:var(--fd);font-size:17px;font-weight:700;color:var(--t1);margin-bottom:4px}
   .det-conno{font-size:12px;color:var(--t2);margin-bottom:16px}
-  .det-field{
-    display:flex;justify-content:space-between;align-items:center;
-    padding:10px 0;border-bottom:1px solid var(--card-b);gap:12px;
-  }
+  .det-field{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--card-b);gap:12px}
   .det-field:last-of-type{border-bottom:none}
   .det-label{font-size:12px;color:var(--t2);font-family:var(--fd);font-weight:500;flex-shrink:0}
-  .det-value{font-size:13px;color:var(--t1);text-align:right}
-  .det-badge{
-    font-size:11px;font-family:var(--fd);font-weight:600;
-    padding:3px 10px;border-radius:8px;
-  }
+  .det-value{font-size:13px;color:var(--t1);text-align:right;word-break:break-word;user-select:text;-webkit-user-select:text}
+  .det-badge{font-size:11px;font-family:var(--fd);font-weight:600;padding:3px 10px;border-radius:8px}
   .det-badge.active{background:rgba(46,125,50,.12);color:#2E7D32}
   .det-badge.inactive{background:rgba(120,120,120,.12);color:#757575}
   .det-badge.defaulter{background:rgba(211,47,47,.12);color:var(--danger)}
-  [data-theme=dark] .det-badge.active{background:rgba(46,125,50,.2);color:#66BB6A}
-  [data-theme=dark] .det-badge.defaulter{background:rgba(211,47,47,.2);color:#EF5350}
-  .det-actions{display:flex;gap:10px;margin-top:16px}
-  .det-btn{
-    flex:1;height:46px;border-radius:var(--rb);border:none;
-    font-family:var(--fd);font-size:13px;font-weight:600;cursor:pointer;
-    display:flex;align-items:center;justify-content:center;gap:6px;
+  [data-theme=dark] .det-badge.active{background:rgba(76,175,80,.2);color:#66BB6A}
+  [data-theme=dark] .det-badge.inactive{background:rgba(120,120,120,.2);color:#BDBDBD}
+  [data-theme=dark] .det-badge.defaulter{background:rgba(211,47,47,.2);color:#EF9A9A}
+
+  /* Phone actions in detail */
+  .det-phone-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+  .det-phone-num{font-size:13px;color:var(--t1);user-select:text;-webkit-user-select:text}
+  .det-phone-btn{
+    display:flex;align-items:center;gap:4px;padding:5px 12px;border-radius:10px;
+    font-size:12px;font-family:var(--fd);font-weight:600;text-decoration:none;
     transition:opacity .2s;
   }
+  .det-phone-btn:active{opacity:.7}
+  .det-phone-btn .material-icons-round{font-size:15px}
+  .det-phone-btn.call{background:rgba(46,125,50,.12);color:#2E7D32}
+  .det-phone-btn.wa{background:rgba(37,211,102,.12);color:#25D366}
+  [data-theme=dark] .det-phone-btn.call{background:rgba(76,175,80,.2);color:#66BB6A}
+  [data-theme=dark] .det-phone-btn.wa{background:rgba(37,211,102,.2);color:#25D366}
+
+  .det-actions{display:flex;gap:10px;margin-top:16px}
+  .det-btn{flex:1;height:46px;border-radius:var(--rb);border:none;font-family:var(--fd);font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;transition:opacity .2s}
   .det-btn:active{opacity:.7}
   .det-btn .material-icons-round{font-size:16px}
   .det-edit{background:rgba(0,82,180,.1);color:var(--primary)}
@@ -208,37 +211,18 @@
   .nav-left{display:flex;align-items:center;gap:10px}
   .nav-bolt{font-size:22px;line-height:1}
   .nav-app{font-family:var(--fd);font-size:15px;font-weight:700;color:#fff;line-height:1.2}
-  .nav-office{
-    font-size:11px;color:rgba(255,255,255,.7);display:block;
-    line-height:1.2;max-width:160px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
-  }
+  .nav-office{font-size:11px;color:rgba(255,255,255,.7);display:block;line-height:1.2;max-width:160px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .nav-right{display:flex;gap:4px}
-  .nav-btn{
-    background:rgba(255,255,255,.15);border:none;border-radius:50%;
-    width:36px;height:36px;display:flex;align-items:center;justify-content:center;
-    color:#fff;cursor:pointer;transition:background .15s;
-  }
+  .nav-btn{background:rgba(255,255,255,.15);border:none;border-radius:50%;width:36px;height:36px;display:flex;align-items:center;justify-content:center;color:#fff;cursor:pointer;transition:background .15s}
   .nav-btn:active{background:rgba(255,255,255,.3)}
   .nav-btn .material-icons-round{font-size:20px}
 
-  /* Select mode bar (replaces navbar) */
-  .sel-bar{
-    position:fixed;top:0;left:0;right:0;height:var(--nav-h);
-    background:#102040;display:flex;align-items:center;
-    padding:0 12px;gap:12px;z-index:110;
-  }
-  .sel-cancel{
-    background:rgba(255,255,255,.15);border:none;border-radius:50%;
-    width:36px;height:36px;display:flex;align-items:center;justify-content:center;
-    color:#fff;cursor:pointer;flex-shrink:0;
-  }
+  /* Select bar */
+  .sel-bar{position:fixed;top:0;left:0;right:0;height:var(--nav-h);background:#102040;display:flex;align-items:center;padding:0 12px;gap:12px;z-index:110}
+  .sel-cancel{background:rgba(255,255,255,.15);border:none;border-radius:50%;width:36px;height:36px;display:flex;align-items:center;justify-content:center;color:#fff;cursor:pointer;flex-shrink:0}
   .sel-cancel .material-icons-round{font-size:20px}
   .sel-cnt{flex:1;font-family:var(--fd);font-size:15px;font-weight:600;color:#fff}
-  .sel-all-btn{
-    background:rgba(255,255,255,.15);border:none;border-radius:20px;
-    padding:6px 14px;font-family:var(--fd);font-size:12px;font-weight:500;
-    color:#fff;cursor:pointer;white-space:nowrap;
-  }
+  .sel-all-btn{background:rgba(255,255,255,.15);border:none;border-radius:20px;padding:6px 14px;font-family:var(--fd);font-size:12px;font-weight:500;color:#fff;cursor:pointer;white-space:nowrap}
 
   /* ═══════════════════════════════════════════
      USER MENU
@@ -251,21 +235,18 @@
     transition:opacity .2s var(--ease),transform .2s var(--ease);
   }
   .user-menu.show{opacity:1;transform:none;pointer-events:all}
-  .um-avatar{width:42px;height:42px;border-radius:50%;background:var(--primary);
-             display:flex;align-items:center;justify-content:center;margin-bottom:8px}
+  .um-avatar{width:42px;height:42px;border-radius:50%;background:var(--primary);display:flex;align-items:center;justify-content:center;margin-bottom:8px}
   .um-avatar .material-icons-round{color:#fff;font-size:22px}
   .um-name{font-family:var(--fd);font-size:14px;font-weight:600;color:var(--t1)}
   .um-role{font-size:11px;color:var(--primary);margin-top:2px;font-family:var(--fd);font-weight:500;text-transform:capitalize}
   .menu-div{height:1px;background:var(--card-b);margin:11px 0}
-  .mi{
-    width:100%;background:none;border:none;display:flex;align-items:center;
-    gap:12px;padding:9px 6px;color:var(--t1);font-size:13px;cursor:pointer;
-    border-radius:10px;font-family:var(--fb);text-align:left;transition:background .15s;
-  }
+  .mi{width:100%;background:none;border:none;display:flex;align-items:center;gap:12px;padding:9px 6px;color:var(--t1);font-size:13px;cursor:pointer;border-radius:10px;font-family:var(--fb);text-align:left;transition:background .15s}
   .mi:hover{background:var(--inp)}
   .mi .material-icons-round{font-size:18px;color:var(--t2)}
   .mi.danger{color:var(--danger)}
   .mi.danger .material-icons-round{color:var(--danger)}
+  .mi.install{color:var(--success)}
+  .mi.install .material-icons-round{color:var(--success)}
   .menu-ov{position:fixed;inset:0;z-index:150}
 
   /* ═══════════════════════════════════════════
@@ -276,17 +257,12 @@
     background:var(--bg);padding:10px 14px 0;z-index:90;
     border-bottom:1px solid var(--card-b);
   }
-  .search-wrap{
-    display:flex;align-items:center;background:var(--inp);
-    border:1.5px solid var(--inp-b);border-radius:var(--ri);
-    padding:0 12px;gap:8px;height:44px;
-  }
+
+  /* Search bar */
+  .search-wrap{display:flex;align-items:center;background:var(--inp);border:1.5px solid var(--inp-b);border-radius:var(--ri);padding:0 12px;gap:8px;height:44px}
   .search-wrap:focus-within{border-color:var(--primary)}
   .s-ico{color:var(--t2);font-size:20px!important;flex-shrink:0}
-  .search-inp{
-    flex:1;background:none;border:none;outline:none;
-    font-family:var(--fb);font-size:14px;color:var(--t1);
-  }
+  .search-inp{flex:1;background:none;border:none;outline:none;font-family:var(--fb);font-size:14px;color:var(--t1)}
   .search-inp::placeholder{color:var(--t2)}
   .search-inp::-webkit-search-decoration,
   .search-inp::-webkit-search-cancel-button,
@@ -295,21 +271,36 @@
   .s-clr{background:none;border:none;cursor:pointer;color:var(--t2);display:flex;padding:2px}
   .s-clr .material-icons-round{font-size:18px}
 
-  .chips-wrap{position:relative}
-  .chips-wrap::after{
-    content:'';position:absolute;right:0;top:0;bottom:0;width:28px;
-    background:linear-gradient(to right,transparent,var(--bg));pointer-events:none;z-index:1;
-  }
-  .chips{
-    display:flex;gap:8px;overflow-x:auto;padding:10px 0;
-    scrollbar-width:none;-webkit-overflow-scrolling:touch;scroll-behavior:smooth;
-  }
-  .chips::-webkit-scrollbar{display:none}
-  .chip{
+  /* Filter + Sort row */
+  .f-row{display:flex;align-items:center;gap:6px;padding:8px 0 4px}
+  .f-pill{
     flex-shrink:0;background:var(--inp);border:1.5px solid var(--inp-b);
-    border-radius:20px;padding:4px 14px;font-size:12px;font-family:var(--fd);
+    border-radius:20px;padding:3px 12px;font-size:11.5px;font-family:var(--fd);
     font-weight:500;color:var(--t2);cursor:pointer;transition:all .15s;
   }
+  .f-pill.active{background:var(--primary);border-color:var(--primary);color:#fff}
+  .f-pill.active-s{background:rgba(46,125,50,.15);border-color:rgba(46,125,50,.3);color:#2E7D32}
+  .f-pill.inactive-s{background:rgba(120,120,120,.12);border-color:rgba(120,120,120,.2);color:#757575}
+  .f-pill.defaulter-s{background:rgba(211,47,47,.12);border-color:rgba(211,47,47,.2);color:var(--danger)}
+  [data-theme=dark] .f-pill.active-s{background:rgba(76,175,80,.2);color:#66BB6A;border-color:rgba(76,175,80,.3)}
+  [data-theme=dark] .f-pill.inactive-s{background:rgba(120,120,120,.2);color:#BDBDBD}
+  [data-theme=dark] .f-pill.defaulter-s{background:rgba(211,47,47,.2);color:#EF9A9A}
+  .f-sep{flex:1}
+  .sort-btn{
+    display:flex;align-items:center;gap:3px;background:var(--inp);
+    border:1.5px solid var(--inp-b);border-radius:10px;padding:3px 10px;
+    font-size:11px;font-family:var(--fd);font-weight:600;color:var(--t2);cursor:pointer;
+    white-space:nowrap;flex-shrink:0;
+  }
+  .sort-btn .material-icons-round{font-size:15px}
+  .sort-btn.active{border-color:var(--primary);color:var(--primary)}
+
+  /* Area chips */
+  .chips-wrap{position:relative}
+  .chips-wrap::after{content:'';position:absolute;right:0;top:0;bottom:0;width:28px;background:linear-gradient(to right,transparent,var(--bg));pointer-events:none;z-index:1}
+  .chips{display:flex;gap:8px;overflow-x:auto;padding:8px 0 10px;scrollbar-width:none;-webkit-overflow-scrolling:touch;scroll-behavior:smooth}
+  .chips::-webkit-scrollbar{display:none}
+  .chip{flex-shrink:0;background:var(--inp);border:1.5px solid var(--inp-b);border-radius:20px;padding:4px 12px;font-size:11.5px;font-family:var(--fd);font-weight:500;color:var(--t2);cursor:pointer;transition:all .15s;white-space:nowrap}
   .chip.active{background:var(--primary);border-color:var(--primary);color:#fff}
 
   /* ═══════════════════════════════════════════
@@ -320,15 +311,9 @@
     padding-left:14px;padding-right:14px;
   }
 
-  /* ── Sync / Count bar (scrolls with content) ── */
-  .sync-row{
-    display:flex;align-items:center;gap:8px;
-    padding:10px 2px 8px;
-  }
-  .sync-dot{
-    width:7px;height:7px;border-radius:50%;background:#9E9E9E;
-    flex-shrink:0;transition:background .4s;
-  }
+  /* Sync + count (scrolls with content) */
+  .sync-row{display:flex;align-items:center;gap:8px;padding:10px 2px 8px}
+  .sync-dot{width:8px;height:8px;border-radius:50%;background:#9E9E9E;flex-shrink:0;transition:background .4s}
   .sync-dot.online{background:#4CAF50}
   .sync-dot.syncing{background:var(--accent);animation:blink 1s infinite}
   .sync-dot.offline{background:#FF5722}
@@ -336,10 +321,7 @@
   @keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
   .sync-txt{font-size:11.5px;color:var(--t2);flex:1}
   .cnt-txt{font-size:12px;font-family:var(--fd);font-weight:600;color:var(--primary)}
-  .refresh-btn{
-    background:none;border:none;color:var(--t2);cursor:pointer;
-    padding:4px;display:flex;align-items:center;border-radius:50%;
-  }
+  .refresh-btn{background:none;border:none;color:var(--t2);cursor:pointer;padding:4px;display:flex;align-items:center;border-radius:50%}
   .refresh-btn:active{color:var(--primary)}
   .refresh-btn .material-icons-round{font-size:18px}
   .refresh-btn.spin .material-icons-round{animation:spin .7s linear infinite}
@@ -357,71 +339,57 @@
   }
   @keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
   .c-card:active{transform:scale(.985)}
-  .c-card.selected{border-color:var(--primary);background:rgba(0,82,180,.06)}
-  [data-theme=dark] .c-card.selected{background:rgba(25,118,210,.12)}
+  .c-card.selected{border-color:var(--primary)}
+  .c-card.pressing{background:rgba(0,82,180,.04)}  /* Visual feedback during long press */
+  [data-theme=dark] .c-card.selected{background:rgba(25,118,210,.1)}
+  [data-theme=dark] .c-card.pressing{background:rgba(255,255,255,.03)}
 
-  /* Long-press visual feedback */
-  .c-card.pressing::after{
-    content:'';position:absolute;inset:0;background:rgba(0,82,180,.06);
-    border-radius:inherit;pointer-events:none;
-  }
+  /* Dark mode top highlight for depth at low brightness */
+  [data-theme=dark] .c-card::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:rgba(255,255,255,.05)}
 
   .c-inner{display:flex;align-items:center;gap:11px}
-  .c-check{
-    width:22px;height:22px;border-radius:50%;border:2px solid var(--inp-b);
-    display:flex;align-items:center;justify-content:center;
-    flex-shrink:0;background:var(--inp);transition:all .15s;
-  }
+  .c-check{width:22px;height:22px;border-radius:50%;border:2px solid var(--inp-b);display:flex;align-items:center;justify-content:center;flex-shrink:0;background:var(--inp);transition:all .15s}
   .c-card.selected .c-check{background:var(--primary);border-color:var(--primary)}
   .c-check .material-icons-round{font-size:13px;color:#fff;display:none}
   .c-card.selected .c-check .material-icons-round{display:block}
-
   .c-body{flex:1;min-width:0}
-  .c-row1{display:flex;align-items:center;gap:6px;margin-bottom:3px}
-  .c-conno{font-size:11px;font-family:var(--fd);font-weight:600;color:var(--t2);flex:1}
-  .area-badge{
-    background:rgba(0,82,180,.1);color:var(--primary);
-    font-size:10px;font-family:var(--fd);font-weight:600;padding:2px 7px;border-radius:7px;
-  }
-  [data-theme=dark] .area-badge{background:rgba(25,118,210,.18)}
+  .c-row1{display:flex;align-items:center;gap:5px;margin-bottom:3px;flex-wrap:nowrap}
+  .c-conno{font-size:11px;font-family:var(--fd);font-weight:600;color:var(--t2);flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .badges{display:flex;gap:5px;flex-shrink:0}
+
+  /* Badges — bright enough for low brightness */
+  .area-badge{background:rgba(0,82,180,.1);color:var(--primary);font-size:10px;font-family:var(--fd);font-weight:600;padding:2px 7px;border-radius:7px}
+  [data-theme=dark] .area-badge{background:rgba(0,120,255,.25);color:#90CAF9}
   .status-badge{font-size:10px;font-family:var(--fd);font-weight:600;padding:2px 7px;border-radius:7px}
-  .status-badge.active{background:rgba(46,125,50,.1);color:#2E7D32}
-  .status-badge.inactive{background:rgba(120,120,120,.1);color:#757575}
-  .status-badge.defaulter{background:rgba(211,47,47,.1);color:var(--danger)}
-  [data-theme=dark] .status-badge.active{background:rgba(46,125,50,.18);color:#66BB6A}
-  [data-theme=dark] .status-badge.defaulter{background:rgba(211,47,47,.18);color:#EF5350}
+  .status-badge.active{background:rgba(46,125,50,.12);color:#2E7D32}
+  .status-badge.inactive{background:rgba(120,120,120,.12);color:#757575}
+  .status-badge.defaulter{background:rgba(211,47,47,.12);color:var(--danger)}
+  [data-theme=dark] .status-badge.active{background:rgba(46,125,50,.25);color:#81C784}
+  [data-theme=dark] .status-badge.inactive{background:rgba(120,120,120,.25);color:#BDBDBD}
+  [data-theme=dark] .status-badge.defaulter{background:rgba(211,47,47,.25);color:#EF9A9A}
 
-  .c-name{
-    font-family:var(--fd);font-size:14px;font-weight:600;color:var(--t1);
-    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
-    margin-bottom:4px;
-  }
+  .c-name{font-family:var(--fd);font-size:14px;font-weight:600;color:var(--t1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:4px}
+
   .c-meta{display:flex;flex-wrap:wrap;gap:3px 12px}
-  .c-mi{display:flex;align-items:center;gap:3px;font-size:11.5px;color:var(--t2)}
-  .c-mi .material-icons-round{font-size:12px}
+  /* Colored icons for readability at low brightness */
+  .c-mi{display:flex;align-items:center;gap:4px;font-size:12px;color:var(--t2)}
+  .c-mi .material-icons-round{font-size:14px}
+  .c-mi.meter .material-icons-round{color:#FFC107;opacity:.85}  /* amber for meter */
+  .c-mi.phone .material-icons-round{color:#4CAF50;opacity:.85}  /* green for phone */
+  .c-mi.addr  .material-icons-round{color:#FF7043;opacity:.8}   /* orange for location */
 
-  .c-arrow{color:var(--inp-b);font-size:20px;flex-shrink:0;line-height:1}
+  .c-arrow{color:var(--t2);font-size:20px;flex-shrink:0;line-height:1;opacity:.55}
 
   /* Ripple */
-  .ripple{
-    position:absolute;border-radius:50%;background:rgba(0,82,180,.1);
-    transform:scale(0);animation:rip .55s ease-out forwards;pointer-events:none;
-  }
+  .ripple{position:absolute;border-radius:50%;background:rgba(0,82,180,.1);transform:scale(0);animation:rip .55s ease-out forwards;pointer-events:none}
   [data-theme=dark] .ripple{background:rgba(255,255,255,.06)}
   @keyframes rip{to{transform:scale(4);opacity:0}}
 
   /* ═══════════════════════════════════════════
      SKELETON
   ═══════════════════════════════════════════ */
-  .skeleton{
-    background:var(--card);border:1px solid var(--card-b);
-    border-radius:var(--r);padding:14px;margin-bottom:9px;
-  }
-  .sk{
-    border-radius:6px;
-    background:linear-gradient(90deg,var(--inp) 25%,var(--card-b) 50%,var(--inp) 75%);
-    background-size:200% 100%;animation:shim 1.4s infinite;
-  }
+  .skeleton{background:var(--card);border:1px solid var(--card-b);border-radius:var(--r);padding:14px;margin-bottom:9px}
+  .sk{border-radius:6px;background:linear-gradient(90deg,var(--inp) 25%,var(--card-b) 50%,var(--inp) 75%);background-size:200% 100%;animation:shim 1.4s infinite}
   @keyframes shim{0%{background-position:200% 0}100%{background-position:-200% 0}}
   .sk-row{display:flex;justify-content:space-between;margin-bottom:9px}
 
@@ -432,67 +400,33 @@
   .empty-state .material-icons-round{font-size:52px;color:var(--t2);opacity:.3}
   .empty-title{font-family:var(--fd);font-size:15px;font-weight:600;color:var(--t1);margin:12px 0 5px}
   .empty-sub{font-size:13px;color:var(--t2);line-height:1.5}
-
-  .err-bar{
-    background:rgba(211,47,47,.07);border:1px solid rgba(211,47,47,.18);
-    border-radius:14px;padding:12px 14px;display:flex;align-items:center;
-    gap:10px;font-size:13px;color:var(--danger);margin-bottom:10px;
-  }
+  .err-bar{background:rgba(211,47,47,.07);border:1px solid rgba(211,47,47,.18);border-radius:14px;padding:12px 14px;display:flex;align-items:center;gap:10px;font-size:13px;color:var(--danger);margin-bottom:10px}
   .err-bar .material-icons-round{font-size:17px;flex-shrink:0}
 
   /* ═══════════════════════════════════════════
      SELECT DELETE BAR
   ═══════════════════════════════════════════ */
-  .del-bar{
-    position:fixed;bottom:var(--bnav-h);left:0;right:0;
-    background:var(--danger);padding:13px 16px;
-    display:flex;align-items:center;justify-content:center;
-    gap:10px;z-index:95;
-    animation:slideUp .25s var(--ease);
-  }
+  .del-bar{position:fixed;bottom:var(--bnav-h);left:0;right:0;background:var(--danger);padding:13px 16px;display:flex;align-items:center;justify-content:center;gap:10px;z-index:95;animation:slideUp .25s var(--ease)}
   @keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
-  .del-bar-btn{
-    background:none;border:none;color:#fff;font-family:var(--fd);
-    font-size:15px;font-weight:600;cursor:pointer;
-    display:flex;align-items:center;gap:8px;
-  }
+  .del-bar-btn{background:none;border:none;color:#fff;font-family:var(--fd);font-size:15px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:8px}
   .del-bar-btn .material-icons-round{font-size:20px}
 
   /* ═══════════════════════════════════════════
      FAB
   ═══════════════════════════════════════════ */
-  .fab{
-    position:fixed;bottom:calc(var(--bnav-h) + 14px);right:18px;
-    width:54px;height:54px;border-radius:50%;background:var(--primary);
-    color:#fff;border:none;box-shadow:0 4px 20px rgba(0,82,180,.45);
-    display:flex;align-items:center;justify-content:center;cursor:pointer;
-    z-index:90;transition:transform .15s var(--ease),box-shadow .15s;overflow:hidden;
-  }
+  .fab{position:fixed;bottom:calc(var(--bnav-h) + 14px);right:18px;width:54px;height:54px;border-radius:50%;background:var(--primary);color:#fff;border:none;box-shadow:0 4px 20px rgba(0,82,180,.45);display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:90;transition:transform .15s var(--ease),box-shadow .15s;overflow:hidden}
   .fab:active{transform:scale(.88);box-shadow:0 2px 8px rgba(0,82,180,.3)}
   .fab .material-icons-round{font-size:26px}
 
   /* ═══════════════════════════════════════════
      BOTTOM NAV
   ═══════════════════════════════════════════ */
-  .bottom-nav{
-    position:fixed;bottom:0;left:0;right:0;height:var(--bnav-h);
-    background:var(--card);border-top:1px solid var(--card-b);
-    display:flex;z-index:100;
-  }
-  .bnav{
-    flex:1;background:none;border:none;display:flex;flex-direction:column;
-    align-items:center;justify-content:center;gap:2px;color:var(--t2);
-    font-size:10px;font-family:var(--fd);font-weight:500;cursor:pointer;
-    padding:6px 0 10px;transition:color .15s;position:relative;
-  }
+  .bottom-nav{position:fixed;bottom:0;left:0;right:0;height:var(--bnav-h);background:var(--card);border-top:1px solid var(--card-b);display:flex;z-index:100;transition:transform .25s var(--ease)}
+  .bottom-nav.hide{transform:translateY(100%)}
+  .bnav{flex:1;background:none;border:none;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;color:var(--t2);font-size:10px;font-family:var(--fd);font-weight:500;cursor:pointer;padding:6px 0 10px;transition:color .15s;position:relative}
   .bnav.active{color:var(--primary)}
-  .bnav.active::before{
-    content:'';position:absolute;top:8px;
-    width:28px;height:3px;background:var(--primary);border-radius:2px;
-  }
+  .bnav.active::before{content:'';position:absolute;top:8px;width:28px;height:3px;background:var(--primary);border-radius:2px}
   .bnav .material-icons-round{font-size:22px}
-
-  /* Sentinel */
   #sentinel{height:20px}
 
   /* ═══════════════════════════════════════════
@@ -521,6 +455,12 @@
   <div class="splash-sub">Consumer Manager</div>
 </div>
 
+<!-- UPDATE BANNER -->
+<div class="update-banner hidden" id="updateBanner">
+  <span>🔄 New version available</span>
+  <button class="upd-btn" onclick="applyUpdate()">Update Now</button>
+</div>
+
 <!-- NAVBAR -->
 <nav class="navbar" id="navbar">
   <div class="nav-left">
@@ -534,7 +474,7 @@
     <button class="nav-btn hidden" id="selectBtn" onclick="enterSelectMode()" aria-label="Select">
       <span class="material-icons-round">checklist</span>
     </button>
-    <button class="nav-btn" id="themeToggle" aria-label="Theme">
+    <button class="nav-btn" id="themeToggle" aria-label="Toggle theme">
       <span class="material-icons-round" id="themeIcon">dark_mode</span>
     </button>
     <button class="nav-btn" id="userMenuBtn" aria-label="Profile">
@@ -543,11 +483,9 @@
   </div>
 </nav>
 
-<!-- SELECT MODE BAR -->
+<!-- SELECT BAR -->
 <div class="sel-bar hidden" id="selBar">
-  <button class="sel-cancel" onclick="exitSelectMode()">
-    <span class="material-icons-round">close</span>
-  </button>
+  <button class="sel-cancel" onclick="exitSelectMode()"><span class="material-icons-round">close</span></button>
   <span class="sel-cnt" id="selCnt">Tap to select</span>
   <button class="sel-all-btn" id="selAllBtn" onclick="toggleSelectAll()">Select All</button>
 </div>
@@ -558,6 +496,9 @@
   <div class="um-name" id="uName">—</div>
   <div class="um-role" id="uRole">—</div>
   <div class="menu-div"></div>
+  <button class="mi install hidden" id="installBtn" onclick="installApp()">
+    <span class="material-icons-round">install_mobile</span>Install App
+  </button>
   <button class="mi" onclick="openChangePass()">
     <span class="material-icons-round">lock_reset</span>Change Password
   </button>
@@ -573,22 +514,20 @@
 
 <!-- CHANGE PASSWORD SHEET -->
 <div class="bottom-sheet" id="cpSheet">
-  <div class="sheet-handle"></div>
+  <div class="sheet-handle" id="cpHandle"></div>
   <div class="sheet-title">Change Password</div>
   <div class="s-alert err" id="cpErr"><span class="material-icons-round">error_outline</span><span id="cpErrMsg"></span></div>
-  <div class="s-alert ok"  id="cpOk"><span class="material-icons-round">check_circle_outline</span>Password changed!</div>
+  <div class="s-alert ok" id="cpOk"><span class="material-icons-round">check_circle_outline</span>Password changed successfully!</div>
   <div class="sf">
     <label class="sl">Current Password</label>
-    <div class="siw">
-      <span class="material-icons-round">lock_outline</span>
+    <div class="siw"><span class="material-icons-round">lock_outline</span>
       <input class="sinp" type="password" id="cpCur" placeholder="Current password" autocomplete="current-password">
       <button class="eye" onclick="toggleEye('cpCur','cpE1')"><span class="material-icons-round" id="cpE1">visibility_off</span></button>
     </div>
   </div>
   <div class="sf">
     <label class="sl">New Password</label>
-    <div class="siw">
-      <span class="material-icons-round">lock_outline</span>
+    <div class="siw"><span class="material-icons-round">lock_outline</span>
       <input class="sinp" type="password" id="cpNew" placeholder="Min 8 characters" autocomplete="new-password" oninput="chkStrength(this.value)">
       <button class="eye" onclick="toggleEye('cpNew','cpE2')"><span class="material-icons-round" id="cpE2">visibility_off</span></button>
     </div>
@@ -597,8 +536,7 @@
   </div>
   <div class="sf">
     <label class="sl">Confirm New Password</label>
-    <div class="siw">
-      <span class="material-icons-round">lock_outline</span>
+    <div class="siw"><span class="material-icons-round">lock_outline</span>
       <input class="sinp" type="password" id="cpCfm" placeholder="Repeat new password" autocomplete="new-password">
       <button class="eye" onclick="toggleEye('cpCfm','cpE3')"><span class="material-icons-round" id="cpE3">visibility_off</span></button>
     </div>
@@ -610,7 +548,7 @@
 
 <!-- ABOUT SHEET -->
 <div class="bottom-sheet" id="aboutSheet">
-  <div class="sheet-handle"></div>
+  <div class="sheet-handle" id="aboutHandle"></div>
   <div class="ab-logo">⚡</div>
   <div class="ab-name">A&amp;N Electricity</div>
   <div class="ab-ver">Consumer Manager v1.0.0</div>
@@ -634,7 +572,7 @@
 
 <!-- CONSUMER DETAIL SHEET -->
 <div class="bottom-sheet" id="detailSheet">
-  <div class="sheet-handle"></div>
+  <div class="sheet-handle" id="detHandle"></div>
   <div class="det-name" id="detName">—</div>
   <div class="det-conno" id="detConno">—</div>
   <div id="detFields"></div>
@@ -643,11 +581,11 @@
 
 <!-- DELETE CONFIRM SHEET -->
 <div class="bottom-sheet" id="delSheet">
-  <div class="sheet-handle"></div>
+  <div class="sheet-handle" id="delHandle"></div>
   <div class="del-ico"><span class="material-icons-round">delete_forever</span></div>
   <div class="del-ttl">Delete Consumer?</div>
-  <div class="del-sub">This cannot be undone.<span class="del-who" id="delWho"></span></div>
-  <button class="btn-del-confirm" onclick="doDelete()">Yes, Delete</button>
+  <div class="del-sub">This action cannot be undone.<span class="del-who" id="delWho"></span></div>
+  <button class="btn-del-confirm" onclick="doDelete()">Yes, Delete Permanently</button>
   <button class="btn-cancel" onclick="closeSheet()">Cancel</button>
 </div>
 
@@ -656,42 +594,57 @@
 
 <!-- SEARCH SECTION -->
 <div class="search-sec" id="searchSec">
+  <!-- Search bar -->
   <div class="search-wrap">
     <span class="material-icons-round s-ico">search</span>
     <input class="search-inp" type="search" id="searchInp"
-           placeholder="Name, ConNo, meter, phone…"
+           placeholder="Name, ConNo, meter, phone, address…"
            autocomplete="off" autocorrect="off" autocapitalize="none">
     <button class="s-clr hidden" id="sClear" onclick="clearSearch()">
       <span class="material-icons-round">close</span>
     </button>
   </div>
+
+  <!-- Status filter + Sort -->
+  <div class="f-row">
+    <button class="f-pill active" data-status="ALL" onclick="setStatus(this,'ALL')">All Status</button>
+    <button class="f-pill" data-status="Active"    onclick="setStatus(this,'Active')">🟢 Active</button>
+    <button class="f-pill" data-status="Inactive"  onclick="setStatus(this,'Inactive')">⚫ Inactive</button>
+    <button class="f-pill" data-status="Defaulter" onclick="setStatus(this,'Defaulter')">🔴 Defaulter</button>
+    <div class="f-sep"></div>
+    <button class="sort-btn" id="sortBtn" onclick="cycleSort()">
+      <span class="material-icons-round">sort</span>
+      <span id="sortLbl">A-Z</span>
+    </button>
+  </div>
+
+  <!-- Area chips -->
   <div class="chips-wrap">
     <div class="chips" id="chips">
-      <button class="chip active" onclick="setArea(this,'ALL')">All</button>
-      <button class="chip" onclick="setArea(this,'AHS')">AHS</button>
-      <button class="chip" onclick="setArea(this,'OBS')">OBS</button>
-      <button class="chip" onclick="setArea(this,'SSN')">SSN</button>
-      <button class="chip" onclick="setArea(this,'SP1')">SP1</button>
-      <button class="chip" onclick="setArea(this,'PLC')">PLC</button>
-      <button class="chip" onclick="setArea(this,'SPV')">SPV</button>
-      <button class="chip" onclick="setArea(this,'RKM')">RKM</button>
-      <button class="chip" onclick="setArea(this,'RBV')">RBV</button>
-      <button class="chip" onclick="setArea(this,'SSP')">SSP</button>
-      <button class="chip" onclick="setArea(this,'MP1')">MP1</button>
-      <button class="chip" onclick="setArea(this,'CHS')">CHS</button>
-      <button class="chip" onclick="setArea(this,'RGT1')">RGT1</button>
-      <button class="chip" onclick="setArea(this,'SJM')">SJM</button>
-      <button class="chip" onclick="setArea(this,'MGP1')">MGP1</button>
-      <button class="chip" onclick="setArea(this,'SCT')">SCT</button>
-      <button class="chip" onclick="setArea(this,'RJM')">RJM</button>
-      <button class="chip" onclick="setArea(this,'PAO1')">PAO1</button>
+      <button class="chip active" data-area="ALL"   onclick="setArea(this,'ALL')">All</button>
+      <button class="chip" data-area="AHS"  onclick="setArea(this,'AHS')">AHS</button>
+      <button class="chip" data-area="OBS"  onclick="setArea(this,'OBS')">OBS</button>
+      <button class="chip" data-area="SSN"  onclick="setArea(this,'SSN')">SSN</button>
+      <button class="chip" data-area="SP1"  onclick="setArea(this,'SP1')">SP1</button>
+      <button class="chip" data-area="PLC"  onclick="setArea(this,'PLC')">PLC</button>
+      <button class="chip" data-area="SPV"  onclick="setArea(this,'SPV')">SPV</button>
+      <button class="chip" data-area="RKM"  onclick="setArea(this,'RKM')">RKM</button>
+      <button class="chip" data-area="RBV"  onclick="setArea(this,'RBV')">RBV</button>
+      <button class="chip" data-area="SSP"  onclick="setArea(this,'SSP')">SSP</button>
+      <button class="chip" data-area="MP1"  onclick="setArea(this,'MP1')">MP1</button>
+      <button class="chip" data-area="CHS"  onclick="setArea(this,'CHS')">CHS</button>
+      <button class="chip" data-area="RGT1" onclick="setArea(this,'RGT1')">RGT1</button>
+      <button class="chip" data-area="SJM"  onclick="setArea(this,'SJM')">SJM</button>
+      <button class="chip" data-area="MGP1" onclick="setArea(this,'MGP1')">MGP1</button>
+      <button class="chip" data-area="SCT"  onclick="setArea(this,'SCT')">SCT</button>
+      <button class="chip" data-area="RJM"  onclick="setArea(this,'RJM')">RJM</button>
+      <button class="chip" data-area="PAO1" onclick="setArea(this,'PAO1')">PAO1</button>
     </div>
   </div>
 </div>
 
 <!-- MAIN -->
 <main class="main" id="main">
-  <!-- Sync + count bar (scrolls with content) -->
   <div class="sync-row">
     <span class="sync-dot syncing" id="syncDot"></span>
     <span class="sync-txt" id="syncTxt">Loading…</span>
@@ -700,7 +653,6 @@
       <span class="material-icons-round">refresh</span>
     </button>
   </div>
-
   <div id="consumerList"></div>
   <div id="sentinel"></div>
   <div class="empty-state hidden" id="emptyState">
@@ -710,7 +662,7 @@
   </div>
 </main>
 
-<!-- DELETE ACTION BAR (select mode) -->
+<!-- DELETE ACTION BAR -->
 <div class="del-bar hidden" id="delBar">
   <button class="del-bar-btn" onclick="bulkDeleteConfirm()">
     <span class="material-icons-round">delete</span>
@@ -724,7 +676,7 @@
 </button>
 
 <!-- BOTTOM NAV -->
-<nav class="bottom-nav">
+<nav class="bottom-nav" id="bottomNav">
   <button class="bnav active" id="bnav-consumers" onclick="switchTab('consumers')">
     <span class="material-icons-round">people</span><span>Consumers</span>
   </button>
@@ -742,21 +694,25 @@
 <script>
 'use strict';
 
-/* ── CONFIG ──────────────────────────────────────────────── */
+/* ── CONFIG ─────────────────────────────────────────────── */
 const API_URL   = 'https://script.google.com/macros/s/AKfycbyeO7pIZrT1WKPHHuR8LKxhPKgf4uELmkSkIgUefNwT88JdCBiAoTAfgKTyCBKEMmBowQ/exec';
 const PAGE_SIZE = 30;
+const TIMEOUT   = 30000; // 30s network timeout
 
-/* ── STATE ───────────────────────────────────────────────── */
+/* ── STATE ──────────────────────────────────────────────── */
 let session     = null;
 let isAdmin     = false;
 let masterList  = [];
 let filtered    = [];
 let displayedN  = 0;
 let activeArea  = 'ALL';
+let activeStatus= 'ALL';
+let sortOrder   = 'default'; // 'default' | 'asc' | 'desc'
 let searchQ     = '';
 let searchT     = null;
 let toastT      = null;
 let activeSheet = null;
+let lastScrollY = 0;
 
 // Select mode
 let selectMode  = false;
@@ -766,10 +722,15 @@ let selectedSet = new Set();
 let delRowIdx = 0, delConNo = '', delName = '';
 
 // Long press
-let pressTimer = null;
-let pressPos   = null;
+let pressTimer = null, pressPos = null, pressCard = null;
 
-/* ── DOM ─────────────────────────────────────────────────── */
+// PWA install
+let deferredInstall = null;
+
+// SW registration reference
+let swReg = null;
+
+/* ── DOM ────────────────────────────────────────────────── */
 const $ = id => document.getElementById(id);
 
 /* ════════════════════════════════════════════════════════════
@@ -784,23 +745,54 @@ async function init() {
 
   isAdmin = session.role === 'admin' || session.role === 'Admin';
 
-  // Service Worker
+  // Service Worker + update detection
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('./sw.js').catch(() => {});
-    navigator.serviceWorker.addEventListener('message', onSWMsg);
+    navigator.serviceWorker.register('./sw.js').then(reg => {
+      swReg = reg;
+      navigator.serviceWorker.addEventListener('message', onSWMsg);
+      // Detect new SW version
+      reg.addEventListener('updatefound', () => {
+        const newSW = reg.installing;
+        if (!newSW) return;
+        newSW.addEventListener('statechange', () => {
+          if (newSW.state === 'installed' && navigator.serviceWorker.controller) {
+            $('updateBanner').classList.remove('hidden'); // Show update banner
+          }
+        });
+      });
+    }).catch(() => {});
   }
 
+  // PWA install prompt intercept
+  window.addEventListener('beforeinstallprompt', e => {
+    e.preventDefault();
+    deferredInstall = e;
+    $('installBtn').classList.remove('hidden'); // Show Install App in menu
+  });
+
+  // Online / Offline
   window.addEventListener('online',  onOnline);
   window.addEventListener('offline', onOffline);
+
+  // Android Back Button — close sheets/select before exiting app
+  history.pushState(null, '');
+  window.addEventListener('popstate', () => {
+    if (activeSheet)  { closeSheet(); history.pushState(null, ''); return; }
+    if (selectMode)   { exitSelectMode(); history.pushState(null, ''); return; }
+    // Allow normal back
+  });
+
+  // Track scroll for position memory
+  window.addEventListener('scroll', () => { lastScrollY = window.scrollY; }, { passive: true });
 
   // Theme
   applyTheme(localStorage.getItem('an_elect_theme') || 'dark');
 
-  // Fill UI
-  $('navOffice').textContent    = session.officeName || 'My Office';
-  $('uName').textContent        = session.fullName   || session.username;
-  $('uRole').textContent        = session.role;
-  $('aboutOffice').textContent  = session.officeName || 'My Office';
+  // Fill navbar
+  $('navOffice').textContent   = session.officeName || 'My Office';
+  $('uName').textContent       = session.fullName   || session.username;
+  $('uRole').textContent       = session.role;
+  $('aboutOffice').textContent = session.officeName || 'My Office';
 
   if (isAdmin) {
     $('bnav-admin').classList.remove('hidden');
@@ -809,15 +801,18 @@ async function init() {
 
   await AN_DB.setApiUrl(API_URL);
 
-  // Adjust layout dynamically
+  // Adjust layout dynamically (accounts for different screen sizes)
   adjustLayout();
   window.addEventListener('resize', adjustLayout);
   document.fonts.ready.then(adjustLayout);
 
-  // Infinite scroll
+  // Infinite scroll observer
   new IntersectionObserver(entries => {
     if (entries[0].isIntersecting && displayedN < filtered.length) appendCards();
   }, { threshold: 0.1 }).observe($('sentinel'));
+
+  // Swipe to close sheets
+  setupSwipeClose();
 
   await loadConsumers();
   hideSplash();
@@ -835,36 +830,79 @@ function hideSplash() {
   setTimeout(() => s.style.display = 'none', 400);
 }
 
+/* ── PWA Install ─────────────────────────────────────────── */
+async function installApp() {
+  if (!deferredInstall) return;
+  closeUserMenu();
+  deferredInstall.prompt();
+  const { outcome } = await deferredInstall.userChoice;
+  deferredInstall = null;
+  $('installBtn').classList.add('hidden');
+  if (outcome === 'accepted') toast('App installed! ✅', 'ok');
+}
+
+/* ── SW Update ───────────────────────────────────────────── */
+function applyUpdate() {
+  if (swReg?.waiting) {
+    swReg.waiting.postMessage({ type: 'SKIP_WAITING' });
+  }
+  window.location.reload();
+}
+
+/* ── Swipe down to close sheets ─────────────────────────── */
+function setupSwipeClose() {
+  const handles = ['cpHandle','aboutHandle','detHandle','delHandle'];
+  handles.forEach(id => {
+    const el = $(id);
+    if (!el) return;
+    let startY = 0;
+    el.addEventListener('touchstart', e => { startY = e.touches[0].clientY; }, { passive: true });
+    el.addEventListener('touchmove',  e => {
+      const dy = e.touches[0].clientY - startY;
+      if (dy > 70) closeSheet();
+    }, { passive: true });
+  });
+}
+
 /* ════════════════════════════════════════════════════════════
    LOAD CONSUMERS
 ════════════════════════════════════════════════════════════ */
-async function loadConsumers() {
+async function loadConsumers(showSkeleton = true) {
+  if (showSkeleton) renderSkeleton();
   setRefreshSpin(true);
-  renderSkeleton();
   setSync('syncing', 'Loading…');
 
+  // A: Show cache instantly
   const cached = await AN_DB.getAllConsumers();
   if (cached.length) {
     masterList = cached;
     applyFilters();
+    updateChipCounts();
     setSync('syncing', 'Refreshing…');
   }
 
+  // B: Fetch fresh from server
   if (!navigator.onLine) {
     setRefreshSpin(false);
-    if (!cached.length) showErr('No cached data. Connect to internet first.');
+    if (!cached.length) showErr('No cached data. Connect to internet and refresh.');
     setSync('offline', 'Offline — showing cached data');
     return;
   }
 
   try {
+    const controller = new AbortController();
+    const timeoutId  = setTimeout(() => controller.abort(), TIMEOUT);
+
     const res  = await fetch(API_URL, {
       method: 'POST', headers: { 'Content-Type': 'text/plain' },
       body: JSON.stringify({
         action: 'getConsumers', token: session.token,
         officeId: session.officeId, sheetName: 'CONSUMER DATA ALL'
-      })
+      }),
+      signal: controller.signal
     });
+    clearTimeout(timeoutId);
+
     const json = await res.json();
 
     if (json.success && Array.isArray(json.data)) {
@@ -873,6 +911,7 @@ async function loadConsumers() {
       await AN_DB.setLastSync(Date.now());
       masterList = list;
       applyFilters();
+      updateChipCounts();
       setSync('online', `Synced ${timeAgo(Date.now())}`);
     } else if (json.code === 'UNAUTHORIZED' || json.error === 'SESSION_EXPIRED') {
       await AN_DB.clearSession();
@@ -883,8 +922,13 @@ async function loadConsumers() {
       console.warn('[App]', json.message || json.error);
     }
   } catch (err) {
-    if (!cached.length) showErr('Could not connect. Check your internet.');
-    setSync('offline', 'Offline — showing cached data');
+    if (err.name === 'AbortError') {
+      setSync('offline', 'Request timed out — check connection');
+      toast('Network timeout. Try again.', 'err');
+    } else {
+      if (!cached.length) showErr('Could not connect. Check your internet.');
+      setSync('offline', 'Offline — showing cached data');
+    }
   }
 
   setRefreshSpin(false);
@@ -892,24 +936,23 @@ async function loadConsumers() {
 
 function refreshData() { loadConsumers(); }
 
-/* ── Normalize ────────────────────────────────────────────── */
+/* ── Normalize ──────────────────────────────────────────── */
 function normalize(c) {
   function get(...keys) {
     for (const k of keys) {
       const v = c[k];
-      if (v !== undefined && v !== null && String(v).trim() !== '' && String(v) !== '0') {
+      if (v !== undefined && v !== null && String(v).trim() !== '' && String(v).trim() !== '0') {
         return String(v).trim();
       }
     }
     return '';
   }
-  // Keep meterNo even if 0 for some records
   const meterRaw = c['MeterNo'] || c.meterNo || c['Meter No'] || '';
   return {
     _rowIndex:    c._rowIndex || 0,
     sNo:          get('S.No.','sNo'),
     conNo:        get('ConNo','conNo'),
-    consumerName: get('ConsumerName','Consumer Name','consumerName','consumer_name'),
+    consumerName: get('ConsumerName','Consumer Name','consumerName'),
     address:      get('Address','address'),
     labNo:        get('LabNo','labNo','Lab No'),
     meterNo:      meterRaw ? String(meterRaw).trim() : '',
@@ -922,15 +965,41 @@ function normalize(c) {
   };
 }
 
+/* ── Update chip consumer counts ───────────────────────── */
+function updateChipCounts() {
+  const counts = {};
+  masterList.forEach(c => { if (c.transfCode) counts[c.transfCode] = (counts[c.transfCode]||0)+1; });
+
+  document.querySelectorAll('.chip').forEach(chip => {
+    const area = chip.dataset.area;
+    if (!area) return;
+    if (area === 'ALL') {
+      chip.textContent = `All (${masterList.length})`;
+    } else if (counts[area]) {
+      chip.textContent = `${area} · ${counts[area]}`;
+    }
+  });
+}
+
 /* ════════════════════════════════════════════════════════════
    FILTER + RENDER
 ════════════════════════════════════════════════════════════ */
 function applyFilters() {
   filtered = masterList;
 
+  // Area filter
   if (activeArea !== 'ALL') {
     filtered = filtered.filter(c => c.transfCode === activeArea);
   }
+
+  // Status filter
+  if (activeStatus !== 'ALL') {
+    filtered = filtered.filter(c =>
+      (c.status || 'Active').toLowerCase() === activeStatus.toLowerCase()
+    );
+  }
+
+  // Text search
   if (searchQ.trim()) {
     const q = searchQ.toLowerCase().trim();
     filtered = filtered.filter(c =>
@@ -942,16 +1011,23 @@ function applyFilters() {
     );
   }
 
+  // Sort
+  if (sortOrder === 'asc') {
+    filtered = [...filtered].sort((a,b) => (a.consumerName||'').localeCompare(b.consumerName||''));
+  } else if (sortOrder === 'desc') {
+    filtered = [...filtered].sort((a,b) => (b.consumerName||'').localeCompare(a.consumerName||''));
+  }
+
   $('cntTxt').textContent = filtered.length
     ? `${filtered.length} consumer${filtered.length !== 1 ? 's' : ''}` : '';
 
   if (!filtered.length) {
     $('consumerList').innerHTML = '';
     $('emptyState').classList.remove('hidden');
-    if (searchQ || activeArea !== 'ALL') {
+    if (searchQ || activeArea !== 'ALL' || activeStatus !== 'ALL') {
       $('emptyIco').textContent = 'search_off';
       $('emptyTtl').textContent = 'No results';
-      $('emptySub').textContent = 'Try a different search or area filter';
+      $('emptySub').textContent = 'Try different search, area, or status filter';
     } else {
       $('emptyIco').textContent = 'people_outline';
       $('emptyTtl').textContent = 'No consumers yet';
@@ -971,25 +1047,24 @@ function appendCards() {
   const end  = Math.min(displayedN + PAGE_SIZE, filtered.length);
   for (let i = displayedN; i < end; i++) {
     const card = makeCard(filtered[i]);
-    card.style.animationDelay = ((i - displayedN) * 0.035) + 's';
+    card.style.animationDelay = ((i - displayedN) * 0.03) + 's';
     frag.appendChild(card);
   }
   $('consumerList').appendChild(frag);
   displayedN = end;
 }
 
-/* ── Build card ────────────────────────────────────────────── */
+/* ── Build card ─────────────────────────────────────────── */
 function makeCard(c) {
-  const div   = document.createElement('div');
+  const div = document.createElement('div');
   div.className = 'c-card';
-  div.dataset.conno = c.conNo;
   if (selectMode && selectedSet.has(c.conNo)) div.classList.add('selected');
 
   const status = (c.status || 'Active').toLowerCase();
   const area   = c.transfCode ? `<span class="area-badge">${esc(c.transfCode)}</span>` : '';
-  const meter  = c.meterNo   ? `<div class="c-mi"><span class="material-icons-round">electric_meter</span>${esc(c.meterNo)}</div>` : '';
-  const phone  = c.phoneNo   ? `<div class="c-mi"><span class="material-icons-round">phone</span>${esc(c.phoneNo)}</div>` : '';
-  const addr   = c.address   ? `<div class="c-mi"><span class="material-icons-round">location_on</span>${esc(c.address).substring(0,30)}</div>` : '';
+  const meter  = c.meterNo   ? `<div class="c-mi meter"><span class="material-icons-round">electric_meter</span>${esc(c.meterNo)}</div>` : '';
+  const phone  = c.phoneNo   ? `<div class="c-mi phone"><span class="material-icons-round">phone</span>${esc(c.phoneNo)}</div>` : '';
+  const addr   = c.address   ? `<div class="c-mi addr"><span class="material-icons-round">location_on</span>${esc(c.address).substring(0,28)}</div>` : '';
   const check  = selectMode  ? `<div class="c-check"><span class="material-icons-round">check</span></div>` : '';
   const arrow  = selectMode  ? '' : `<span class="c-arrow material-icons-round">chevron_right</span>`;
 
@@ -999,8 +1074,7 @@ function makeCard(c) {
       <div class="c-body">
         <div class="c-row1">
           <span class="c-conno">${esc(c.conNo || '—')}</span>
-          ${area}
-          <span class="status-badge ${status}">${esc(c.status || 'Active')}</span>
+          <div class="badges">${area}<span class="status-badge ${status}">${esc(c.status||'Active')}</span></div>
         </div>
         <div class="c-name">${esc(c.consumerName || '—')}</div>
         <div class="c-meta">${meter}${phone}${addr}</div>
@@ -1011,18 +1085,10 @@ function makeCard(c) {
   if (selectMode) {
     div.addEventListener('click', () => toggleCard(c.conNo, div));
   } else {
-    // Tap → detail view
     div.addEventListener('click', () => openDetail(c));
-    // Long press → select mode
-    attachLongPress(div, () => {
-      if (!isAdmin) return;
-      enterSelectMode();
-      toggleCard(c.conNo, div);
-    });
-    // Ripple
+    attachLongPress(div, c);
     div.addEventListener('pointerdown', e => addRipple(div, e));
   }
-
   return div;
 }
 
@@ -1031,34 +1097,78 @@ function renderSkeleton() {
   $('consumerList').innerHTML = Array(6).fill(`
     <div class="skeleton">
       <div class="sk-row"><div class="sk" style="width:30%;height:11px"></div><div class="sk" style="width:18%;height:11px"></div></div>
-      <div class="sk" style="width:60%;height:14px;margin-bottom:8px"></div>
-      <div class="sk" style="width:40%;height:11px"></div>
+      <div class="sk" style="width:62%;height:14px;margin-bottom:8px"></div>
+      <div class="sk" style="width:42%;height:11px"></div>
     </div>`).join('');
 }
 
 /* ════════════════════════════════════════════════════════════
-   CONSUMER DETAIL SHEET
+   CONSUMER DETAIL
 ════════════════════════════════════════════════════════════ */
 function openDetail(c) {
+  lastScrollY = window.scrollY; // Save scroll position
+
   $('detName').textContent  = c.consumerName || '—';
   $('detConno').textContent = 'Consumer No: ' + (c.conNo || '—');
 
-  const fields = [
-    { label: 'Meter No',    value: c.meterNo     || '—' },
-    { label: 'Area Code',   value: c.transfCode  || '—' },
-    { label: 'Address',     value: c.address     || '—' },
-    { label: 'Lab No',      value: c.labNo       || '—' },
-    { label: 'Phone',       value: c.phoneNo     || '—' },
-    { label: 'Status',      value: c.status      || 'Active', isStatus: true },
-    { label: 'Last Edited', value: c.lastEditedBy ? `${c.lastEditedBy}` : '—' },
-  ];
+  // Build all fields — show '—' for missing
+  let fieldsHtml = '';
 
-  $('detFields').innerHTML = fields.map(f => {
-    const val = f.isStatus
-      ? `<span class="det-badge ${(f.value||'').toLowerCase()}">${esc(f.value)}</span>`
-      : `<span class="det-value">${esc(f.value)}</span>`;
-    return `<div class="det-field"><span class="det-label">${f.label}</span>${val}</div>`;
-  }).join('');
+  const addField = (label, value, extra = '') => {
+    fieldsHtml += `<div class="det-field">
+      <span class="det-label">${label}</span>
+      <span class="det-value">${value}</span>
+    </div>`;
+  };
+
+  // S.No
+  addField('Serial No', esc(c.sNo || '—'));
+
+  // Meter
+  addField('Meter No', esc(c.meterNo || '—'));
+
+  // Area
+  addField('Area Code', esc(c.transfCode || '—'));
+
+  // Address
+  addField('Address', esc(c.address || '—'));
+
+  // Lab No
+  addField('Lab No', esc(c.labNo || '—'));
+
+  // Phone — with call + WhatsApp buttons
+  if (c.phoneNo) {
+    const clean = c.phoneNo.replace(/\D/g,'');
+    fieldsHtml += `<div class="det-field">
+      <span class="det-label">Phone</span>
+      <div class="det-phone-row">
+        <span class="det-phone-num">${esc(c.phoneNo)}</span>
+        <a href="tel:${esc(c.phoneNo)}" class="det-phone-btn call">
+          <span class="material-icons-round">call</span>Call
+        </a>
+        ${clean.length >= 10 ? `<a href="https://wa.me/91${clean.slice(-10)}" target="_blank" rel="noopener" class="det-phone-btn wa">
+          <span class="material-icons-round">message</span>WA
+        </a>` : ''}
+      </div>
+    </div>`;
+  } else {
+    addField('Phone', '—');
+  }
+
+  // Status badge
+  const st = (c.status || 'Active').toLowerCase();
+  fieldsHtml += `<div class="det-field">
+    <span class="det-label">Status</span>
+    <span class="det-badge ${st}">${esc(c.status || 'Active')}</span>
+  </div>`;
+
+  // Last edited
+  addField('Last Edited By', esc(c.lastEditedBy || '—'));
+
+  // Created date
+  addField('Created', esc(formatDate(c.createdAt)));
+
+  $('detFields').innerHTML = fieldsHtml;
 
   const delBtn = isAdmin
     ? `<button class="det-btn det-del" onclick="confirmDelete(${c._rowIndex},'${esc(c.conNo)}','${esc(c.consumerName)}')">
@@ -1068,14 +1178,13 @@ function openDetail(c) {
   $('detActions').innerHTML = `
     <button class="det-btn det-edit" onclick="openEditForm('${esc(c.conNo)}')">
       <span class="material-icons-round">edit</span>Edit
-    </button>
-    ${delBtn}`;
+    </button>${delBtn}`;
 
   openSheet('detailSheet');
 }
 
 /* ════════════════════════════════════════════════════════════
-   SEARCH
+   SEARCH, FILTER, SORT
 ════════════════════════════════════════════════════════════ */
 $('searchInp').addEventListener('input', e => {
   searchQ = e.target.value;
@@ -1085,8 +1194,7 @@ $('searchInp').addEventListener('input', e => {
 });
 
 function clearSearch() {
-  $('searchInp').value = '';
-  searchQ = '';
+  $('searchInp').value = ''; searchQ = '';
   $('sClear').classList.add('hidden');
   applyFilters();
 }
@@ -1098,13 +1206,34 @@ function setArea(el, code) {
   applyFilters();
 }
 
+function setStatus(el, status) {
+  activeStatus = status;
+  document.querySelectorAll('.f-pill').forEach(p => p.classList.remove('active','active-s','inactive-s','defaulter-s'));
+  if (status === 'ALL') el.classList.add('active');
+  else if (status === 'Active')    el.classList.add('active-s');
+  else if (status === 'Inactive')  el.classList.add('inactive-s');
+  else if (status === 'Defaulter') el.classList.add('defaulter-s');
+  applyFilters();
+}
+
+function cycleSort() {
+  const orders  = ['default','asc','desc'];
+  const labels  = ['Default','A → Z','Z → A'];
+  const current = orders.indexOf(sortOrder);
+  sortOrder = orders[(current + 1) % 3];
+  const lbl = labels[orders.indexOf(sortOrder)];
+  $('sortLbl').textContent = lbl;
+  $('sortBtn').classList.toggle('active', sortOrder !== 'default');
+  applyFilters();
+}
+
 /* ════════════════════════════════════════════════════════════
    THEME
 ════════════════════════════════════════════════════════════ */
 function applyTheme(t) {
   document.documentElement.setAttribute('data-theme', t);
   $('themeIcon').textContent  = t === 'dark' ? 'dark_mode' : 'light_mode';
-  $('themeColorMeta').content = t === 'dark' ? '#0D1D36'  : '#0052B4';
+  $('themeColorMeta').content = t === 'dark' ? '#0F1F3C' : '#0052B4';
   localStorage.setItem('an_elect_theme', t);
 }
 $('themeToggle').addEventListener('click', () => {
@@ -1138,45 +1267,33 @@ function openChangePass() {
 
 function chkStrength(v) {
   const fi = $('sfi'), tx = $('stxt');
-  if (!v) { fi.style.width = '0%'; tx.textContent = ''; return; }
+  if (!v) { fi.style.width='0%'; tx.textContent=''; return; }
   let s = 0;
   if (v.length >= 8) s++;
   if (/[A-Z]/.test(v)) s++;
   if (/[0-9]/.test(v)) s++;
   if (/[^A-Za-z0-9]/.test(v)) s++;
-  const L = [
-    { w:'25%', b:'#F44336', t:'Too weak' },
-    { w:'50%', b:'#FF9800', t:'Weak' },
-    { w:'75%', b:'#FFC107', t:'Good' },
-    { w:'100%',b:'#4CAF50', t:'Strong ✓' },
-  ][s - 1] || { w:'25%', b:'#F44336', t:'Too weak' };
-  fi.style.width = L.w; fi.style.background = L.b; tx.textContent = L.t;
+  const L = [{w:'25%',b:'#F44336',t:'Too weak'},{w:'50%',b:'#FF9800',t:'Weak'},{w:'75%',b:'#FFC107',t:'Good'},{w:'100%',b:'#4CAF50',t:'Strong ✓'}][s-1] || {w:'25%',b:'#F44336',t:'Too weak'};
+  fi.style.width=L.w; fi.style.background=L.b; tx.textContent=L.t;
 }
 
 async function submitCP() {
-  const cur = $('cpCur').value.trim();
-  const nw  = $('cpNew').value.trim();
-  const cfm = $('cpCfm').value.trim();
+  const cur=$('cpCur').value.trim(), nw=$('cpNew').value.trim(), cfm=$('cpCfm').value.trim();
   $('cpErr').classList.remove('show'); $('cpOk').classList.remove('show');
-  if (!cur || !nw || !cfm) { showCpErr('All fields are required.'); return; }
-  if (nw.length < 8) { showCpErr('Min 8 characters.'); return; }
-  if (nw !== cfm) { showCpErr('Passwords do not match.'); return; }
-  const btn = $('cpBtn'); btn.classList.add('loading');
+  if (!cur||!nw||!cfm) { showCpErr('All fields required.'); return; }
+  if (nw.length<8) { showCpErr('Min 8 characters.'); return; }
+  if (nw!==cfm) { showCpErr('Passwords do not match.'); return; }
+  const btn=$('cpBtn'); btn.classList.add('loading');
   try {
-    const res  = await fetch(API_URL, {
-      method: 'POST', headers: { 'Content-Type': 'text/plain' },
-      body: JSON.stringify({ action: 'changePassword', username: session.username,
-                             currentPassword: cur, newPassword: nw })
-    });
-    const json = await res.json();
-    if (json.success) { $('cpOk').classList.add('show'); setTimeout(closeSheet, 2000); }
-    else showCpErr(json.message || 'Failed.');
+    const res=await fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain'},
+      body:JSON.stringify({action:'changePassword',username:session.username,currentPassword:cur,newPassword:nw})});
+    const json=await res.json();
+    if (json.success) { $('cpOk').classList.add('show'); setTimeout(closeSheet,2000); }
+    else showCpErr(json.message||'Failed.');
   } catch { showCpErr('Network error.'); }
   btn.classList.remove('loading');
 }
-
-function showCpErr(msg) { $('cpErrMsg').textContent = msg; $('cpErr').classList.add('show'); }
-
+function showCpErr(msg) { $('cpErrMsg').textContent=msg; $('cpErr').classList.add('show'); }
 function openAbout() { closeUserMenu(); openSheet('aboutSheet'); }
 
 /* ════════════════════════════════════════════════════════════
@@ -1184,10 +1301,7 @@ function openAbout() { closeUserMenu(); openSheet('aboutSheet'); }
 ════════════════════════════════════════════════════════════ */
 async function handleLogout() {
   closeUserMenu();
-  try {
-    await fetch(API_URL, { method:'POST', headers:{'Content-Type':'text/plain'},
-      body: JSON.stringify({ action:'logout', token:session.token }) });
-  } catch {}
+  try { await fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({action:'logout',token:session.token})}); } catch {}
   await AN_DB.clearAllData();
   await AN_DB.clearSession();
   location.replace('./login.html');
@@ -1198,21 +1312,20 @@ async function handleLogout() {
 ════════════════════════════════════════════════════════════ */
 function enterSelectMode() {
   if (!isAdmin) return;
-  selectMode = true;
-  selectedSet.clear();
+  selectMode = true; selectedSet.clear();
   $('selBar').classList.remove('hidden');
   $('navbar').classList.add('hidden');
   $('fabBtn').classList.add('hidden');
-  updateSelUI();
-  applyFilters();
+  $('bottomNav').classList.add('hide'); // Hide bottom nav in select mode
+  updateSelUI(); applyFilters();
 }
 
 function exitSelectMode() {
-  selectMode = false;
-  selectedSet.clear();
+  selectMode = false; selectedSet.clear();
   $('selBar').classList.add('hidden');
   $('navbar').classList.remove('hidden');
   $('fabBtn').classList.remove('hidden');
+  $('bottomNav').classList.remove('hide'); // Restore bottom nav
   $('delBar').classList.add('hidden');
   applyFilters();
 }
@@ -1224,32 +1337,28 @@ function toggleCard(conNo, el) {
 }
 
 function toggleSelectAll() {
-  const allSelected = selectedSet.size === filtered.length;
+  const allSel = selectedSet.size === filtered.length;
   selectedSet.clear();
-  if (!allSelected) filtered.forEach(c => selectedSet.add(c.conNo));
-  document.querySelectorAll('.c-card').forEach(card => {
-    card.classList.toggle('selected', !allSelected);
-  });
+  if (!allSel) filtered.forEach(c => selectedSet.add(c.conNo));
+  document.querySelectorAll('.c-card').forEach(card => card.classList.toggle('selected', !allSel));
   updateSelUI();
 }
 
 function updateSelUI() {
   const n = selectedSet.size;
-  $('selCnt').textContent    = n === 0 ? 'Tap to select' : `${n} selected`;
+  $('selCnt').textContent    = n===0 ? 'Tap cards to select' : `${n} selected`;
   $('delBarCnt').textContent = n;
-  $('delBar').classList.toggle('hidden', n === 0);
-  $('selAllBtn').textContent = n === filtered.length ? 'Deselect All' : 'Select All';
+  $('delBar').classList.toggle('hidden', n===0);
+  $('selAllBtn').textContent = n===filtered.length ? 'Deselect All' : 'Select All';
 }
 
-/* ── Bulk delete ──────────────────────────────────────────── */
+/* ── Bulk delete ────────────────────────────────────────── */
 function bulkDeleteConfirm() {
   const n = selectedSet.size;
   if (!n) return;
-  $('delWho').textContent = `${n} consumer${n !== 1 ? 's' : ''} will be permanently deleted.`;
-  // Store the set snapshot
-  openSheet('delSheet');
-  // Override doDelete for bulk
+  $('delWho').textContent = `${n} consumer${n!==1?'s':''} will be permanently deleted.`;
   window._bulkDelete = true;
+  openSheet('delSheet');
 }
 
 async function doDelete() {
@@ -1265,58 +1374,44 @@ async function doDelete() {
 async function executeBulkDelete() {
   const conNos = [...selectedSet];
   if (!conNos.length) return;
-
   toast(`Deleting ${conNos.length} consumers…`);
 
-  // Get full consumer objects, sort by _rowIndex DESC (delete bottom to top to preserve indices)
+  // CRITICAL: Sort by _rowIndex DESC to avoid row shifting
   const toDelete = conNos
     .map(conNo => masterList.find(c => c.conNo === conNo))
     .filter(Boolean)
-    .sort((a, b) => b._rowIndex - a._rowIndex);
+    .sort((a,b) => b._rowIndex - a._rowIndex);
 
-  let deleted = 0, failed = 0;
-
+  let deleted=0, failed=0;
   for (const c of toDelete) {
     try {
       if (navigator.onLine) {
-        const res  = await fetch(API_URL, {
-          method: 'POST', headers: { 'Content-Type': 'text/plain' },
-          body: JSON.stringify({
-            action: 'deleteConsumer', token: session.token,
-            officeId: session.officeId, sheetName: 'CONSUMER DATA ALL',
-            rowIndex: c._rowIndex, conNo: c.conNo, consumerName: c.consumerName
-          })
-        });
-        const json = await res.json();
-        if (json.success) {
-          await AN_DB.deleteConsumer(c.conNo);
-          masterList = masterList.filter(x => x.conNo !== c.conNo);
-          deleted++;
-        } else { failed++; }
+        const res=await fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain'},
+          body:JSON.stringify({action:'deleteConsumer',token:session.token,officeId:session.officeId,
+            sheetName:'CONSUMER DATA ALL',rowIndex:c._rowIndex,conNo:c.conNo,consumerName:c.consumerName})});
+        const json=await res.json();
+        if (json.success) { await AN_DB.deleteConsumer(c.conNo); masterList=masterList.filter(x=>x.conNo!==c.conNo); deleted++; }
+        else failed++;
       } else {
         await AN_DB.deleteConsumer(c.conNo);
-        await AN_DB.addPendingChange('deleteConsumer',
-          { rowIndex: c._rowIndex, conNo: c.conNo }, session.officeId);
-        masterList = masterList.filter(x => x.conNo !== c.conNo);
-        deleted++;
+        await AN_DB.addPendingChange('deleteConsumer',{rowIndex:c._rowIndex,conNo:c.conNo},session.officeId);
+        masterList=masterList.filter(x=>x.conNo!==c.conNo); deleted++;
       }
     } catch { failed++; }
   }
 
   exitSelectMode();
-  toast(
-    `Deleted ${deleted}${failed ? ` · ${failed} failed` : ''}`,
-    deleted > 0 ? 'ok' : 'err'
-  );
+  toast(`Deleted ${deleted}${failed?` · ${failed} failed`:''}`, deleted>0?'ok':'err');
 
-  if (!navigator.onLine) AN_DB.requestSync();
+  // Reload to get fresh row indices (prevents drift on next delete)
+  if (navigator.onLine) setTimeout(() => loadConsumers(false), 800);
+  else AN_DB.requestSync();
 }
 
-/* Single delete (from detail sheet) */
 function confirmDelete(rowIdx, conNo, name) {
-  closeSheet(); // close detail
-  delRowIdx = rowIdx; delConNo = conNo; delName = name;
-  window._bulkDelete = false;
+  closeSheet();
+  delRowIdx=rowIdx; delConNo=conNo; delName=name;
+  window._bulkDelete=false;
   $('delWho').textContent = name;
   setTimeout(() => openSheet('delSheet'), 150);
 }
@@ -1324,38 +1419,34 @@ function confirmDelete(rowIdx, conNo, name) {
 async function executeSingleDelete() {
   try {
     if (navigator.onLine) {
-      const res  = await fetch(API_URL, {
-        method: 'POST', headers: { 'Content-Type': 'text/plain' },
-        body: JSON.stringify({
-          action: 'deleteConsumer', token: session.token,
-          officeId: session.officeId, sheetName: 'CONSUMER DATA ALL',
-          rowIndex: delRowIdx, conNo: delConNo, consumerName: delName
-        })
-      });
-      const json = await res.json();
+      const res=await fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain'},
+        body:JSON.stringify({action:'deleteConsumer',token:session.token,officeId:session.officeId,
+          sheetName:'CONSUMER DATA ALL',rowIndex:delRowIdx,conNo:delConNo,consumerName:delName})});
+      const json=await res.json();
       if (json.success) {
         await AN_DB.deleteConsumer(delConNo);
-        masterList = masterList.filter(c => c.conNo !== delConNo);
+        masterList=masterList.filter(c=>c.conNo!==delConNo);
         applyFilters();
-        toast('Consumer deleted', 'ok');
-      } else { toast(json.error || 'Delete failed', 'err'); }
+        toast('Consumer deleted','ok');
+        // Reload fresh row indices
+        if (navigator.onLine) setTimeout(() => loadConsumers(false), 800);
+      } else { toast(json.error||json.message||'Delete failed','err'); }
     } else {
       await AN_DB.deleteConsumer(delConNo);
-      await AN_DB.addPendingChange('deleteConsumer',
-        { rowIndex: delRowIdx, conNo: delConNo }, session.officeId);
-      masterList = masterList.filter(c => c.conNo !== delConNo);
+      await AN_DB.addPendingChange('deleteConsumer',{rowIndex:delRowIdx,conNo:delConNo},session.officeId);
+      masterList=masterList.filter(c=>c.conNo!==delConNo);
       applyFilters();
       toast('Deleted offline — will sync when online');
       AN_DB.requestSync();
     }
-  } catch { toast('Error deleting', 'err'); }
+  } catch { toast('Error deleting','err'); }
 }
 
 /* ════════════════════════════════════════════════════════════
-   ADD / EDIT STUBS
+   ADD / EDIT — STUBS (Step 6)
 ════════════════════════════════════════════════════════════ */
-function openAddForm()       { toast('Add Consumer — coming in Step 6!'); }
-function openEditForm(conNo) { closeSheet(); toast('Edit Consumer — coming in Step 6!'); }
+function openAddForm()       { toast('Add Consumer — Step 6 coming soon!'); }
+function openEditForm(conNo) { closeSheet(); toast('Edit Consumer — Step 6 coming soon!'); }
 
 /* ════════════════════════════════════════════════════════════
    TABS
@@ -1363,26 +1454,8 @@ function openEditForm(conNo) { closeSheet(); toast('Edit Consumer — coming in 
 function switchTab(tab) {
   document.querySelectorAll('.bnav').forEach(b => b.classList.remove('active'));
   $(`bnav-${tab}`)?.classList.add('active');
-  if (tab === 'activity') toast('Activity Log — coming soon!');
-  if (tab === 'admin')    toast('Admin Panel — coming soon!');
-}
-
-/* ════════════════════════════════════════════════════════════
-   SYNC
-════════════════════════════════════════════════════════════ */
-function setSync(type, txt) {
-  $('syncDot').className    = `sync-dot ${type}`;
-  $('syncTxt').textContent  = txt;
-}
-function setRefreshSpin(on) {
-  $('refreshBtn').classList.toggle('spin', on);
-}
-function onOnline()  { setSync('syncing','Back online — syncing…'); AN_DB.requestSync(); setTimeout(loadConsumers,600); }
-function onOffline() { setSync('offline','Offline — edits save locally'); }
-function onSWMsg({ data }) {
-  if (!data) return;
-  if (data.type === 'SYNC_COMPLETE') { setSync('online', `${data.synced} change${data.synced!==1?'s':''} synced`); loadConsumers(); }
-  if (data.type === 'SYNC_FAILED')   { setSync('pending','Sync failed — will retry'); }
+  if (tab==='activity') toast('Activity Log — coming soon!');
+  if (tab==='admin')    toast('Admin Panel — coming soon!');
 }
 
 /* ════════════════════════════════════════════════════════════
@@ -1393,91 +1466,119 @@ function openSheet(id) {
   activeSheet = id;
   $(id).classList.add('open');
   $('backdrop').classList.add('show');
-  // Prevent backdrop from closing delete confirm in bulk mode
-  if (id === 'delSheet') {
-    $('backdrop').onclick = null;
-  } else {
-    $('backdrop').onclick = closeSheet;
-  }
+  $('backdrop').onclick = id === 'delSheet' ? null : closeSheet;
 }
 
 function closeSheet() {
-  if (activeSheet) { $(activeSheet).classList.remove('open'); activeSheet = null; }
+  if (activeSheet) { $(activeSheet).classList.remove('open'); activeSheet=null; }
   $('backdrop').classList.remove('show');
   $('backdrop').onclick = closeSheet;
   window._bulkDelete = false;
+  // Restore scroll position
+  requestAnimationFrame(() => window.scrollTo(0, lastScrollY));
 }
 
 function toggleEye(inputId, iconId) {
-  const inp = $(inputId), icon = $(iconId);
-  const show = inp.type === 'password';
-  inp.type = show ? 'text' : 'password';
-  icon.textContent = show ? 'visibility' : 'visibility_off';
+  const inp=$(inputId), icon=$(iconId);
+  inp.type=inp.type==='password'?'text':'password';
+  icon.textContent=inp.type==='text'?'visibility':'visibility_off';
 }
 
 /* ════════════════════════════════════════════════════════════
-   LONG PRESS
+   LONG PRESS (with visual feedback)
 ════════════════════════════════════════════════════════════ */
-function attachLongPress(el, cb) {
+function attachLongPress(el, consumer) {
   el.addEventListener('pointerdown', e => {
+    if (!isAdmin) return;
     pressPos = { x: e.clientX, y: e.clientY };
+    pressCard = el;
+    el.classList.add('pressing'); // Visual feedback during long press
     pressTimer = setTimeout(() => {
       if (navigator.vibrate) navigator.vibrate(50);
+      el.classList.remove('pressing');
       pressTimer = null;
-      cb();
+      enterSelectMode();
+      toggleCard(consumer.conNo, el);
     }, 500);
   });
+
   el.addEventListener('pointermove', e => {
     if (!pressPos) return;
-    if (Math.abs(e.clientX - pressPos.x) > 12 || Math.abs(e.clientY - pressPos.y) > 12) {
-      clearTimeout(pressTimer); pressTimer = null; pressPos = null;
+    if (Math.abs(e.clientX-pressPos.x)>12 || Math.abs(e.clientY-pressPos.y)>12) {
+      clearPressTimer();
     }
   });
+
   ['pointerup','pointercancel','pointerleave'].forEach(evt => {
-    el.addEventListener(evt, () => { clearTimeout(pressTimer); pressTimer = null; pressPos = null; });
+    el.addEventListener(evt, () => clearPressTimer());
   });
+}
+
+function clearPressTimer() {
+  clearTimeout(pressTimer); pressTimer=null; pressPos=null;
+  if (pressCard) { pressCard.classList.remove('pressing'); pressCard=null; }
+}
+
+/* ════════════════════════════════════════════════════════════
+   SYNC
+════════════════════════════════════════════════════════════ */
+function setSync(type, txt) {
+  $('syncDot').className    = `sync-dot ${type}`;
+  $('syncTxt').textContent  = txt;
+}
+function setRefreshSpin(on) { $('refreshBtn').classList.toggle('spin', on); }
+function onOnline()  { setSync('syncing','Back online — syncing…'); AN_DB.requestSync(); setTimeout(loadConsumers, 600); }
+function onOffline() { setSync('offline','Offline — edits save locally'); }
+function onSWMsg({ data }) {
+  if (!data) return;
+  if (data.type==='SYNC_COMPLETE') { setSync('online',`${data.synced} change${data.synced!==1?'s':''} synced`); loadConsumers(false); }
+  if (data.type==='SYNC_FAILED')   { setSync('pending','Sync failed — will retry'); }
 }
 
 /* ════════════════════════════════════════════════════════════
    ERROR + RIPPLE + TOAST + UTILS
 ════════════════════════════════════════════════════════════ */
 function showErr(msg) {
-  $('consumerList').innerHTML =
-    `<div class="err-bar"><span class="material-icons-round">warning_amber</span>${esc(msg)}</div>`;
+  $('consumerList').innerHTML=`<div class="err-bar"><span class="material-icons-round">warning_amber</span>${esc(msg)}</div>`;
 }
 
 function addRipple(el, e) {
-  const r  = el.getBoundingClientRect();
-  const sz = Math.max(r.width, r.height) * 1.4;
-  const rip = document.createElement('span');
-  rip.className = 'ripple';
-  rip.style.cssText = `width:${sz}px;height:${sz}px;left:${e.clientX-r.left-sz/2}px;top:${e.clientY-r.top-sz/2}px;`;
+  const r=el.getBoundingClientRect(), sz=Math.max(r.width,r.height)*1.4;
+  const rip=document.createElement('span');
+  rip.className='ripple';
+  rip.style.cssText=`width:${sz}px;height:${sz}px;left:${e.clientX-r.left-sz/2}px;top:${e.clientY-r.top-sz/2}px;`;
   el.appendChild(rip);
-  setTimeout(() => rip.remove(), 600);
+  setTimeout(()=>rip.remove(),600);
 }
 
-function toast(msg, type = '') {
-  const el = $('toast');
-  el.textContent = msg;
-  el.className = `show ${type}`.trim();
+function toast(msg, type='') {
+  const el=$('toast');
+  el.textContent=msg; el.className=`show ${type}`.trim();
   clearTimeout(toastT);
-  toastT = setTimeout(() => { el.className = type.trim(); }, 2800);
+  toastT=setTimeout(()=>{ el.className=type.trim(); },2800);
 }
 
 function esc(s) {
-  return String(s??'')
-    .replace(/&/g,'&amp;').replace(/</g,'&lt;')
-    .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  return String(s??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function formatDate(ts) {
+  if (!ts || ts==='—') return '—';
+  try {
+    const d = new Date(ts);
+    if (isNaN(d)) return ts;
+    return d.toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'});
+  } catch { return ts; }
 }
 
 function timeAgo(ts) {
-  const d = Date.now() - ts;
-  if (d < 60000)   return 'just now';
-  if (d < 3600000) return `${Math.floor(d/60000)}m ago`;
+  const d=Date.now()-ts;
+  if (d<60000)   return 'just now';
+  if (d<3600000) return `${Math.floor(d/60000)}m ago`;
   return `${Math.floor(d/3600000)}h ago`;
 }
 
-/* ── START ─────────────────────────────────────────────────── */
+/* ── START ─────────────────────────────────────────────── */
 init();
 </script>
 </body>
