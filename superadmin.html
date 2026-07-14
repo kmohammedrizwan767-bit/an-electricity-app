@@ -1,0 +1,1438 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="theme-color" content="#060C18" />
+  <title>SuperAdmin — A&N Electricity</title>
+  <link rel="manifest" href="./manifest.json" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&family=Roboto:wght@400;500&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet" />
+
+  <style>
+    /* ===== CSS VARIABLES ===== */
+    :root {
+      --primary: #0052B4;
+      --primary-light: #1976D2;
+      --bg: #060C18;
+      --card: #0F1F3C;
+      --card-border: #1E3868;
+      --text: #EEF4FF;
+      --text-secondary: #9CB8DC;
+      --accent: #FFC107;
+      --danger: #D32F2F;
+      --success: #2E7D32;
+      --r-card: 20px;
+      --r-input: 12px;
+      --r-btn: 12px;
+    }
+    .light-mode {
+      --bg: #F0F4FF;
+      --card: #FFFFFF;
+      --card-border: #C5D5F0;
+      --text: #0A1628;
+      --text-secondary: #3A5A8A;
+    }
+
+    /* ===== RESET ===== */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      height: 100%;
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Roboto', sans-serif;
+      font-size: 14px;
+      overscroll-behavior: none;
+      -webkit-tap-highlight-color: transparent;
+      transition: background 0.3s, color 0.3s;
+    }
+
+    /* ===== SPLASH ===== */
+    #splash {
+      position: fixed; inset: 0;
+      background: var(--bg);
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      z-index: 1000;
+      transition: opacity 0.4s;
+    }
+    #splash.hide { opacity: 0; pointer-events: none; }
+    .splash-logo {
+      width: 80px; height: 80px;
+      border-radius: 20px;
+      background: var(--primary);
+      display: flex; align-items: center; justify-content: center;
+      margin-bottom: 16px;
+      box-shadow: 0 8px 32px rgba(0,82,180,0.4);
+    }
+    .splash-logo .material-icons-round { font-size: 42px; color: white; }
+    .splash-title {
+      font-family: 'Poppins', sans-serif;
+      font-size: 20px; font-weight: 700;
+      color: var(--text);
+    }
+    .splash-sub {
+      font-size: 11px; color: var(--text-secondary);
+      margin-top: 4px;
+      letter-spacing: 1.5px; text-transform: uppercase;
+    }
+    .splash-loader {
+      margin-top: 32px; width: 40px; height: 3px;
+      background: var(--card-border); border-radius: 2px; overflow: hidden;
+    }
+    .splash-loader::after {
+      content: ''; display: block;
+      width: 40%; height: 100%;
+      background: var(--primary); border-radius: 2px;
+      animation: splash-slide 1.2s ease-in-out infinite;
+    }
+    @keyframes splash-slide {
+      0% { transform: translateX(-100%); }
+      100% { transform: translateX(350%); }
+    }
+
+    /* ===== APP ===== */
+    #app { min-height: 100vh; display: flex; flex-direction: column; }
+
+    /* ===== HEADER ===== */
+    .header {
+      position: sticky; top: 0; z-index: 100;
+      background: var(--bg);
+      border-bottom: 1px solid var(--card-border);
+      padding: 0 16px; height: 56px;
+      display: flex; align-items: center; gap: 12px;
+    }
+    .header-brand { flex: 1; min-width: 0; }
+    .header-brand h1 {
+      font-family: 'Poppins', sans-serif;
+      font-size: 16px; font-weight: 700;
+      color: var(--text);
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .header-brand p {
+      font-size: 11px; color: var(--accent);
+      font-weight: 500; letter-spacing: 0.5px;
+    }
+    .header-actions { display: flex; align-items: center; gap: 4px; flex-shrink: 0; }
+
+    .icon-btn {
+      width: 40px; height: 40px;
+      border: none; background: transparent;
+      color: var(--text-secondary);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; position: relative; overflow: hidden;
+      transition: color 0.2s, background 0.2s;
+    }
+    .icon-btn:hover { background: var(--card-border); color: var(--text); }
+    .icon-btn .material-icons-round { font-size: 22px; }
+
+    /* ===== PROFILE MENU ===== */
+    .profile-menu-wrap { position: relative; }
+    .profile-avatar {
+      width: 36px; height: 36px;
+      border-radius: 50%;
+      background: var(--primary);
+      border: 2px solid var(--accent);
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer;
+      font-family: 'Poppins', sans-serif;
+      font-size: 13px; font-weight: 700; color: white;
+      user-select: none;
+    }
+    .profile-dropdown {
+      display: none;
+      position: absolute; top: calc(100% + 8px); right: 0;
+      background: var(--card);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      min-width: 200px; overflow: hidden;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+      z-index: 200;
+    }
+    .profile-dropdown.open { display: block; }
+    .profile-dropdown-header {
+      padding: 16px;
+      border-bottom: 1px solid var(--card-border);
+    }
+    .profile-dropdown-header .name {
+      font-family: 'Poppins', sans-serif;
+      font-weight: 600; font-size: 14px; color: var(--text);
+    }
+    .profile-dropdown-header .role {
+      font-size: 11px; color: var(--accent); margin-top: 2px;
+    }
+    .profile-menu-item {
+      width: 100%; border: none; background: transparent;
+      color: var(--text);
+      padding: 12px 16px;
+      display: flex; align-items: center; gap: 12px;
+      cursor: pointer; text-align: left; font-size: 14px;
+      transition: background 0.2s;
+    }
+    .profile-menu-item:hover { background: var(--card-border); }
+    .profile-menu-item.danger { color: var(--danger); }
+    .profile-menu-item .material-icons-round { font-size: 18px; color: var(--text-secondary); }
+    .profile-menu-item.danger .material-icons-round { color: var(--danger); }
+
+    /* ===== MAIN ===== */
+    .main-content { flex: 1; padding: 16px; padding-bottom: 40px; }
+
+    /* ===== PAGE HEADER ===== */
+    .page-header {
+      display: flex; align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px; gap: 12px;
+    }
+    .page-title {
+      font-family: 'Poppins', sans-serif;
+      font-size: 20px; font-weight: 700; color: var(--text);
+    }
+    .page-subtitle { font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
+
+    .add-btn {
+      display: flex; align-items: center; gap: 6px;
+      padding: 10px 14px;
+      background: var(--primary); color: white;
+      border: none; border-radius: var(--r-btn);
+      font-family: 'Poppins', sans-serif;
+      font-size: 13px; font-weight: 600;
+      cursor: pointer; position: relative; overflow: hidden;
+      box-shadow: 0 4px 16px rgba(0,82,180,0.3);
+      transition: background 0.2s, transform 0.1s;
+      white-space: nowrap; flex-shrink: 0;
+    }
+    .add-btn:active { transform: scale(0.97); }
+    .add-btn .material-icons-round { font-size: 18px; }
+
+    /* ===== STATS GRID ===== */
+    .stats-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      gap: 10px; margin-bottom: 16px;
+    }
+    .stat-card {
+      background: var(--card);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 14px 10px; text-align: center;
+    }
+    .stat-icon { font-size: 20px; margin-bottom: 6px; }
+    .stat-value {
+      font-family: 'Poppins', sans-serif;
+      font-size: 24px; font-weight: 700;
+      color: var(--text); line-height: 1;
+    }
+    .stat-label {
+      font-size: 10px; color: var(--text-secondary);
+      margin-top: 4px; text-transform: uppercase; letter-spacing: 0.5px;
+    }
+
+    /* ===== SYNC BAR ===== */
+    .sync-bar {
+      background: var(--card);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 8px 14px;
+      display: flex; align-items: center; gap: 8px;
+      margin-bottom: 16px;
+      font-size: 12px; color: var(--text-secondary);
+    }
+    .sync-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%; flex-shrink: 0;
+    }
+    .sync-dot.synced { background: #4CAF50; }
+    .sync-dot.loading { background: var(--accent); animation: blink 1s infinite; }
+    .sync-dot.error { background: var(--danger); }
+    @keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
+    .sync-refresh {
+      margin-left: auto; background: none; border: none;
+      color: var(--text-secondary); cursor: pointer;
+      padding: 4px; display: flex; align-items: center;
+    }
+    .sync-refresh .material-icons-round { font-size: 16px; }
+    .sync-refresh.spinning .material-icons-round { animation: spin 1s linear infinite; }
+
+    /* ===== TABS ===== */
+    .tabs-bar {
+      display: flex;
+      background: var(--card);
+      border: 1px solid var(--card-border);
+      border-radius: 14px; padding: 4px;
+      margin-bottom: 16px; gap: 4px;
+    }
+    .tab-btn {
+      flex: 1; padding: 9px 8px;
+      border: none; background: transparent;
+      color: var(--text-secondary); border-radius: 10px;
+      font-family: 'Poppins', sans-serif;
+      font-size: 13px; font-weight: 500;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center; gap: 6px;
+      transition: all 0.2s;
+    }
+    .tab-btn.active { background: var(--primary); color: white; }
+    .tab-btn .material-icons-round { font-size: 16px; }
+    .tab-badge {
+      background: var(--accent); color: #000;
+      font-size: 10px; font-weight: 700;
+      padding: 1px 5px; border-radius: 10px;
+      min-width: 18px; text-align: center;
+    }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+
+    /* ===== OFFICE CARDS ===== */
+    .office-card {
+      background: var(--card);
+      border: 1px solid var(--card-border);
+      border-radius: var(--r-card);
+      padding: 16px; margin-bottom: 12px;
+    }
+    .office-card-top {
+      display: flex; align-items: flex-start;
+      justify-content: space-between; gap: 12px;
+      margin-bottom: 12px;
+    }
+    .office-icon-wrap {
+      width: 42px; height: 42px; border-radius: 12px;
+      background: rgba(0,82,180,0.12);
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    }
+    .office-icon-wrap .material-icons-round { color: var(--primary-light); font-size: 22px; }
+    .office-info { flex: 1; min-width: 0; }
+    .office-name {
+      font-family: 'Poppins', sans-serif;
+      font-size: 15px; font-weight: 600; color: var(--text);
+      margin-bottom: 2px;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .office-id { font-size: 11px; color: var(--text-secondary); font-family: monospace; }
+    .status-badge {
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 3px 10px; border-radius: 20px;
+      font-size: 11px; font-weight: 600; flex-shrink: 0;
+    }
+    .status-badge::before {
+      content: ''; width: 6px; height: 6px;
+      border-radius: 50%; background: currentColor;
+    }
+    .status-badge.active {
+      background: rgba(46,125,50,0.15); color: #4CAF50;
+      border: 1px solid rgba(46,125,50,0.3);
+    }
+    .status-badge.inactive {
+      background: rgba(211,47,47,0.15); color: #EF5350;
+      border: 1px solid rgba(211,47,47,0.3);
+    }
+    .office-meta { display: flex; flex-wrap: wrap; gap: 10px; }
+    .office-meta-item {
+      display: flex; align-items: center; gap: 4px;
+      font-size: 12px; color: var(--text-secondary);
+    }
+    .office-meta-item .material-icons-round { font-size: 14px; }
+    .office-meta-item.no-sheet { color: #EF5350; }
+
+    /* ===== REQUEST CARDS ===== */
+    .request-card {
+      background: var(--card);
+      border: 1px solid var(--card-border);
+      border-radius: var(--r-card);
+      padding: 16px; margin-bottom: 12px;
+      border-left-width: 4px;
+    }
+    .request-card.pending { border-left-color: var(--accent); }
+    .request-card.approved { border-left-color: #4CAF50; }
+    .request-card.rejected { border-left-color: var(--danger); }
+    .request-card-top {
+      display: flex; align-items: flex-start;
+      justify-content: space-between; gap: 10px;
+      margin-bottom: 4px;
+    }
+    .request-office-name {
+      font-family: 'Poppins', sans-serif;
+      font-size: 15px; font-weight: 600; color: var(--text);
+      margin-bottom: 2px;
+    }
+    .request-meta { font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
+    .request-status {
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 3px 10px; border-radius: 20px;
+      font-size: 11px; font-weight: 600; flex-shrink: 0;
+    }
+    .request-status.pending {
+      background: rgba(255,193,7,0.12); color: var(--accent);
+      border: 1px solid rgba(255,193,7,0.3);
+    }
+    .request-status.approved {
+      background: rgba(76,175,80,0.12); color: #4CAF50;
+      border: 1px solid rgba(76,175,80,0.3);
+    }
+    .request-status.rejected {
+      background: rgba(211,47,47,0.12); color: #EF5350;
+      border: 1px solid rgba(211,47,47,0.3);
+    }
+    .approve-btn {
+      width: 100%; padding: 10px; border: none;
+      background: var(--primary); color: white;
+      border-radius: var(--r-btn);
+      font-family: 'Poppins', sans-serif;
+      font-size: 13px; font-weight: 600;
+      cursor: pointer; margin-top: 12px;
+      display: flex; align-items: center; justify-content: center; gap: 6px;
+      transition: background 0.2s;
+    }
+    .approve-btn:active { background: var(--primary-light); }
+    .approve-btn .material-icons-round { font-size: 16px; }
+
+    /* ===== SKELETON ===== */
+    .skeleton {
+      background: var(--card);
+      border: 1px solid var(--card-border);
+      border-radius: var(--r-card);
+      padding: 16px; margin-bottom: 12px;
+      overflow: hidden; position: relative;
+    }
+    .skeleton::after {
+      content: ''; position: absolute; inset: 0;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.04), transparent);
+      animation: shimmer 1.5s infinite;
+    }
+    @keyframes shimmer { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
+    .sk-line {
+      height: 12px; background: var(--card-border);
+      border-radius: 6px; margin-bottom: 10px;
+    }
+    .sk-line.w70 { width: 70%; }
+    .sk-line.w50 { width: 50%; }
+    .sk-line.w30 { width: 30%; }
+
+    /* ===== EMPTY STATE ===== */
+    .empty-state { text-align: center; padding: 48px 24px; }
+    .empty-state .material-icons-round {
+      font-size: 56px; color: var(--card-border);
+      margin-bottom: 12px; display: block;
+    }
+    .empty-state h3 {
+      font-family: 'Poppins', sans-serif;
+      font-size: 16px; font-weight: 600; color: var(--text-secondary);
+      margin-bottom: 4px;
+    }
+    .empty-state p { font-size: 13px; color: var(--text-secondary); opacity: 0.7; }
+
+    /* ===== OVERLAY ===== */
+    .sheet-overlay {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,0.6);
+      z-index: 300; backdrop-filter: blur(3px);
+    }
+    .sheet-overlay.open { display: block; }
+
+    /* ===== BOTTOM SHEET ===== */
+    .bottom-sheet {
+      display: none; position: fixed;
+      bottom: 0; left: 0; right: 0;
+      background: var(--card);
+      border-radius: 24px 24px 0 0;
+      border-top: 1px solid var(--card-border);
+      max-height: 90vh; overflow-y: auto;
+      z-index: 400;
+      transform: translateY(100%);
+      transition: transform 0.3s cubic-bezier(0.32, 0.72, 0, 1);
+    }
+    .bottom-sheet.open { display: block; transform: translateY(0); }
+    .sheet-handle {
+      width: 40px; height: 4px; background: var(--card-border);
+      border-radius: 2px; margin: 12px auto 8px;
+    }
+    .sheet-header {
+      padding: 8px 20px 16px;
+      border-bottom: 1px solid var(--card-border);
+    }
+    .sheet-title {
+      font-family: 'Poppins', sans-serif;
+      font-size: 17px; font-weight: 700; color: var(--text);
+    }
+    .sheet-subtitle { font-size: 12px; color: var(--text-secondary); margin-top: 3px; }
+    .sheet-body { padding: 20px; }
+
+    /* ===== FORM ===== */
+    .form-group { margin-bottom: 16px; }
+    .form-label {
+      display: block; font-size: 11px; font-weight: 500;
+      color: var(--text-secondary); margin-bottom: 6px;
+      text-transform: uppercase; letter-spacing: 0.5px;
+    }
+    .form-input {
+      width: 100%; padding: 12px 14px;
+      background: var(--bg);
+      border: 1.5px solid var(--card-border);
+      border-radius: var(--r-input);
+      color: var(--text); font-size: 14px;
+      font-family: 'Roboto', sans-serif;
+      outline: none; transition: border-color 0.2s;
+    }
+    .form-input:focus { border-color: var(--primary-light); }
+    .form-input::placeholder { color: var(--text-secondary); opacity: 0.5; }
+    .input-wrap { position: relative; }
+    .input-wrap .form-input { padding-right: 44px; }
+    .eye-btn {
+      position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+      background: none; border: none; color: var(--text-secondary);
+      cursor: pointer; padding: 4px; display: flex; align-items: center;
+    }
+    .eye-btn .material-icons-round { font-size: 18px; }
+
+    .form-divider { height: 1px; background: var(--card-border); margin: 20px 0 8px; }
+    .form-section-label {
+      font-size: 11px; color: var(--text-secondary);
+      text-align: center; margin-bottom: 16px;
+      letter-spacing: 0.5px; text-transform: uppercase;
+    }
+    .form-note {
+      font-size: 11px; color: var(--text-secondary);
+      padding: 8px 12px; margin-bottom: 8px;
+      background: rgba(255,193,7,0.06);
+      border-radius: 8px; border-left: 3px solid var(--accent);
+    }
+
+    .btn-primary {
+      width: 100%; padding: 14px;
+      background: var(--primary); color: white;
+      border: none; border-radius: var(--r-btn);
+      font-family: 'Poppins', sans-serif;
+      font-size: 15px; font-weight: 600;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      transition: opacity 0.2s, transform 0.1s;
+      margin-top: 8px;
+    }
+    .btn-primary:disabled { opacity: 0.6; }
+    .btn-primary:active:not(:disabled) { transform: scale(0.98); }
+    .btn-primary .material-icons-round { font-size: 18px; }
+    .btn-secondary {
+      width: 100%; padding: 12px;
+      background: transparent; color: var(--text-secondary);
+      border: 1.5px solid var(--card-border);
+      border-radius: var(--r-btn);
+      font-family: 'Poppins', sans-serif;
+      font-size: 14px; font-weight: 500;
+      cursor: pointer; margin-top: 10px;
+      transition: background 0.2s;
+    }
+    .btn-secondary:hover { background: var(--card-border); }
+
+    /* ===== SPINNER ===== */
+    .btn-spin {
+      width: 18px; height: 18px;
+      border: 2px solid rgba(255,255,255,0.3);
+      border-top-color: white; border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ===== TOAST ===== */
+    #toast {
+      position: fixed; bottom: 32px; left: 50%;
+      transform: translateX(-50%) translateY(80px);
+      background: var(--card); color: var(--text);
+      border: 1px solid var(--card-border);
+      border-radius: 14px; padding: 12px 20px;
+      font-size: 14px; font-weight: 500;
+      z-index: 900;
+      transition: transform 0.3s, opacity 0.3s;
+      opacity: 0; white-space: nowrap;
+      max-width: calc(100vw - 32px); text-align: center;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+    }
+    #toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+    #toast.success { border-color: #4CAF50; }
+    #toast.error { border-color: var(--danger); }
+
+    /* ===== RIPPLE ===== */
+    .ripple {
+      position: absolute; width: 80px; height: 80px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.12);
+      transform: scale(0); pointer-events: none;
+      animation: ripple 0.5s ease-out forwards;
+    }
+    @keyframes ripple { to { transform: scale(4); opacity: 0; } }
+
+    /* ===== LIGHT MODE ADJUSTMENTS ===== */
+    .light-mode .form-input { background: #F8FBFF; }
+    .light-mode .profile-dropdown { box-shadow: 0 8px 32px rgba(0,0,40,0.15); }
+  </style>
+</head>
+<body class="dark-mode">
+
+<!-- SPLASH -->
+<div id="splash">
+  <div class="splash-logo">
+    <span class="material-icons-round">bolt</span>
+  </div>
+  <div class="splash-title">A&amp;N Electricity</div>
+  <div class="splash-sub">SuperAdmin Portal</div>
+  <div class="splash-loader"></div>
+</div>
+
+<!-- OVERLAY (for sheets) -->
+<div class="sheet-overlay" id="overlay"></div>
+
+<!-- APP -->
+<div id="app" style="display:none">
+
+  <!-- HEADER -->
+  <header class="header">
+    <div class="header-brand">
+      <h1>⚡ A&amp;N Electricity</h1>
+      <p>SUPER ADMIN</p>
+    </div>
+    <div class="header-actions">
+      <button class="icon-btn" id="themeToggle" title="Toggle theme">
+        <span class="material-icons-round" id="themeIcon">dark_mode</span>
+      </button>
+      <div class="profile-menu-wrap">
+        <div class="profile-avatar" id="profileAvatar" title="Profile">SA</div>
+        <div class="profile-dropdown" id="profileDropdown">
+          <div class="profile-dropdown-header">
+            <div class="name" id="profileName">Super Admin</div>
+            <div class="role">⭐ SuperAdmin</div>
+          </div>
+          <button class="profile-menu-item" id="changePwdMenuBtn">
+            <span class="material-icons-round">lock_reset</span>
+            Change Password
+          </button>
+          <button class="profile-menu-item danger" id="logoutBtn">
+            <span class="material-icons-round">logout</span>
+            Sign Out
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN -->
+  <main class="main-content">
+
+    <!-- PAGE HEADER -->
+    <div class="page-header">
+      <div>
+        <div class="page-title">Dashboard</div>
+        <div class="page-subtitle" id="pageSubtitle">Loading...</div>
+      </div>
+      <button class="add-btn" id="addOfficeBtn">
+        <span class="material-icons-round">add_business</span>
+        Add Office
+      </button>
+    </div>
+
+    <!-- STATS -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon">🏢</div>
+        <div class="stat-value" id="statTotal">—</div>
+        <div class="stat-label">Offices</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">✅</div>
+        <div class="stat-value" id="statActive">—</div>
+        <div class="stat-label">Active</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">🔔</div>
+        <div class="stat-value" id="statRequests">—</div>
+        <div class="stat-label">Requests</div>
+      </div>
+    </div>
+
+    <!-- SYNC BAR -->
+    <div class="sync-bar" id="syncBar">
+      <div class="sync-dot loading" id="syncDot"></div>
+      <span id="syncText">Loading data...</span>
+      <button class="sync-refresh" id="syncRefreshBtn" title="Refresh">
+        <span class="material-icons-round">refresh</span>
+      </button>
+    </div>
+
+    <!-- TABS -->
+    <div class="tabs-bar">
+      <button class="tab-btn active" data-tab="offices" id="tabOffices">
+        <span class="material-icons-round">business</span>
+        Offices
+      </button>
+      <button class="tab-btn" data-tab="requests" id="tabRequests">
+        <span class="material-icons-round">inbox</span>
+        Requests
+        <span class="tab-badge" id="pendingBadge" style="display:none">0</span>
+      </button>
+    </div>
+
+    <!-- TAB: OFFICES -->
+    <div class="tab-content active" id="tab-offices">
+      <div id="officesList"></div>
+    </div>
+
+    <!-- TAB: REQUESTS -->
+    <div class="tab-content" id="tab-requests">
+      <div id="requestsList"></div>
+    </div>
+
+  </main>
+</div>
+
+<!-- ===== BOTTOM SHEETS ===== -->
+
+<!-- ADD OFFICE -->
+<div class="bottom-sheet" id="sheetAddOffice">
+  <div class="sheet-handle"></div>
+  <div class="sheet-header">
+    <div class="sheet-title">Add New Office</div>
+    <div class="sheet-subtitle">Creates Google Sheet + admin account automatically</div>
+  </div>
+  <div class="sheet-body">
+    <div class="form-group">
+      <label class="form-label">Office Name</label>
+      <input type="text" class="form-input" id="newOfficeName"
+        placeholder="e.g. Port Blair Site Office" />
+    </div>
+
+    <div class="form-divider"></div>
+    <div class="form-section-label">Admin Account for This Office</div>
+
+    <div class="form-group">
+      <label class="form-label">Admin Full Name</label>
+      <input type="text" class="form-input" id="newAdminFullName"
+        placeholder="e.g. John Smith" />
+    </div>
+    <div class="form-group">
+      <label class="form-label">Admin Username</label>
+      <input type="text" class="form-input" id="newAdminUsername"
+        placeholder="e.g. admin_portblair" autocomplete="off" />
+    </div>
+    <div class="form-group">
+      <label class="form-label">Admin Password</label>
+      <div class="input-wrap">
+        <input type="password" class="form-input" id="newAdminPwd"
+          placeholder="Minimum 8 characters" autocomplete="new-password" />
+        <button class="eye-btn" data-target="newAdminPwd">
+          <span class="material-icons-round">visibility</span>
+        </button>
+      </div>
+    </div>
+    <div class="form-note">
+      ⚠ Admin must change password on first login. The office Google Sheet is created automatically — no manual setup needed.
+    </div>
+    <button class="btn-primary" id="submitAddOffice">
+      <span class="material-icons-round">add_business</span>
+      Create Office
+    </button>
+    <button class="btn-secondary" onclick="hideSheet('sheetAddOffice')">Cancel</button>
+  </div>
+</div>
+
+<!-- APPROVE REQUEST -->
+<div class="bottom-sheet" id="sheetApproveReq">
+  <div class="sheet-handle"></div>
+  <div class="sheet-header">
+    <div class="sheet-title">Approve Office Request</div>
+    <div class="sheet-subtitle" id="approveSubtitle">Set admin credentials</div>
+  </div>
+  <div class="sheet-body">
+    <div class="form-group">
+      <label class="form-label">Admin Full Name</label>
+      <input type="text" class="form-input" id="approveAdminFullName"
+        placeholder="Admin's full name" />
+    </div>
+    <div class="form-group">
+      <label class="form-label">Admin Username</label>
+      <input type="text" class="form-input" id="approveAdminUsername"
+        placeholder="e.g. admin_portblair" autocomplete="off" />
+    </div>
+    <div class="form-group">
+      <label class="form-label">Admin Password</label>
+      <div class="input-wrap">
+        <input type="password" class="form-input" id="approveAdminPwd"
+          placeholder="Minimum 8 characters" autocomplete="new-password" />
+        <button class="eye-btn" data-target="approveAdminPwd">
+          <span class="material-icons-round">visibility</span>
+        </button>
+      </div>
+    </div>
+    <div class="form-note">
+      ⚠ Approving creates the office and sends admin credentials. Admin must change password on first login.
+    </div>
+    <button class="btn-primary" id="submitApproveReq">
+      <span class="material-icons-round">check_circle</span>
+      Approve &amp; Create Office
+    </button>
+    <button class="btn-secondary" onclick="hideSheet('sheetApproveReq')">Cancel</button>
+  </div>
+</div>
+
+<!-- CHANGE PASSWORD -->
+<div class="bottom-sheet" id="sheetChangePwd">
+  <div class="sheet-handle"></div>
+  <div class="sheet-header">
+    <div class="sheet-title">Change Password</div>
+    <div class="sheet-subtitle">SuperAdmin account</div>
+  </div>
+  <div class="sheet-body">
+    <div class="form-group">
+      <label class="form-label">Current Password</label>
+      <div class="input-wrap">
+        <input type="password" class="form-input" id="currPwd"
+          placeholder="Your current password" />
+        <button class="eye-btn" data-target="currPwd">
+          <span class="material-icons-round">visibility</span>
+        </button>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">New Password</label>
+      <div class="input-wrap">
+        <input type="password" class="form-input" id="newPwd"
+          placeholder="Minimum 8 characters" />
+        <button class="eye-btn" data-target="newPwd">
+          <span class="material-icons-round">visibility</span>
+        </button>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Confirm New Password</label>
+      <input type="password" class="form-input" id="confirmPwd"
+        placeholder="Repeat new password" />
+    </div>
+    <button class="btn-primary" id="submitChangePwd">
+      <span class="material-icons-round">lock_reset</span>
+      Update Password
+    </button>
+    <button class="btn-secondary" onclick="hideSheet('sheetChangePwd')">Cancel</button>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div id="toast"></div>
+
+<!-- SCRIPTS -->
+<script src="db.js"></script>
+<script>
+'use strict';
+
+/* =============================================
+   CONFIG
+   ============================================= */
+const API_URL = 'https://script.google.com/macros/s/AKfycbyeO7pIZrT1WKPHHuR8LKxhPKgf4uELmkSkIgUefNwT88JdCBiAoTAfgKTyCBKEMmBowQ/exec';
+
+let session = null;
+let allOffices = [];
+let allRequests = [];
+let pendingRequestId = null;   // request being approved
+let toastTimer = null;
+let isDark = true;
+
+/* =============================================
+   UTILITIES
+   ============================================= */
+
+// XSS-safe escape
+function esc(v) {
+  if (v == null) return '';
+  return String(v)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;').replace(/"/g,'&quot;')
+    .replace(/'/g,'&#x27;');
+}
+
+// Human-readable date
+function fmtDate(s) {
+  if (!s) return '—';
+  try {
+    return new Date(s).toLocaleDateString('en-IN',
+      { day:'2-digit', month:'short', year:'numeric' });
+  } catch { return s; }
+}
+
+// SHA-256 hash:  password + username_lower + salt
+async function hashPwd(pwd, user) {
+  const raw = pwd + user.toLowerCase() + 'AN_ELECT_SECRET_2025';
+  const buf = await crypto.subtle.digest('SHA-256',
+    new TextEncoder().encode(raw));
+  return Array.from(new Uint8Array(buf))
+    .map(b => b.toString(16).padStart(2,'0')).join('');
+}
+
+// Toast notification
+function showToast(msg, type = 'info', ms = 3200) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = `show ${type}`;
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => { el.className = ''; }, ms);
+}
+
+// Ripple on button
+function ripple(btn, e) {
+  const sp = document.createElement('span');
+  sp.className = 'ripple';
+  const r = btn.getBoundingClientRect();
+  sp.style.left = ((e?.clientX || r.left + r.width/2) - r.left - 40) + 'px';
+  sp.style.top  = ((e?.clientY || r.top  + r.height/2) - r.top - 40) + 'px';
+  btn.style.position = 'relative';
+  btn.style.overflow = 'hidden';
+  btn.appendChild(sp);
+  sp.addEventListener('animationend', () => sp.remove());
+}
+
+/* =============================================
+   SHEET HELPERS
+   ============================================= */
+function showSheet(id) {
+  document.getElementById('overlay').classList.add('open');
+  const el = document.getElementById(id);
+  el.style.display = 'block';
+  // Trigger reflow so transition plays
+  el.offsetHeight;
+  el.classList.add('open');
+}
+function hideSheet(id) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.classList.remove('open');
+  setTimeout(() => {
+    el.style.display = 'none';
+    // Only remove overlay if no other sheet is open
+    const anyOpen = ['sheetAddOffice','sheetApproveReq','sheetChangePwd']
+      .some(sid => document.getElementById(sid)?.classList.contains('open'));
+    if (!anyOpen) document.getElementById('overlay').classList.remove('open');
+  }, 310);
+}
+function hideAllSheets() {
+  ['sheetAddOffice','sheetApproveReq','sheetChangePwd'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) { el.classList.remove('open'); el.style.display = 'none'; }
+  });
+  document.getElementById('overlay').classList.remove('open');
+}
+
+/* =============================================
+   THEME
+   ============================================= */
+function applyTheme(dark) {
+  isDark = dark;
+  document.body.className = dark ? 'dark-mode' : 'light-mode';
+  document.getElementById('themeIcon').textContent = dark ? 'dark_mode' : 'light_mode';
+  localStorage.setItem('an_theme', dark ? 'dark' : 'light');
+}
+
+/* =============================================
+   TABS
+   ============================================= */
+function switchTab(name) {
+  document.querySelectorAll('.tab-btn').forEach(b =>
+    b.classList.toggle('active', b.dataset.tab === name));
+  document.querySelectorAll('.tab-content').forEach(el =>
+    el.classList.toggle('active', el.id === 'tab-' + name));
+}
+
+/* =============================================
+   API CALL
+   ============================================= */
+async function api(body) {
+  const ctrl = new AbortController();
+  const t = setTimeout(() => ctrl.abort(), 30000);
+  try {
+    const res = await fetch(API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain' },
+      body: JSON.stringify(body),
+      signal: ctrl.signal,
+      redirect: 'follow'
+    });
+    return await res.json();
+  } finally {
+    clearTimeout(t);
+  }
+}
+
+/* =============================================
+   RENDER SKELETONS
+   ============================================= */
+function skeletons(containerId, n = 3) {
+  document.getElementById(containerId).innerHTML =
+    Array.from({length: n}, () => `
+      <div class="skeleton">
+        <div class="sk-line w70"></div>
+        <div class="sk-line w50"></div>
+        <div class="sk-line w30"></div>
+      </div>`).join('');
+}
+
+/* =============================================
+   RENDER OFFICES
+   ============================================= */
+function renderOffices(list) {
+  const el = document.getElementById('officesList');
+  if (!list?.length) {
+    el.innerHTML = `
+      <div class="empty-state">
+        <span class="material-icons-round">business_center</span>
+        <h3>No offices yet</h3>
+        <p>Tap "Add Office" to create the first office</p>
+      </div>`;
+    return;
+  }
+  el.innerHTML = list.map(o => {
+    // Normalise field names (Apps Script may return different casing)
+    const name    = esc(o.officeName  || o.OfficeName  || '—');
+    const oid     = esc(o.officeId    || o.OfficeID    || '—');
+    const admin   = esc(o.adminUsername || o.AdminUsername || '—');
+    const created = fmtDate(o.createdAt || o.CreatedAt);
+    const hasSheet = !!(o.sheetId || o.SheetID);
+    const active  = String(o.isActive ?? o.IsActive ?? 'false').toLowerCase() === 'true';
+    return `
+      <div class="office-card">
+        <div class="office-card-top">
+          <div class="office-icon-wrap">
+            <span class="material-icons-round">business</span>
+          </div>
+          <div class="office-info">
+            <div class="office-name">${name}</div>
+            <div class="office-id">${oid}</div>
+          </div>
+          <div class="status-badge ${active ? 'active' : 'inactive'}">
+            ${active ? 'Active' : 'Inactive'}
+          </div>
+        </div>
+        <div class="office-meta">
+          <div class="office-meta-item">
+            <span class="material-icons-round">manage_accounts</span>
+            ${admin}
+          </div>
+          <div class="office-meta-item">
+            <span class="material-icons-round">calendar_today</span>
+            ${created}
+          </div>
+          <div class="office-meta-item ${hasSheet ? '' : 'no-sheet'}">
+            <span class="material-icons-round">${hasSheet ? 'table_chart' : 'error_outline'}</span>
+            ${hasSheet ? 'Sheet linked' : 'No sheet linked'}
+          </div>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+/* =============================================
+   RENDER REQUESTS
+   ============================================= */
+function renderRequests(list) {
+  const el = document.getElementById('requestsList');
+  if (!list?.length) {
+    el.innerHTML = `
+      <div class="empty-state">
+        <span class="material-icons-round">inbox</span>
+        <h3>No requests</h3>
+        <p>Pending office requests will appear here</p>
+      </div>`;
+    return;
+  }
+  el.innerHTML = list.map(r => {
+    const status   = (r.status || r.Status || 'pending').toLowerCase();
+    const name     = esc(r.officeName  || r.OfficeName  || '—');
+    const by       = esc(r.requestedBy || r.RequestedBy || '—');
+    const email    = esc(r.adminEmail  || r.AdminEmail  || '');
+    const created  = fmtDate(r.createdAt || r.CreatedAt);
+    const rid      = esc(r.requestId   || r.RequestID   || '');
+    const notes    = esc(r.notes || r.Notes || '');
+    const statusLabel = status === 'approved' ? '✅ Approved'
+                      : status === 'rejected' ? '❌ Rejected' : '⏳ Pending';
+    return `
+      <div class="request-card ${status}">
+        <div class="request-card-top">
+          <div>
+            <div class="request-office-name">${name}</div>
+            <div class="request-meta">Requested by: ${by}${email ? ' · ' + email : ''}</div>
+            <div class="request-meta">📅 ${created}${notes ? ' · ' + notes : ''}</div>
+          </div>
+          <div class="request-status ${status}">${statusLabel}</div>
+        </div>
+        ${status === 'pending' ? `
+          <button class="approve-btn"
+            onclick="openApproveSheet('${rid}','${name}')">
+            <span class="material-icons-round">check_circle</span>
+            Approve &amp; Create Office
+          </button>` : ''}
+      </div>`;
+  }).join('');
+}
+
+/* =============================================
+   LOAD DATA
+   ============================================= */
+async function loadData() {
+  const dot      = document.getElementById('syncDot');
+  const syncText = document.getElementById('syncText');
+  dot.className  = 'sync-dot loading';
+  syncText.textContent = 'Loading...';
+  skeletons('officesList', 3);
+  skeletons('requestsList', 2);
+
+  try {
+    // Fetch offices + requests in parallel
+    const [offRes, reqRes] = await Promise.all([
+      api({ action: 'getOffices',        token: session.token }),
+      api({ action: 'getOfficeRequests', token: session.token })
+    ]);
+
+    // Offices
+    if (offRes.success) {
+      allOffices = offRes.data || [];
+      renderOffices(allOffices);
+    } else {
+      showToast('Offices: ' + (offRes.message || 'Load failed'), 'error');
+      document.getElementById('officesList').innerHTML = `
+        <div class="empty-state">
+          <span class="material-icons-round">error_outline</span>
+          <h3>Failed to load</h3>
+          <p>${esc(offRes.message || 'Check your connection')}</p>
+        </div>`;
+    }
+
+    // Requests
+    if (reqRes.success) {
+      allRequests = reqRes.data || [];
+      renderRequests(allRequests);
+    } else {
+      // Not a hard error — requests tab just shows empty
+      allRequests = [];
+      renderRequests([]);
+    }
+
+    // Stats
+    const activeCount  = allOffices.filter(o =>
+      String(o.isActive ?? o.IsActive ?? false).toLowerCase() === 'true').length;
+    const pendingCount = allRequests.filter(r =>
+      (r.status || r.Status || '').toLowerCase() === 'pending').length;
+
+    document.getElementById('statTotal').textContent    = allOffices.length;
+    document.getElementById('statActive').textContent   = activeCount;
+    document.getElementById('statRequests').textContent = pendingCount;
+
+    // Badge on requests tab
+    const badge = document.getElementById('pendingBadge');
+    if (pendingCount > 0) {
+      badge.textContent = pendingCount;
+      badge.style.display = 'inline-block';
+    } else {
+      badge.style.display = 'none';
+    }
+
+    // Sync bar
+    const now = new Date().toLocaleTimeString('en-IN',
+      { hour:'2-digit', minute:'2-digit' });
+    dot.className  = 'sync-dot synced';
+    syncText.textContent = `Updated ${now} · ${allOffices.length} offices, ${pendingCount} pending`;
+    document.getElementById('pageSubtitle').textContent =
+      `${allOffices.length} offices · ${pendingCount} pending request${pendingCount !== 1 ? 's' : ''}`;
+
+  } catch (err) {
+    dot.className = 'sync-dot error';
+    syncText.textContent = 'Error — tap refresh';
+    showToast('Network error: ' + err.message, 'error');
+  }
+}
+
+/* =============================================
+   ADD OFFICE
+   ============================================= */
+async function handleAddOffice() {
+  const officeName     = document.getElementById('newOfficeName').value.trim();
+  const adminFullName  = document.getElementById('newAdminFullName').value.trim();
+  const adminUsername  = document.getElementById('newAdminUsername').value.trim().toLowerCase();
+  const adminPassword  = document.getElementById('newAdminPwd').value;
+
+  if (!officeName)    { showToast('Enter office name', 'error'); return; }
+  if (!adminFullName) { showToast('Enter admin full name', 'error'); return; }
+  if (!adminUsername) { showToast('Enter admin username', 'error'); return; }
+  if (!/^[a-z][a-z0-9_]{2,}$/.test(adminUsername)) {
+    showToast('Username: start with letter, lowercase/numbers/underscore, min 3 chars', 'error');
+    return;
+  }
+  if (adminPassword.length < 8) {
+    showToast('Password must be at least 8 characters', 'error'); return;
+  }
+
+  const btn = document.getElementById('submitAddOffice');
+  btn.disabled = true;
+  btn.innerHTML = '<div class="btn-spin"></div> Creating office...';
+
+  try {
+    const pwdHash = await hashPwd(adminPassword, adminUsername);
+    const res = await api({
+      action:         'addOffice',
+      token:          session.token,
+      officeName,
+      adminUsername,
+      adminPassword:  pwdHash,    // field name as documented in Code.gs
+      adminFullName
+    });
+
+    if (res.success) {
+      showToast('✅ Office created successfully!', 'success', 4000);
+      hideSheet('sheetAddOffice');
+      // Clear form
+      ['newOfficeName','newAdminFullName','newAdminUsername','newAdminPwd']
+        .forEach(id => { document.getElementById(id).value = ''; });
+      loadData();
+    } else {
+      showToast(res.message || 'Failed to create office', 'error');
+    }
+  } catch (err) {
+    showToast('Error: ' + err.message, 'error');
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '<span class="material-icons-round">add_business</span> Create Office';
+  }
+}
+
+/* =============================================
+   APPROVE REQUEST
+   ============================================= */
+function openApproveSheet(requestId, officeName) {
+  pendingRequestId = requestId;
+  document.getElementById('approveSubtitle').textContent =
+    'Approving: ' + officeName;
+  // Auto-suggest username from office name
+  const suggested = 'admin_' + officeName
+    .toLowerCase().replace(/[^a-z0-9]/g,'_')
+    .replace(/_+/g,'_').replace(/^_|_$/g,'');
+  document.getElementById('approveAdminUsername').value = suggested;
+  document.getElementById('approveAdminFullName').value = '';
+  document.getElementById('approveAdminPwd').value = '';
+  showSheet('sheetApproveReq');
+}
+
+async function handleApproveRequest() {
+  if (!pendingRequestId) { showToast('No request selected', 'error'); return; }
+  const adminFullName = document.getElementById('approveAdminFullName').value.trim();
+  const adminUsername = document.getElementById('approveAdminUsername').value.trim().toLowerCase();
+  const adminPassword = document.getElementById('approveAdminPwd').value;
+
+  if (!adminFullName) { showToast('Enter admin full name', 'error'); return; }
+  if (!adminUsername) { showToast('Enter admin username', 'error'); return; }
+  if (!/^[a-z][a-z0-9_]{2,}$/.test(adminUsername)) {
+    showToast('Username: start with letter, lowercase/numbers/underscore, min 3 chars', 'error');
+    return;
+  }
+  if (adminPassword.length < 8) {
+    showToast('Password must be at least 8 characters', 'error'); return;
+  }
+
+  const btn = document.getElementById('submitApproveReq');
+  btn.disabled = true;
+  btn.innerHTML = '<div class="btn-spin"></div> Approving...';
+
+  try {
+    const pwdHash = await hashPwd(adminPassword, adminUsername);
+    const res = await api({
+      action:         'approveOfficeRequest',
+      token:          session.token,
+      requestId:      pendingRequestId,
+      adminUsername,
+      adminPassword:  pwdHash,
+      adminFullName
+    });
+
+    if (res.success) {
+      showToast('✅ Office approved and created!', 'success', 4000);
+      hideSheet('sheetApproveReq');
+      pendingRequestId = null;
+      loadData();
+    } else {
+      showToast(res.message || 'Failed to approve request', 'error');
+    }
+  } catch (err) {
+    showToast('Error: ' + err.message, 'error');
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '<span class="material-icons-round">check_circle</span> Approve &amp; Create Office';
+  }
+}
+
+/* =============================================
+   CHANGE PASSWORD
+   ============================================= */
+async function handleChangePwd() {
+  const curr    = document.getElementById('currPwd').value;
+  const newP    = document.getElementById('newPwd').value;
+  const confirm = document.getElementById('confirmPwd').value;
+
+  if (!curr)          { showToast('Enter current password', 'error'); return; }
+  if (newP.length < 8){ showToast('New password min 8 characters', 'error'); return; }
+  if (newP !== confirm){ showToast('Passwords do not match', 'error'); return; }
+
+  const btn = document.getElementById('submitChangePwd');
+  btn.disabled = true;
+  btn.innerHTML = '<div class="btn-spin"></div> Updating...';
+
+  try {
+    const currHash = await hashPwd(curr,  session.username);
+    const newHash  = await hashPwd(newP,  session.username);
+
+    const res = await api({
+      action:              'changePassword',
+      token:               session.token,
+      username:            session.username,
+      currentPasswordHash: currHash,
+      newPasswordHash:     newHash
+    });
+
+    if (res.success) {
+      showToast('✅ Password updated', 'success');
+      hideSheet('sheetChangePwd');
+      ['currPwd','newPwd','confirmPwd'].forEach(id => {
+        document.getElementById(id).value = '';
+      });
+    } else {
+      showToast(res.message || 'Failed to change password', 'error');
+    }
+  } catch (err) {
+    showToast('Error: ' + err.message, 'error');
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '<span class="material-icons-round">lock_reset</span> Update Password';
+  }
+}
+
+/* =============================================
+   LOGOUT
+   ============================================= */
+async function handleLogout() {
+  try { await api({ action: 'logout', token: session.token }); } catch (_) {}
+  AN_DB.clearSession();
+  AN_DB.clearAllData();
+  window.location.replace('./login.html');
+}
+
+/* =============================================
+   PASSWORD EYE TOGGLE (all eye buttons)
+   ============================================= */
+function setupEyeButtons() {
+  document.querySelectorAll('.eye-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const input = document.getElementById(btn.dataset.target);
+      if (!input) return;
+      const show = input.type === 'password';
+      input.type = show ? 'text' : 'password';
+      btn.querySelector('.material-icons-round').textContent =
+        show ? 'visibility_off' : 'visibility';
+    });
+  });
+}
+
+/* =============================================
+   ANDROID BACK BUTTON
+   ============================================= */
+window.addEventListener('popstate', () => {
+  const openSheet = ['sheetAddOffice','sheetApproveReq','sheetChangePwd']
+    .find(id => document.getElementById(id)?.classList.contains('open'));
+  if (openSheet) {
+    hideSheet(openSheet);
+    history.pushState(null, '');
+  }
+});
+
+/* =============================================
+   INIT
+   ============================================= */
+async function init() {
+  // Theme
+  applyTheme(localStorage.getItem('an_theme') !== 'light');
+
+  // Session check — SuperAdmin only
+  session = AN_DB.getSession();
+  if (!session?.token) {
+    window.location.replace('./login.html'); return;
+  }
+  if (session.role !== 'SuperAdmin') {
+    window.location.replace('./index.html'); return;
+  }
+
+  // Update profile UI
+  const initials = (session.fullName || 'SA')
+    .split(' ').map(n => n[0]).join('').substring(0,2).toUpperCase();
+  document.getElementById('profileAvatar').textContent = initials;
+  document.getElementById('profileName').textContent   =
+    session.fullName || 'Super Admin';
+
+  // Show app, hide splash
+  setTimeout(() => {
+    document.getElementById('splash').classList.add('hide');
+    setTimeout(() => {
+      document.getElementById('splash').style.display = 'none';
+      document.getElementById('app').style.display    = 'flex';
+    }, 420);
+  }, 800);
+
+  // Load data after splash
+  setTimeout(loadData, 950);
+
+  // Push state for Android back handling
+  history.pushState(null, '');
+
+  /* ---- Event Listeners ---- */
+
+  // Theme
+  document.getElementById('themeToggle').addEventListener('click', () => applyTheme(!isDark));
+
+  // Profile avatar → dropdown
+  document.getElementById('profileAvatar').addEventListener('click', e => {
+    e.stopPropagation();
+    document.getElementById('profileDropdown').classList.toggle('open');
+  });
+  document.addEventListener('click', () => {
+    document.getElementById('profileDropdown').classList.remove('open');
+  });
+
+  // Menu items
+  document.getElementById('changePwdMenuBtn').addEventListener('click', () => {
+    document.getElementById('profileDropdown').classList.remove('open');
+    showSheet('sheetChangePwd');
+  });
+  document.getElementById('logoutBtn').addEventListener('click', handleLogout);
+
+  // Add office
+  document.getElementById('addOfficeBtn').addEventListener('click', () =>
+    showSheet('sheetAddOffice'));
+  document.getElementById('submitAddOffice').addEventListener('click', handleAddOffice);
+
+  // Approve request
+  document.getElementById('submitApproveReq').addEventListener('click', handleApproveRequest);
+
+  // Change password
+  document.getElementById('submitChangePwd').addEventListener('click', handleChangePwd);
+
+  // Tabs
+  document.querySelectorAll('.tab-btn').forEach(btn =>
+    btn.addEventListener('click', () => switchTab(btn.dataset.tab)));
+
+  // Overlay → close sheets
+  document.getElementById('overlay').addEventListener('click', hideAllSheets);
+
+  // Sync refresh
+  const refreshBtn = document.getElementById('syncRefreshBtn');
+  refreshBtn.addEventListener('click', () => {
+    refreshBtn.classList.add('spinning');
+    loadData().finally(() => refreshBtn.classList.remove('spinning'));
+  });
+
+  // Password eye buttons
+  setupEyeButtons();
+}
+
+window.addEventListener('DOMContentLoaded', init);
+</script>
+</body>
+</html>
