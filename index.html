@@ -6,7 +6,7 @@
   <meta name="theme-color" id="themeColorMeta" content="#0052B4">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <title>A&amp;N Electricity — Consumer Manager</title>
+  <title>A&N Electricity — Consumer Manager</title>
   <link rel="manifest" href="./manifest.json">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -14,9 +14,6 @@
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
   <style>
 
-  /* ═══════════════════════════════════════════
-     TOKENS — Tuned for readability at low brightness
-  ═══════════════════════════════════════════ */
   :root {
     --primary:#0052B4; --primary-l:#1976D2; --primary-d:#003A82;
     --accent:#FFC107;  --danger:#D32F2F;    --success:#2E7D32;
@@ -38,11 +35,8 @@
     --sh-lg:0 8px 32px rgba(0,0,0,.5);
   }
 
-  /* ═══════════════════════════════════════════
-     RESET
-  ═══════════════════════════════════════════ */
   *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-  html{overscroll-behavior:none}  /* Prevent accidental browser refresh */
+  html{overscroll-behavior:none}
   body{
     font-family:var(--fb);background:var(--bg);color:var(--t1);
     min-height:100vh;overflow-x:hidden;
@@ -51,16 +45,12 @@
   }
   .hidden{display:none!important}
 
-  /* Smooth theme transitions on key elements */
   .navbar,.search-sec,.bottom-nav,.c-card,.skeleton,
   .user-menu,.bottom-sheet,.search-wrap,.chip,.f-pill{
     transition:background-color var(--d) var(--ease),
                border-color var(--d) var(--ease),color var(--d) var(--ease);
   }
 
-  /* ═══════════════════════════════════════════
-     SPLASH
-  ═══════════════════════════════════════════ */
   .splash{
     position:fixed;inset:0;background:#080F1E;
     display:flex;flex-direction:column;align-items:center;justify-content:center;
@@ -72,9 +62,6 @@
   .splash-name{font-family:var(--fd);font-size:20px;font-weight:700;color:#fff}
   .splash-sub{font-size:12px;color:rgba(255,255,255,.45)}
 
-  /* ═══════════════════════════════════════════
-     UPDATE BANNER
-  ═══════════════════════════════════════════ */
   .update-banner{
     background:var(--primary);color:#fff;padding:10px 16px;
     display:flex;align-items:center;justify-content:space-between;gap:12px;
@@ -86,9 +73,6 @@
     font-family:var(--fd);font-weight:600;cursor:pointer;white-space:nowrap;
   }
 
-  /* ═══════════════════════════════════════════
-     BACKDROP + SHEETS
-  ═══════════════════════════════════════════ */
   .backdrop{
     position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:290;
     opacity:0;pointer-events:none;transition:opacity .3s var(--ease);
@@ -110,7 +94,6 @@
   }
   .sheet-title{font-family:var(--fd);font-size:16px;font-weight:700;color:var(--t1);margin-bottom:18px;text-align:center}
 
-  /* Sheet form */
   .sf{margin-bottom:13px}
   .sl{font-size:11px;font-family:var(--fd);font-weight:500;color:var(--t2);margin-bottom:5px;display:block;text-transform:uppercase;letter-spacing:.4px}
   .siw{display:flex;align-items:center;background:var(--inp);border:1.5px solid var(--inp-b);border-radius:var(--ri);padding:0 12px;height:46px;gap:8px}
@@ -118,6 +101,7 @@
   .siw .material-icons-round{color:var(--t2);font-size:18px;flex-shrink:0}
   .sinp{flex:1;background:none;border:none;outline:none;font-family:var(--fb);font-size:14px;color:var(--t1)}
   .sinp::placeholder{color:var(--t2)}
+  .sinp:disabled{opacity:0.5;cursor:not-allowed;}
   .eye{background:none;border:none;color:var(--t2);cursor:pointer;display:flex;padding:2px}
   .eye .material-icons-round{font-size:18px}
   .strength-bar{height:3px;border-radius:2px;background:var(--inp-b);overflow:hidden;margin-top:5px}
@@ -141,7 +125,6 @@
   @keyframes spin{to{transform:rotate(360deg)}}
   .btn-cancel{width:100%;background:var(--inp);border:1.5px solid var(--inp-b);border-radius:var(--rb);height:44px;font-family:var(--fd);font-size:14px;font-weight:500;color:var(--t1);cursor:pointer;margin-top:8px}
 
-  /* About sheet */
   .ab-logo{text-align:center;font-size:48px;margin-bottom:8px}
   .ab-name{text-align:center;font-family:var(--fd);font-size:17px;font-weight:700;color:var(--t1);margin-bottom:3px}
   .ab-ver{text-align:center;font-size:12px;color:var(--t2);margin-bottom:18px}
@@ -151,7 +134,6 @@
   .ab-key{font-size:10px;color:var(--t2);font-family:var(--fd);font-weight:500;text-transform:uppercase}
   .ab-val{font-size:13px;color:var(--t1);margin-top:1px}
 
-  /* Delete confirm */
   .del-ico{text-align:center;margin-bottom:10px}
   .del-ico .material-icons-round{font-size:44px;color:var(--danger)}
   .del-ttl{text-align:center;font-family:var(--fd);font-size:16px;font-weight:700;color:var(--t1);margin-bottom:6px}
@@ -160,7 +142,6 @@
   .btn-del-confirm{width:100%;background:var(--danger);color:#fff;border:none;border-radius:var(--rb);height:48px;font-family:var(--fd);font-size:15px;font-weight:600;cursor:pointer;margin-bottom:10px;transition:opacity .2s}
   .btn-del-confirm:active{opacity:.8}
 
-  /* Consumer detail sheet */
   .det-name{font-family:var(--fd);font-size:17px;font-weight:700;color:var(--t1);margin-bottom:4px}
   .det-conno{font-size:12px;color:var(--t2);margin-bottom:16px}
   .det-field{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--card-b);gap:12px}
@@ -175,7 +156,6 @@
   [data-theme=dark] .det-badge.inactive{background:rgba(120,120,120,.2);color:#BDBDBD}
   [data-theme=dark] .det-badge.defaulter{background:rgba(211,47,47,.2);color:#EF9A9A}
 
-  /* Phone actions in detail */
   .det-phone-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end}
   .det-phone-num{font-size:13px;color:var(--t1);user-select:text;-webkit-user-select:text}
   .det-phone-btn{
@@ -199,9 +179,6 @@
   .det-del{background:rgba(211,47,47,.1);color:var(--danger)}
   [data-theme=dark] .det-del{background:rgba(211,47,47,.15)}
 
-  /* ═══════════════════════════════════════════
-     NAVBAR
-  ═══════════════════════════════════════════ */
   .navbar{
     position:fixed;top:0;left:0;right:0;height:var(--nav-h);
     background:var(--primary);display:flex;align-items:center;
@@ -217,16 +194,12 @@
   .nav-btn:active{background:rgba(255,255,255,.3)}
   .nav-btn .material-icons-round{font-size:20px}
 
-  /* Select bar */
   .sel-bar{position:fixed;top:0;left:0;right:0;height:var(--nav-h);background:#102040;display:flex;align-items:center;padding:0 12px;gap:12px;z-index:110}
   .sel-cancel{background:rgba(255,255,255,.15);border:none;border-radius:50%;width:36px;height:36px;display:flex;align-items:center;justify-content:center;color:#fff;cursor:pointer;flex-shrink:0}
   .sel-cancel .material-icons-round{font-size:20px}
   .sel-cnt{flex:1;font-family:var(--fd);font-size:15px;font-weight:600;color:#fff}
   .sel-all-btn{background:rgba(255,255,255,.15);border:none;border-radius:20px;padding:6px 14px;font-family:var(--fd);font-size:12px;font-weight:500;color:#fff;cursor:pointer;white-space:nowrap}
 
-  /* ═══════════════════════════════════════════
-     USER MENU
-  ═══════════════════════════════════════════ */
   .user-menu{
     position:fixed;top:calc(var(--nav-h) + 8px);right:12px;
     background:var(--card);border:1px solid var(--card-b);border-radius:20px;
@@ -249,29 +222,22 @@
   .mi.install .material-icons-round{color:var(--success)}
   .menu-ov{position:fixed;inset:0;z-index:150}
 
-  /* ═══════════════════════════════════════════
-     SEARCH SECTION (fixed)
-  ═══════════════════════════════════════════ */
   .search-sec{
     position:fixed;top:var(--nav-h);left:0;right:0;
     background:var(--bg);padding:10px 14px 0;z-index:90;
     border-bottom:1px solid var(--card-b);
   }
 
-  /* Search bar */
   .search-wrap{display:flex;align-items:center;background:var(--inp);border:1.5px solid var(--inp-b);border-radius:var(--ri);padding:0 12px;gap:8px;height:44px}
   .search-wrap:focus-within{border-color:var(--primary)}
   .s-ico{color:var(--t2);font-size:20px!important;flex-shrink:0}
   .search-inp{flex:1;background:none;border:none;outline:none;font-family:var(--fb);font-size:14px;color:var(--t1)}
   .search-inp::placeholder{color:var(--t2)}
-  .search-inp::-webkit-search-decoration,
-  .search-inp::-webkit-search-cancel-button,
-  .search-inp::-webkit-search-results-button,
-  .search-inp::-webkit-search-results-decoration{display:none}
+  .search-inp::-webkit-search-decoration,.search-inp::-webkit-search-cancel-button,
+  .search-inp::-webkit-search-results-button,.search-inp::-webkit-search-results-decoration{display:none}
   .s-clr{background:none;border:none;cursor:pointer;color:var(--t2);display:flex;padding:2px}
   .s-clr .material-icons-round{font-size:18px}
 
-  /* Filter + Sort row */
   .f-row{display:flex;align-items:center;gap:6px;padding:8px 0 4px}
   .f-pill{
     flex-shrink:0;background:var(--inp);border:1.5px solid var(--inp-b);
@@ -295,7 +261,6 @@
   .sort-btn .material-icons-round{font-size:15px}
   .sort-btn.active{border-color:var(--primary);color:var(--primary)}
 
-  /* Area chips */
   .chips-wrap{position:relative}
   .chips-wrap::after{content:'';position:absolute;right:0;top:0;bottom:0;width:28px;background:linear-gradient(to right,transparent,var(--bg));pointer-events:none;z-index:1}
   .chips{display:flex;gap:8px;overflow-x:auto;padding:8px 0 10px;scrollbar-width:none;-webkit-overflow-scrolling:touch;scroll-behavior:smooth}
@@ -303,15 +268,11 @@
   .chip{flex-shrink:0;background:var(--inp);border:1.5px solid var(--inp-b);border-radius:20px;padding:4px 12px;font-size:11.5px;font-family:var(--fd);font-weight:500;color:var(--t2);cursor:pointer;transition:all .15s;white-space:nowrap}
   .chip.active{background:var(--primary);border-color:var(--primary);color:#fff}
 
-  /* ═══════════════════════════════════════════
-     MAIN CONTENT
-  ═══════════════════════════════════════════ */
   .main{
     padding-bottom:calc(var(--bnav-h) + 24px);
     padding-left:14px;padding-right:14px;
   }
 
-  /* Sync + count (scrolls with content) */
   .sync-row{display:flex;align-items:center;gap:8px;padding:10px 2px 8px}
   .sync-dot{width:8px;height:8px;border-radius:50%;background:#9E9E9E;flex-shrink:0;transition:background .4s}
   .sync-dot.online{background:#4CAF50}
@@ -326,9 +287,6 @@
   .refresh-btn .material-icons-round{font-size:18px}
   .refresh-btn.spin .material-icons-round{animation:spin .7s linear infinite}
 
-  /* ═══════════════════════════════════════════
-     CONSUMER CARD
-  ═══════════════════════════════════════════ */
   .c-card{
     background:var(--card);border:1px solid var(--card-b);
     border-radius:var(--r);padding:13px 14px;margin-bottom:9px;
@@ -340,11 +298,9 @@
   @keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
   .c-card:active{transform:scale(.985)}
   .c-card.selected{border-color:var(--primary)}
-  .c-card.pressing{background:rgba(0,82,180,.04)}  /* Visual feedback during long press */
+  .c-card.pressing{background:rgba(0,82,180,.04)}
   [data-theme=dark] .c-card.selected{background:rgba(25,118,210,.1)}
   [data-theme=dark] .c-card.pressing{background:rgba(255,255,255,.03)}
-
-  /* Dark mode top highlight for depth at low brightness */
   [data-theme=dark] .c-card::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:rgba(255,255,255,.05)}
 
   .c-inner{display:flex;align-items:center;gap:11px}
@@ -356,8 +312,6 @@
   .c-row1{display:flex;align-items:center;gap:5px;margin-bottom:3px;flex-wrap:nowrap}
   .c-conno{font-size:11px;font-family:var(--fd);font-weight:600;color:var(--t2);flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .badges{display:flex;gap:5px;flex-shrink:0}
-
-  /* Badges — bright enough for low brightness */
   .area-badge{background:rgba(0,82,180,.1);color:var(--primary);font-size:10px;font-family:var(--fd);font-weight:600;padding:2px 7px;border-radius:7px}
   [data-theme=dark] .area-badge{background:rgba(0,120,255,.25);color:#90CAF9}
   .status-badge{font-size:10px;font-family:var(--fd);font-weight:600;padding:2px 7px;border-radius:7px}
@@ -367,35 +321,23 @@
   [data-theme=dark] .status-badge.active{background:rgba(46,125,50,.25);color:#81C784}
   [data-theme=dark] .status-badge.inactive{background:rgba(120,120,120,.25);color:#BDBDBD}
   [data-theme=dark] .status-badge.defaulter{background:rgba(211,47,47,.25);color:#EF9A9A}
-
   .c-name{font-family:var(--fd);font-size:14px;font-weight:600;color:var(--t1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:4px}
-
   .c-meta{display:flex;flex-wrap:wrap;gap:3px 12px}
-  /* Colored icons for readability at low brightness */
   .c-mi{display:flex;align-items:center;gap:4px;font-size:12px;color:var(--t2)}
   .c-mi .material-icons-round{font-size:14px}
-  .c-mi.meter .material-icons-round{color:#FFC107;opacity:.85}  /* amber for meter */
-  .c-mi.phone .material-icons-round{color:#4CAF50;opacity:.85}  /* green for phone */
-  .c-mi.addr  .material-icons-round{color:#FF7043;opacity:.8}   /* orange for location */
-
+  .c-mi.meter .material-icons-round{color:#FFC107;opacity:.85}
+  .c-mi.phone .material-icons-round{color:#4CAF50;opacity:.85}
+  .c-mi.addr  .material-icons-round{color:#FF7043;opacity:.8}
   .c-arrow{color:var(--t2);font-size:20px;flex-shrink:0;line-height:1;opacity:.55}
-
-  /* Ripple */
   .ripple{position:absolute;border-radius:50%;background:rgba(0,82,180,.1);transform:scale(0);animation:rip .55s ease-out forwards;pointer-events:none}
   [data-theme=dark] .ripple{background:rgba(255,255,255,.06)}
   @keyframes rip{to{transform:scale(4);opacity:0}}
 
-  /* ═══════════════════════════════════════════
-     SKELETON
-  ═══════════════════════════════════════════ */
   .skeleton{background:var(--card);border:1px solid var(--card-b);border-radius:var(--r);padding:14px;margin-bottom:9px}
   .sk{border-radius:6px;background:linear-gradient(90deg,var(--inp) 25%,var(--card-b) 50%,var(--inp) 75%);background-size:200% 100%;animation:shim 1.4s infinite}
   @keyframes shim{0%{background-position:200% 0}100%{background-position:-200% 0}}
   .sk-row{display:flex;justify-content:space-between;margin-bottom:9px}
 
-  /* ═══════════════════════════════════════════
-     EMPTY + ERROR
-  ═══════════════════════════════════════════ */
   .empty-state{text-align:center;padding:56px 24px;animation:fadeUp .4s var(--ease)}
   .empty-state .material-icons-round{font-size:52px;color:var(--t2);opacity:.3}
   .empty-title{font-family:var(--fd);font-size:15px;font-weight:600;color:var(--t1);margin:12px 0 5px}
@@ -403,24 +345,15 @@
   .err-bar{background:rgba(211,47,47,.07);border:1px solid rgba(211,47,47,.18);border-radius:14px;padding:12px 14px;display:flex;align-items:center;gap:10px;font-size:13px;color:var(--danger);margin-bottom:10px}
   .err-bar .material-icons-round{font-size:17px;flex-shrink:0}
 
-  /* ═══════════════════════════════════════════
-     SELECT DELETE BAR
-  ═══════════════════════════════════════════ */
   .del-bar{position:fixed;bottom:var(--bnav-h);left:0;right:0;background:var(--danger);padding:13px 16px;display:flex;align-items:center;justify-content:center;gap:10px;z-index:95;animation:slideUp .25s var(--ease)}
   @keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
   .del-bar-btn{background:none;border:none;color:#fff;font-family:var(--fd);font-size:15px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:8px}
   .del-bar-btn .material-icons-round{font-size:20px}
 
-  /* ═══════════════════════════════════════════
-     FAB
-  ═══════════════════════════════════════════ */
   .fab{position:fixed;bottom:calc(var(--bnav-h) + 14px);right:18px;width:54px;height:54px;border-radius:50%;background:var(--primary);color:#fff;border:none;box-shadow:0 4px 20px rgba(0,82,180,.45);display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:90;transition:transform .15s var(--ease),box-shadow .15s;overflow:hidden}
   .fab:active{transform:scale(.88);box-shadow:0 2px 8px rgba(0,82,180,.3)}
   .fab .material-icons-round{font-size:26px}
 
-  /* ═══════════════════════════════════════════
-     BOTTOM NAV
-  ═══════════════════════════════════════════ */
   .bottom-nav{position:fixed;bottom:0;left:0;right:0;height:var(--bnav-h);background:var(--card);border-top:1px solid var(--card-b);display:flex;z-index:100;transition:transform .25s var(--ease)}
   .bottom-nav.hide{transform:translateY(100%)}
   .bnav{flex:1;background:none;border:none;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;color:var(--t2);font-size:10px;font-family:var(--fd);font-weight:500;cursor:pointer;padding:6px 0 10px;transition:color .15s;position:relative}
@@ -429,9 +362,6 @@
   .bnav .material-icons-round{font-size:22px}
   #sentinel{height:20px}
 
-  /* ═══════════════════════════════════════════
-     TOAST
-  ═══════════════════════════════════════════ */
   #toast{
     position:fixed;bottom:calc(var(--bnav-h) + 14px);left:50%;
     transform:translateX(-50%) translateY(10px);
@@ -444,29 +374,41 @@
   #toast.err{background:var(--danger)}
   #toast.ok{background:var(--success)}
 
+  /* ══ CONSUMER FORM SHEET — Step 6 ══════════════════════ */
+  /* Select wrapper — matches existing .siw height/border */
+  .cf-sel-wrap{position:relative;display:flex;align-items:center;}
+  .cf-sel{
+    flex:1;background:var(--inp);border:1.5px solid var(--inp-b);
+    border-radius:var(--ri);height:46px;padding:0 40px 0 12px;
+    color:var(--t1);font-family:var(--fb);font-size:14px;
+    outline:none;-webkit-appearance:none;appearance:none;
+    cursor:pointer;transition:border-color .15s;width:100%;
+  }
+  .cf-sel:focus{border-color:var(--primary);}
+  .cf-sel-ico{position:absolute;right:10px;color:var(--t2);font-size:18px;pointer-events:none;}
+  .cf-sel option{background:#0F1F3C;color:#EEF4FF;}
+  [data-theme=light] .cf-sel option{background:#fff;color:#1A1A2E;}
+
   </style>
 </head>
 <body>
 
-<!-- SPLASH -->
 <div id="splash" class="splash">
   <div class="splash-bolt">⚡</div>
-  <div class="splash-name">A&amp;N Electricity</div>
+  <div class="splash-name">A&N Electricity</div>
   <div class="splash-sub">Consumer Manager</div>
 </div>
 
-<!-- UPDATE BANNER -->
 <div class="update-banner hidden" id="updateBanner">
   <span>🔄 New version available</span>
   <button class="upd-btn" onclick="applyUpdate()">Update Now</button>
 </div>
 
-<!-- NAVBAR -->
 <nav class="navbar" id="navbar">
   <div class="nav-left">
     <span class="nav-bolt">⚡</span>
     <div>
-      <span class="nav-app">A&amp;N Electricity</span>
+      <span class="nav-app">A&N Electricity</span>
       <span class="nav-office" id="navOffice">Loading…</span>
     </div>
   </div>
@@ -483,14 +425,12 @@
   </div>
 </nav>
 
-<!-- SELECT BAR -->
 <div class="sel-bar hidden" id="selBar">
   <button class="sel-cancel" onclick="exitSelectMode()"><span class="material-icons-round">close</span></button>
   <span class="sel-cnt" id="selCnt">Tap to select</span>
   <button class="sel-all-btn" id="selAllBtn" onclick="toggleSelectAll()">Select All</button>
 </div>
 
-<!-- USER MENU -->
 <div class="user-menu" id="userMenu">
   <div class="um-avatar"><span class="material-icons-round">person</span></div>
   <div class="um-name" id="uName">—</div>
@@ -550,11 +490,11 @@
 <div class="bottom-sheet" id="aboutSheet">
   <div class="sheet-handle" id="aboutHandle"></div>
   <div class="ab-logo">⚡</div>
-  <div class="ab-name">A&amp;N Electricity</div>
+  <div class="ab-name">A&N Electricity</div>
   <div class="ab-ver">Consumer Manager v1.0.0</div>
   <div class="ab-row">
     <span class="material-icons-round">business</span>
-    <div><div class="ab-key">Department</div><div class="ab-val">A&amp;N Islands Electricity Department</div></div>
+    <div><div class="ab-key">Department</div><div class="ab-val">A&N Islands Electricity Department</div></div>
   </div>
   <div class="ab-row">
     <span class="material-icons-round">location_on</span>
@@ -589,12 +529,100 @@
   <button class="btn-cancel" onclick="closeSheet()">Cancel</button>
 </div>
 
+<!-- CONSUMER FORM SHEET — Step 6 (Add / Edit) -->
+<div class="bottom-sheet" id="cfSheet">
+  <div class="sheet-handle" id="cfHandle"></div>
+  <div class="sheet-title" id="cfTitle">Add Consumer</div>
+
+  <div class="s-alert err" id="cfErr">
+    <span class="material-icons-round">error_outline</span>
+    <span id="cfErrMsg"></span>
+  </div>
+
+  <div class="sf">
+    <label class="sl">Consumer No. <span style="color:var(--danger)">*</span></label>
+    <div class="siw">
+      <span class="material-icons-round">tag</span>
+      <input class="sinp" type="text" id="cfConNo" placeholder="e.g. E/1001" maxlength="20" autocomplete="off">
+    </div>
+  </div>
+  <div class="sf">
+    <label class="sl">Consumer Name <span style="color:var(--danger)">*</span></label>
+    <div class="siw">
+      <span class="material-icons-round">person</span>
+      <input class="sinp" type="text" id="cfCName" placeholder="Full name" maxlength="100" autocomplete="off">
+    </div>
+  </div>
+  <div class="sf">
+    <label class="sl">Address</label>
+    <div class="siw">
+      <span class="material-icons-round">location_on</span>
+      <input class="sinp" type="text" id="cfAddr" placeholder="Full address" maxlength="200" autocomplete="off">
+    </div>
+  </div>
+  <div class="sf">
+    <label class="sl">Lab No.</label>
+    <div class="siw">
+      <span class="material-icons-round">science</span>
+      <input class="sinp" type="text" id="cfLabNo" placeholder="Lab number" maxlength="30" autocomplete="off">
+    </div>
+  </div>
+  <div class="sf">
+    <label class="sl">Meter No.</label>
+    <div class="siw">
+      <span class="material-icons-round">electric_meter</span>
+      <input class="sinp" type="text" id="cfMeter" placeholder="Meter serial number" maxlength="30" autocomplete="off">
+    </div>
+  </div>
+  <div class="sf">
+    <label class="sl">Area Code (TransfCode)</label>
+    <div class="cf-sel-wrap">
+      <select class="cf-sel" id="cfTransf">
+        <option value="">— Select Area —</option>
+        <option value="AHS">AHS</option><option value="OBS">OBS</option>
+        <option value="SSN">SSN</option><option value="SP1">SP1</option>
+        <option value="PLC">PLC</option><option value="SPV">SPV</option>
+        <option value="RKM">RKM</option><option value="RBV">RBV</option>
+        <option value="SSP">SSP</option><option value="MP1">MP1</option>
+        <option value="CHS">CHS</option><option value="RGT1">RGT1</option>
+        <option value="SJM">SJM</option><option value="MGP1">MGP1</option>
+        <option value="SCT">SCT</option><option value="RJM">RJM</option>
+        <option value="PAO1">PAO1</option>
+      </select>
+      <span class="material-icons-round cf-sel-ico">expand_more</span>
+    </div>
+  </div>
+  <div class="sf">
+    <label class="sl">Phone No.</label>
+    <div class="siw">
+      <span class="material-icons-round">phone</span>
+      <input class="sinp" type="tel" id="cfPhone" placeholder="10-digit mobile" maxlength="15" inputmode="numeric" autocomplete="off">
+    </div>
+  </div>
+  <div class="sf">
+    <label class="sl">Status</label>
+    <div class="cf-sel-wrap">
+      <select class="cf-sel" id="cfStatus">
+        <option value="Active">Active</option>
+        <option value="Inactive">Inactive</option>
+        <option value="Defaulter">Defaulter</option>
+      </select>
+      <span class="material-icons-round cf-sel-ico">expand_more</span>
+    </div>
+  </div>
+
+  <button class="btn-sh" id="cfBtn" onclick="saveConsumer()">
+    <span class="bl" id="cfBtnLbl">Add Consumer</span>
+    <div class="spin"></div>
+  </button>
+  <button class="btn-cancel" onclick="closeSheet()">Cancel</button>
+</div>
+
 <!-- BACKDROP -->
 <div class="backdrop" id="backdrop" onclick="closeSheet()"></div>
 
 <!-- SEARCH SECTION -->
 <div class="search-sec" id="searchSec">
-  <!-- Search bar -->
   <div class="search-wrap">
     <span class="material-icons-round s-ico">search</span>
     <input class="search-inp" type="search" id="searchInp"
@@ -604,8 +632,6 @@
       <span class="material-icons-round">close</span>
     </button>
   </div>
-
-  <!-- Status filter + Sort -->
   <div class="f-row">
     <button class="f-pill active" data-status="ALL" onclick="setStatus(this,'ALL')">All Status</button>
     <button class="f-pill" data-status="Active"    onclick="setStatus(this,'Active')">🟢 Active</button>
@@ -617,8 +643,6 @@
       <span id="sortLbl">A-Z</span>
     </button>
   </div>
-
-  <!-- Area chips -->
   <div class="chips-wrap">
     <div class="chips" id="chips">
       <button class="chip active" data-area="ALL"   onclick="setArea(this,'ALL')">All</button>
@@ -643,7 +667,6 @@
   </div>
 </div>
 
-<!-- MAIN -->
 <main class="main" id="main">
   <div class="sync-row">
     <span class="sync-dot syncing" id="syncDot"></span>
@@ -662,7 +685,6 @@
   </div>
 </main>
 
-<!-- DELETE ACTION BAR -->
 <div class="del-bar hidden" id="delBar">
   <button class="del-bar-btn" onclick="bulkDeleteConfirm()">
     <span class="material-icons-round">delete</span>
@@ -670,12 +692,10 @@
   </button>
 </div>
 
-<!-- FAB -->
 <button class="fab" id="fabBtn" onclick="openAddForm()">
   <span class="material-icons-round">add</span>
 </button>
 
-<!-- BOTTOM NAV -->
 <nav class="bottom-nav" id="bottomNav">
   <button class="bnav active" id="bnav-consumers" onclick="switchTab('consumers')">
     <span class="material-icons-round">people</span><span>Consumers</span>
@@ -694,12 +714,10 @@
 <script>
 'use strict';
 
-/* ── CONFIG ─────────────────────────────────────────────── */
 const API_URL   = 'https://script.google.com/macros/s/AKfycbyeO7pIZrT1WKPHHuR8LKxhPKgf4uELmkSkIgUefNwT88JdCBiAoTAfgKTyCBKEMmBowQ/exec';
 const PAGE_SIZE = 30;
-const TIMEOUT   = 30000; // 30s network timeout
+const TIMEOUT   = 30000;
 
-/* ── STATE ──────────────────────────────────────────────── */
 let session     = null;
 let isAdmin     = false;
 let masterList  = [];
@@ -707,30 +725,22 @@ let filtered    = [];
 let displayedN  = 0;
 let activeArea  = 'ALL';
 let activeStatus= 'ALL';
-let sortOrder   = 'default'; // 'default' | 'asc' | 'desc'
+let sortOrder   = 'default';
 let searchQ     = '';
 let searchT     = null;
 let toastT      = null;
 let activeSheet = null;
 let lastScrollY = 0;
-
-// Select mode
 let selectMode  = false;
 let selectedSet = new Set();
-
-// Delete targets
 let delRowIdx = 0, delConNo = '', delName = '';
-
-// Long press
 let pressTimer = null, pressPos = null, pressCard = null;
-
-// PWA install
 let deferredInstall = null;
-
-// SW registration reference
 let swReg = null;
 
-/* ── DOM ────────────────────────────────────────────────── */
+// ── Consumer form state (Step 6) ──────────────────────────
+const CF = { mode:'add', consumer:null };
+
 const $ = id => document.getElementById(id);
 
 /* ════════════════════════════════════════════════════════════
@@ -745,50 +755,43 @@ async function init() {
 
   isAdmin = session.role === 'admin' || session.role === 'Admin';
 
-  // Service Worker + update detection
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('./sw.js').then(reg => {
       swReg = reg;
       navigator.serviceWorker.addEventListener('message', onSWMsg);
-      // Detect new SW version
       reg.addEventListener('updatefound', () => {
         const newSW = reg.installing;
         if (!newSW) return;
         newSW.addEventListener('statechange', () => {
           if (newSW.state === 'installed' && navigator.serviceWorker.controller) {
-            $('updateBanner').classList.remove('hidden'); // Show update banner
+            $('updateBanner').classList.remove('hidden');
           }
         });
       });
     }).catch(() => {});
   }
 
-  // PWA install prompt intercept
   window.addEventListener('beforeinstallprompt', e => {
     e.preventDefault();
     deferredInstall = e;
-    $('installBtn').classList.remove('hidden'); // Show Install App in menu
+    $('installBtn').classList.remove('hidden');
   });
 
-  // Online / Offline
   window.addEventListener('online',  onOnline);
   window.addEventListener('offline', onOffline);
 
-  // Android Back Button — close sheets/select before exiting app
   history.pushState(null, '');
   window.addEventListener('popstate', () => {
+    // Close consumer form first (Step 6)
+    if (activeSheet === 'cfSheet') { closeSheet(); history.pushState(null, ''); return; }
     if (activeSheet)  { closeSheet(); history.pushState(null, ''); return; }
     if (selectMode)   { exitSelectMode(); history.pushState(null, ''); return; }
-    // Allow normal back
   });
 
-  // Track scroll for position memory
   window.addEventListener('scroll', () => { lastScrollY = window.scrollY; }, { passive: true });
 
-  // Theme
   applyTheme(localStorage.getItem('an_elect_theme') || 'dark');
 
-  // Fill navbar
   $('navOffice').textContent   = session.officeName || 'My Office';
   $('uName').textContent       = session.fullName   || session.username;
   $('uRole').textContent       = session.role;
@@ -801,17 +804,14 @@ async function init() {
 
   await AN_DB.setApiUrl(API_URL);
 
-  // Adjust layout dynamically (accounts for different screen sizes)
   adjustLayout();
   window.addEventListener('resize', adjustLayout);
   document.fonts.ready.then(adjustLayout);
 
-  // Infinite scroll observer
   new IntersectionObserver(entries => {
     if (entries[0].isIntersecting && displayedN < filtered.length) appendCards();
   }, { threshold: 0.1 }).observe($('sentinel'));
 
-  // Swipe to close sheets
   setupSwipeClose();
 
   await loadConsumers();
@@ -830,7 +830,6 @@ function hideSplash() {
   setTimeout(() => s.style.display = 'none', 400);
 }
 
-/* ── PWA Install ─────────────────────────────────────────── */
 async function installApp() {
   if (!deferredInstall) return;
   closeUserMenu();
@@ -841,17 +840,13 @@ async function installApp() {
   if (outcome === 'accepted') toast('App installed! ✅', 'ok');
 }
 
-/* ── SW Update ───────────────────────────────────────────── */
 function applyUpdate() {
-  if (swReg?.waiting) {
-    swReg.waiting.postMessage({ type: 'SKIP_WAITING' });
-  }
+  if (swReg?.waiting) { swReg.waiting.postMessage({ type: 'SKIP_WAITING' }); }
   window.location.reload();
 }
 
-/* ── Swipe down to close sheets ─────────────────────────── */
 function setupSwipeClose() {
-  const handles = ['cpHandle','aboutHandle','detHandle','delHandle'];
+  const handles = ['cpHandle','aboutHandle','detHandle','delHandle','cfHandle'];
   handles.forEach(id => {
     const el = $(id);
     if (!el) return;
@@ -872,7 +867,6 @@ async function loadConsumers(showSkeleton = true) {
   setRefreshSpin(true);
   setSync('syncing', 'Loading…');
 
-  // A: Show cache instantly
   const cached = await AN_DB.getAllConsumers();
   if (cached.length) {
     masterList = cached;
@@ -881,7 +875,6 @@ async function loadConsumers(showSkeleton = true) {
     setSync('syncing', 'Refreshing…');
   }
 
-  // B: Fetch fresh from server
   if (!navigator.onLine) {
     setRefreshSpin(false);
     if (!cached.length) showErr('No cached data. Connect to internet and refresh.');
@@ -936,7 +929,6 @@ async function loadConsumers(showSkeleton = true) {
 
 function refreshData() { loadConsumers(); }
 
-/* ── Normalize ──────────────────────────────────────────── */
 function normalize(c) {
   function get(...keys) {
     for (const k of keys) {
@@ -965,19 +957,14 @@ function normalize(c) {
   };
 }
 
-/* ── Update chip consumer counts ───────────────────────── */
 function updateChipCounts() {
   const counts = {};
   masterList.forEach(c => { if (c.transfCode) counts[c.transfCode] = (counts[c.transfCode]||0)+1; });
-
   document.querySelectorAll('.chip').forEach(chip => {
     const area = chip.dataset.area;
     if (!area) return;
-    if (area === 'ALL') {
-      chip.textContent = `All (${masterList.length})`;
-    } else if (counts[area]) {
-      chip.textContent = `${area} · ${counts[area]}`;
-    }
+    if (area === 'ALL') chip.textContent = `All (${masterList.length})`;
+    else if (counts[area]) chip.textContent = `${area} · ${counts[area]}`;
   });
 }
 
@@ -986,20 +973,9 @@ function updateChipCounts() {
 ════════════════════════════════════════════════════════════ */
 function applyFilters() {
   filtered = masterList;
-
-  // Area filter
-  if (activeArea !== 'ALL') {
-    filtered = filtered.filter(c => c.transfCode === activeArea);
-  }
-
-  // Status filter
-  if (activeStatus !== 'ALL') {
-    filtered = filtered.filter(c =>
-      (c.status || 'Active').toLowerCase() === activeStatus.toLowerCase()
-    );
-  }
-
-  // Text search
+  if (activeArea !== 'ALL') filtered = filtered.filter(c => c.transfCode === activeArea);
+  if (activeStatus !== 'ALL') filtered = filtered.filter(c =>
+    (c.status || 'Active').toLowerCase() === activeStatus.toLowerCase());
   if (searchQ.trim()) {
     const q = searchQ.toLowerCase().trim();
     filtered = filtered.filter(c =>
@@ -1007,35 +983,25 @@ function applyFilters() {
       (c.conNo        || '').toLowerCase().includes(q) ||
       (c.meterNo      || '').includes(q) ||
       (c.phoneNo      || '').includes(q) ||
-      (c.address      || '').toLowerCase().includes(q)
-    );
+      (c.address      || '').toLowerCase().includes(q));
   }
+  if (sortOrder === 'asc')  filtered = [...filtered].sort((a,b) => (a.consumerName||'').localeCompare(b.consumerName||''));
+  else if (sortOrder === 'desc') filtered = [...filtered].sort((a,b) => (b.consumerName||'').localeCompare(a.consumerName||''));
 
-  // Sort
-  if (sortOrder === 'asc') {
-    filtered = [...filtered].sort((a,b) => (a.consumerName||'').localeCompare(b.consumerName||''));
-  } else if (sortOrder === 'desc') {
-    filtered = [...filtered].sort((a,b) => (b.consumerName||'').localeCompare(a.consumerName||''));
-  }
-
-  $('cntTxt').textContent = filtered.length
-    ? `${filtered.length} consumer${filtered.length !== 1 ? 's' : ''}` : '';
+  $('cntTxt').textContent = filtered.length ? `${filtered.length} consumer${filtered.length !== 1 ? 's' : ''}` : '';
 
   if (!filtered.length) {
     $('consumerList').innerHTML = '';
     $('emptyState').classList.remove('hidden');
     if (searchQ || activeArea !== 'ALL' || activeStatus !== 'ALL') {
-      $('emptyIco').textContent = 'search_off';
-      $('emptyTtl').textContent = 'No results';
+      $('emptyIco').textContent = 'search_off'; $('emptyTtl').textContent = 'No results';
       $('emptySub').textContent = 'Try different search, area, or status filter';
     } else {
-      $('emptyIco').textContent = 'people_outline';
-      $('emptyTtl').textContent = 'No consumers yet';
+      $('emptyIco').textContent = 'people_outline'; $('emptyTtl').textContent = 'No consumers yet';
       $('emptySub').textContent = 'Tap + to add the first consumer';
     }
     return;
   }
-
   $('emptyState').classList.add('hidden');
   displayedN = 0;
   $('consumerList').innerHTML = '';
@@ -1054,12 +1020,10 @@ function appendCards() {
   displayedN = end;
 }
 
-/* ── Build card ─────────────────────────────────────────── */
 function makeCard(c) {
   const div = document.createElement('div');
   div.className = 'c-card';
   if (selectMode && selectedSet.has(c.conNo)) div.classList.add('selected');
-
   const status = (c.status || 'Active').toLowerCase();
   const area   = c.transfCode ? `<span class="area-badge">${esc(c.transfCode)}</span>` : '';
   const meter  = c.meterNo   ? `<div class="c-mi meter"><span class="material-icons-round">electric_meter</span>${esc(c.meterNo)}</div>` : '';
@@ -1067,7 +1031,6 @@ function makeCard(c) {
   const addr   = c.address   ? `<div class="c-mi addr"><span class="material-icons-round">location_on</span>${esc(c.address).substring(0,28)}</div>` : '';
   const check  = selectMode  ? `<div class="c-check"><span class="material-icons-round">check</span></div>` : '';
   const arrow  = selectMode  ? '' : `<span class="c-arrow material-icons-round">chevron_right</span>`;
-
   div.innerHTML = `
     <div class="c-inner">
       ${check}
@@ -1081,7 +1044,6 @@ function makeCard(c) {
       </div>
       ${arrow}
     </div>`;
-
   if (selectMode) {
     div.addEventListener('click', () => toggleCard(c.conNo, div));
   } else {
@@ -1106,79 +1068,47 @@ function renderSkeleton() {
    CONSUMER DETAIL
 ════════════════════════════════════════════════════════════ */
 function openDetail(c) {
-  lastScrollY = window.scrollY; // Save scroll position
-
+  lastScrollY = window.scrollY;
   $('detName').textContent  = c.consumerName || '—';
   $('detConno').textContent = 'Consumer No: ' + (c.conNo || '—');
 
-  // Build all fields — show '—' for missing
   let fieldsHtml = '';
-
-  const addField = (label, value, extra = '') => {
-    fieldsHtml += `<div class="det-field">
-      <span class="det-label">${label}</span>
-      <span class="det-value">${value}</span>
-    </div>`;
+  const addField = (label, value) => {
+    fieldsHtml += `<div class="det-field"><span class="det-label">${label}</span><span class="det-value">${value}</span></div>`;
   };
 
-  // S.No
   addField('Serial No', esc(c.sNo || '—'));
-
-  // Meter
   addField('Meter No', esc(c.meterNo || '—'));
-
-  // Area
   addField('Area Code', esc(c.transfCode || '—'));
-
-  // Address
   addField('Address', esc(c.address || '—'));
-
-  // Lab No
   addField('Lab No', esc(c.labNo || '—'));
 
-  // Phone — with call + WhatsApp buttons
   if (c.phoneNo) {
     const clean = c.phoneNo.replace(/\D/g,'');
-    fieldsHtml += `<div class="det-field">
-      <span class="det-label">Phone</span>
+    fieldsHtml += `<div class="det-field"><span class="det-label">Phone</span>
       <div class="det-phone-row">
         <span class="det-phone-num">${esc(c.phoneNo)}</span>
         <a href="tel:${esc(c.phoneNo)}" class="det-phone-btn call">
-          <span class="material-icons-round">call</span>Call
-        </a>
+          <span class="material-icons-round">call</span>Call</a>
         ${clean.length >= 10 ? `<a href="https://wa.me/91${clean.slice(-10)}" target="_blank" rel="noopener" class="det-phone-btn wa">
-          <span class="material-icons-round">message</span>WA
-        </a>` : ''}
-      </div>
-    </div>`;
-  } else {
-    addField('Phone', '—');
-  }
+          <span class="material-icons-round">message</span>WA</a>` : ''}
+      </div></div>`;
+  } else { addField('Phone', '—'); }
 
-  // Status badge
   const st = (c.status || 'Active').toLowerCase();
-  fieldsHtml += `<div class="det-field">
-    <span class="det-label">Status</span>
-    <span class="det-badge ${st}">${esc(c.status || 'Active')}</span>
-  </div>`;
-
-  // Last edited
+  fieldsHtml += `<div class="det-field"><span class="det-label">Status</span>
+    <span class="det-badge ${st}">${esc(c.status || 'Active')}</span></div>`;
   addField('Last Edited By', esc(c.lastEditedBy || '—'));
-
-  // Created date
   addField('Created', esc(formatDate(c.createdAt)));
 
   $('detFields').innerHTML = fieldsHtml;
 
-  const delBtn = isAdmin
-    ? `<button class="det-btn det-del" onclick="confirmDelete(${c._rowIndex},'${esc(c.conNo)}','${esc(c.consumerName)}')">
-         <span class="material-icons-round">delete</span>Delete
-       </button>` : '';
+  const delBtn = isAdmin ? `<button class="det-btn det-del" onclick="confirmDelete(${c._rowIndex},'${esc(c.conNo)}','${esc(c.consumerName)}')">
+    <span class="material-icons-round">delete</span>Delete</button>` : '';
 
   $('detActions').innerHTML = `
     <button class="det-btn det-edit" onclick="openEditForm('${esc(c.conNo)}')">
-      <span class="material-icons-round">edit</span>Edit
-    </button>${delBtn}`;
+      <span class="material-icons-round">edit</span>Edit</button>${delBtn}`;
 
   openSheet('detailSheet');
 }
@@ -1192,20 +1122,15 @@ $('searchInp').addEventListener('input', e => {
   clearTimeout(searchT);
   searchT = setTimeout(applyFilters, 280);
 });
-
 function clearSearch() {
   $('searchInp').value = ''; searchQ = '';
-  $('sClear').classList.add('hidden');
-  applyFilters();
+  $('sClear').classList.add('hidden'); applyFilters();
 }
-
 function setArea(el, code) {
   activeArea = code;
   document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
-  el.classList.add('active');
-  applyFilters();
+  el.classList.add('active'); applyFilters();
 }
-
 function setStatus(el, status) {
   activeStatus = status;
   document.querySelectorAll('.f-pill').forEach(p => p.classList.remove('active','active-s','inactive-s','defaulter-s'));
@@ -1215,14 +1140,11 @@ function setStatus(el, status) {
   else if (status === 'Defaulter') el.classList.add('defaulter-s');
   applyFilters();
 }
-
 function cycleSort() {
-  const orders  = ['default','asc','desc'];
-  const labels  = ['Default','A → Z','Z → A'];
+  const orders = ['default','asc','desc'], labels = ['Default','A → Z','Z → A'];
   const current = orders.indexOf(sortOrder);
   sortOrder = orders[(current + 1) % 3];
-  const lbl = labels[orders.indexOf(sortOrder)];
-  $('sortLbl').textContent = lbl;
+  $('sortLbl').textContent = labels[orders.indexOf(sortOrder)];
   $('sortBtn').classList.toggle('active', sortOrder !== 'default');
   applyFilters();
 }
@@ -1248,10 +1170,7 @@ $('userMenuBtn').addEventListener('click', () => {
   if (open) closeUserMenu();
   else { $('userMenu').classList.add('show'); $('menuOv').classList.remove('hidden'); }
 });
-function closeUserMenu() {
-  $('userMenu').classList.remove('show');
-  $('menuOv').classList.add('hidden');
-}
+function closeUserMenu() { $('userMenu').classList.remove('show'); $('menuOv').classList.add('hidden'); }
 
 /* ════════════════════════════════════════════════════════════
    CHANGE PASSWORD
@@ -1259,49 +1178,43 @@ function closeUserMenu() {
 function openChangePass() {
   closeUserMenu();
   $('cpCur').value = $('cpNew').value = $('cpCfm').value = '';
-  $('cpErr').classList.remove('show');
-  $('cpOk').classList.remove('show');
+  $('cpErr').classList.remove('show'); $('cpOk').classList.remove('show');
   $('sfi').style.width = '0%'; $('stxt').textContent = '';
   openSheet('cpSheet');
 }
-
 function chkStrength(v) {
-  const fi = $('sfi'), tx = $('stxt');
-  if (!v) { fi.style.width='0%'; tx.textContent=''; return; }
-  let s = 0;
-  if (v.length >= 8) s++;
-  if (/[A-Z]/.test(v)) s++;
-  if (/[0-9]/.test(v)) s++;
-  if (/[^A-Za-z0-9]/.test(v)) s++;
-  const L = [{w:'25%',b:'#F44336',t:'Too weak'},{w:'50%',b:'#FF9800',t:'Weak'},{w:'75%',b:'#FFC107',t:'Good'},{w:'100%',b:'#4CAF50',t:'Strong ✓'}][s-1] || {w:'25%',b:'#F44336',t:'Too weak'};
-  fi.style.width=L.w; fi.style.background=L.b; tx.textContent=L.t;
+  const fi=$('sfi'),tx=$('stxt');
+  if (!v) { fi.style.width='0%';tx.textContent='';return; }
+  let s=0;
+  if (v.length>=8) s++; if (/[A-Z]/.test(v)) s++; if (/[0-9]/.test(v)) s++; if (/[^A-Za-z0-9]/.test(v)) s++;
+  const L=[{w:'25%',b:'#F44336',t:'Too weak'},{w:'50%',b:'#FF9800',t:'Weak'},{w:'75%',b:'#FFC107',t:'Good'},{w:'100%',b:'#4CAF50',t:'Strong ✓'}][s-1]||{w:'25%',b:'#F44336',t:'Too weak'};
+  fi.style.width=L.w;fi.style.background=L.b;tx.textContent=L.t;
 }
-
 async function submitCP() {
-  const cur=$('cpCur').value.trim(), nw=$('cpNew').value.trim(), cfm=$('cpCfm').value.trim();
-  $('cpErr').classList.remove('show'); $('cpOk').classList.remove('show');
-  if (!cur||!nw||!cfm) { showCpErr('All fields required.'); return; }
-  if (nw.length<8) { showCpErr('Min 8 characters.'); return; }
-  if (nw!==cfm) { showCpErr('Passwords do not match.'); return; }
-  const btn=$('cpBtn'); btn.classList.add('loading');
+  const cur=$('cpCur').value.trim(),nw=$('cpNew').value.trim(),cfm=$('cpCfm').value.trim();
+  $('cpErr').classList.remove('show');$('cpOk').classList.remove('show');
+  if (!cur||!nw||!cfm){showCpErr('All fields required.');return;}
+  if (nw.length<8){showCpErr('Min 8 characters.');return;}
+  if (nw!==cfm){showCpErr('Passwords do not match.');return;}
+  const btn=$('cpBtn');btn.classList.add('loading');
   try {
     const res=await fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain'},
       body:JSON.stringify({action:'changePassword',username:session.username,currentPassword:cur,newPassword:nw})});
     const json=await res.json();
-    if (json.success) { $('cpOk').classList.add('show'); setTimeout(closeSheet,2000); }
+    if (json.success){$('cpOk').classList.add('show');setTimeout(closeSheet,2000);}
     else showCpErr(json.message||'Failed.');
-  } catch { showCpErr('Network error.'); }
+  } catch {showCpErr('Network error.');}
   btn.classList.remove('loading');
 }
-function showCpErr(msg) { $('cpErrMsg').textContent=msg; $('cpErr').classList.add('show'); }
-function openAbout() { closeUserMenu(); openSheet('aboutSheet'); }
+function showCpErr(msg){$('cpErrMsg').textContent=msg;$('cpErr').classList.add('show');}
+function openAbout(){closeUserMenu();openSheet('aboutSheet');}
 
 /* ════════════════════════════════════════════════════════════
    LOGOUT
 ════════════════════════════════════════════════════════════ */
 async function handleLogout() {
   closeUserMenu();
-  try { await fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({action:'logout',token:session.token})}); } catch {}
+  try{await fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({action:'logout',token:session.token})});}catch{}
   await AN_DB.clearAllData();
   await AN_DB.clearSession();
   location.replace('./login.html');
@@ -1312,77 +1225,55 @@ async function handleLogout() {
 ════════════════════════════════════════════════════════════ */
 function enterSelectMode() {
   if (!isAdmin) return;
-  selectMode = true; selectedSet.clear();
-  $('selBar').classList.remove('hidden');
-  $('navbar').classList.add('hidden');
-  $('fabBtn').classList.add('hidden');
-  $('bottomNav').classList.add('hide'); // Hide bottom nav in select mode
-  updateSelUI(); applyFilters();
+  selectMode=true;selectedSet.clear();
+  $('selBar').classList.remove('hidden');$('navbar').classList.add('hidden');
+  $('fabBtn').classList.add('hidden');$('bottomNav').classList.add('hide');
+  updateSelUI();applyFilters();
 }
-
 function exitSelectMode() {
-  selectMode = false; selectedSet.clear();
-  $('selBar').classList.add('hidden');
-  $('navbar').classList.remove('hidden');
-  $('fabBtn').classList.remove('hidden');
-  $('bottomNav').classList.remove('hide'); // Restore bottom nav
-  $('delBar').classList.add('hidden');
-  applyFilters();
+  selectMode=false;selectedSet.clear();
+  $('selBar').classList.add('hidden');$('navbar').classList.remove('hidden');
+  $('fabBtn').classList.remove('hidden');$('bottomNav').classList.remove('hide');
+  $('delBar').classList.add('hidden');applyFilters();
 }
-
-function toggleCard(conNo, el) {
-  if (selectedSet.has(conNo)) { selectedSet.delete(conNo); el.classList.remove('selected'); }
-  else { selectedSet.add(conNo); el.classList.add('selected'); }
+function toggleCard(conNo,el) {
+  if (selectedSet.has(conNo)){selectedSet.delete(conNo);el.classList.remove('selected');}
+  else{selectedSet.add(conNo);el.classList.add('selected');}
   updateSelUI();
 }
-
 function toggleSelectAll() {
-  const allSel = selectedSet.size === filtered.length;
+  const allSel=selectedSet.size===filtered.length;
   selectedSet.clear();
-  if (!allSel) filtered.forEach(c => selectedSet.add(c.conNo));
-  document.querySelectorAll('.c-card').forEach(card => card.classList.toggle('selected', !allSel));
+  if (!allSel) filtered.forEach(c=>selectedSet.add(c.conNo));
+  document.querySelectorAll('.c-card').forEach(card=>card.classList.toggle('selected',!allSel));
   updateSelUI();
 }
-
 function updateSelUI() {
-  const n = selectedSet.size;
-  $('selCnt').textContent    = n===0 ? 'Tap cards to select' : `${n} selected`;
-  $('delBarCnt').textContent = n;
-  $('delBar').classList.toggle('hidden', n===0);
-  $('selAllBtn').textContent = n===filtered.length ? 'Deselect All' : 'Select All';
+  const n=selectedSet.size;
+  $('selCnt').textContent=n===0?'Tap cards to select':`${n} selected`;
+  $('delBarCnt').textContent=n;
+  $('delBar').classList.toggle('hidden',n===0);
+  $('selAllBtn').textContent=n===filtered.length?'Deselect All':'Select All';
 }
 
-/* ── Bulk delete ────────────────────────────────────────── */
+/* ════════════════════════════════════════════════════════════
+   DELETE
+════════════════════════════════════════════════════════════ */
 function bulkDeleteConfirm() {
-  const n = selectedSet.size;
-  if (!n) return;
-  $('delWho').textContent = `${n} consumer${n!==1?'s':''} will be permanently deleted.`;
-  window._bulkDelete = true;
-  openSheet('delSheet');
+  const n=selectedSet.size;if(!n)return;
+  $('delWho').textContent=`${n} consumer${n!==1?'s':''} will be permanently deleted.`;
+  window._bulkDelete=true;openSheet('delSheet');
 }
-
 async function doDelete() {
   closeSheet();
-  if (window._bulkDelete) {
-    window._bulkDelete = false;
-    await executeBulkDelete();
-  } else {
-    await executeSingleDelete();
-  }
+  if (window._bulkDelete){window._bulkDelete=false;await executeBulkDelete();}
+  else await executeSingleDelete();
 }
-
 async function executeBulkDelete() {
-  const conNos = [...selectedSet];
-  if (!conNos.length) return;
+  const conNos=[...selectedSet];if(!conNos.length)return;
   toast(`Deleting ${conNos.length} consumers…`);
-
-  // CRITICAL: Sort by _rowIndex DESC to avoid row shifting
-  const toDelete = conNos
-    .map(conNo => masterList.find(c => c.conNo === conNo))
-    .filter(Boolean)
-    .sort((a,b) => b._rowIndex - a._rowIndex);
-
-  let deleted=0, failed=0;
+  const toDelete=conNos.map(conNo=>masterList.find(c=>c.conNo===conNo)).filter(Boolean).sort((a,b)=>b._rowIndex-a._rowIndex);
+  let deleted=0,failed=0;
   for (const c of toDelete) {
     try {
       if (navigator.onLine) {
@@ -1390,32 +1281,25 @@ async function executeBulkDelete() {
           body:JSON.stringify({action:'deleteConsumer',token:session.token,officeId:session.officeId,
             sheetName:'CONSUMER DATA ALL',rowIndex:c._rowIndex,conNo:c.conNo,consumerName:c.consumerName})});
         const json=await res.json();
-        if (json.success) { await AN_DB.deleteConsumer(c.conNo); masterList=masterList.filter(x=>x.conNo!==c.conNo); deleted++; }
+        if (json.success){await AN_DB.deleteConsumer(c.conNo);masterList=masterList.filter(x=>x.conNo!==c.conNo);deleted++;}
         else failed++;
       } else {
         await AN_DB.deleteConsumer(c.conNo);
         await AN_DB.addPendingChange('deleteConsumer',{rowIndex:c._rowIndex,conNo:c.conNo},session.officeId);
-        masterList=masterList.filter(x=>x.conNo!==c.conNo); deleted++;
+        masterList=masterList.filter(x=>x.conNo!==c.conNo);deleted++;
       }
-    } catch { failed++; }
+    } catch{failed++;}
   }
-
   exitSelectMode();
-  toast(`Deleted ${deleted}${failed?` · ${failed} failed`:''}`, deleted>0?'ok':'err');
-
-  // Reload to get fresh row indices (prevents drift on next delete)
-  if (navigator.onLine) setTimeout(() => loadConsumers(false), 800);
+  toast(`Deleted ${deleted}${failed?` · ${failed} failed`:''}`,deleted>0?'ok':'err');
+  if (navigator.onLine) setTimeout(()=>loadConsumers(false),800);
   else AN_DB.requestSync();
 }
-
-function confirmDelete(rowIdx, conNo, name) {
-  closeSheet();
-  delRowIdx=rowIdx; delConNo=conNo; delName=name;
-  window._bulkDelete=false;
-  $('delWho').textContent = name;
-  setTimeout(() => openSheet('delSheet'), 150);
+function confirmDelete(rowIdx,conNo,name) {
+  closeSheet();delRowIdx=rowIdx;delConNo=conNo;delName=name;
+  window._bulkDelete=false;$('delWho').textContent=name;
+  setTimeout(()=>openSheet('delSheet'),150);
 }
-
 async function executeSingleDelete() {
   try {
     if (navigator.onLine) {
@@ -1423,30 +1307,160 @@ async function executeSingleDelete() {
         body:JSON.stringify({action:'deleteConsumer',token:session.token,officeId:session.officeId,
           sheetName:'CONSUMER DATA ALL',rowIndex:delRowIdx,conNo:delConNo,consumerName:delName})});
       const json=await res.json();
-      if (json.success) {
-        await AN_DB.deleteConsumer(delConNo);
-        masterList=masterList.filter(c=>c.conNo!==delConNo);
-        applyFilters();
-        toast('Consumer deleted','ok');
-        // Reload fresh row indices
-        if (navigator.onLine) setTimeout(() => loadConsumers(false), 800);
-      } else { toast(json.error||json.message||'Delete failed','err'); }
+      if (json.success){
+        await AN_DB.deleteConsumer(delConNo);masterList=masterList.filter(c=>c.conNo!==delConNo);
+        applyFilters();toast('Consumer deleted','ok');
+        if (navigator.onLine) setTimeout(()=>loadConsumers(false),800);
+      } else toast(json.error||json.message||'Delete failed','err');
     } else {
       await AN_DB.deleteConsumer(delConNo);
       await AN_DB.addPendingChange('deleteConsumer',{rowIndex:delRowIdx,conNo:delConNo},session.officeId);
-      masterList=masterList.filter(c=>c.conNo!==delConNo);
-      applyFilters();
-      toast('Deleted offline — will sync when online');
-      AN_DB.requestSync();
+      masterList=masterList.filter(c=>c.conNo!==delConNo);applyFilters();
+      toast('Deleted offline — will sync when online');AN_DB.requestSync();
     }
-  } catch { toast('Error deleting','err'); }
+  } catch{toast('Error deleting','err');}
 }
 
 /* ════════════════════════════════════════════════════════════
-   ADD / EDIT — STUBS (Step 6)
+   ADD / EDIT CONSUMER — Step 6
 ════════════════════════════════════════════════════════════ */
-function openAddForm()       { toast('Add Consumer — Step 6 coming soon!'); }
-function openEditForm(conNo) { closeSheet(); toast('Edit Consumer — Step 6 coming soon!'); }
+function openAddForm() {
+  CF.mode = 'add'; CF.consumer = null;
+  $('cfTitle').textContent  = 'Add Consumer';
+  $('cfBtnLbl').textContent = 'Add Consumer';
+  // Clear all fields
+  $('cfConNo').value  = ''; $('cfConNo').disabled = false;
+  $('cfCName').value  = '';
+  $('cfAddr').value   = '';
+  $('cfLabNo').value  = '';
+  $('cfMeter').value  = '';
+  $('cfTransf').value = '';
+  $('cfPhone').value  = '';
+  $('cfStatus').value = 'Active';
+  $('cfErr').classList.remove('show'); $('cfErrMsg').textContent = '';
+  $('cfBtn').classList.remove('loading');
+  openSheet('cfSheet');
+  setTimeout(() => $('cfConNo').focus(), 380);
+}
+
+function openEditForm(conNo) {
+  const c = masterList.find(x => x.conNo === conNo);
+  if (!c) { toast('Consumer not found. Please reload.', 'err'); return; }
+  if (!c._rowIndex) { toast('Row index missing. Please reload app.', 'err'); return; }
+
+  CF.mode = 'edit'; CF.consumer = c;
+  $('cfTitle').textContent  = 'Edit Consumer';
+  $('cfBtnLbl').textContent = 'Save Changes';
+  // Pre-fill — raw values (NOT esc, inputs are not innerHTML)
+  $('cfConNo').value  = c.conNo         || '';
+  $('cfConNo').disabled = true;           // Lock ConNo on edit
+  $('cfCName').value  = c.consumerName  || '';
+  $('cfAddr').value   = c.address       || '';
+  $('cfLabNo').value  = c.labNo         || '';
+  $('cfMeter').value  = c.meterNo       || '';
+  $('cfTransf').value = c.transfCode    || '';
+  $('cfPhone').value  = c.phoneNo       || '';
+  $('cfStatus').value = c.status        || 'Active';
+  $('cfErr').classList.remove('show'); $('cfErrMsg').textContent = '';
+  $('cfBtn').classList.remove('loading');
+
+  // Close detail sheet then open form
+  closeSheet();
+  setTimeout(() => openSheet('cfSheet'), 200);
+}
+
+async function saveConsumer() {
+  const conNo  = $('cfConNo').value.trim();
+  const cName  = $('cfCName').value.trim();
+  const addr   = $('cfAddr').value.trim();
+  const labNo  = $('cfLabNo').value.trim();
+  const meter  = $('cfMeter').value.trim();
+  const transf = $('cfTransf').value;
+  const phone  = $('cfPhone').value.trim();
+  const status = $('cfStatus').value;
+
+  $('cfErr').classList.remove('show');
+
+  if (!conNo) { showCfErr('Consumer No. is required.'); $('cfConNo').focus(); return; }
+  if (!cName) { showCfErr('Consumer Name is required.'); $('cfCName').focus(); return; }
+  if (!session?.token) { location.replace('./login.html'); return; }
+
+  const btn = $('cfBtn'); btn.classList.add('loading');
+
+  // PascalCase — matches sheet column names
+  const consumerData = {
+    ConNo:conNo, ConsumerName:cName, Address:addr,
+    LabNo:labNo, MeterNo:meter, TransfCode:transf,
+    PhoneNo:phone, Status:status
+  };
+
+  // ── Offline path ────────────────────────────────────────
+  if (!navigator.onLine) {
+    try {
+      if (CF.mode === 'add') {
+        await AN_DB.addPendingChange('addConsumer', consumerData, session.officeId);
+        const tmp = normalize({ ...consumerData, _rowIndex: -1 });
+        await AN_DB.upsertConsumer(tmp);
+        masterList.unshift(tmp);
+      } else {
+        await AN_DB.addPendingChange('updateConsumer',
+          { rowIndex:CF.consumer._rowIndex, consumer:consumerData }, session.officeId);
+        const updated = normalize({ ...consumerData, _rowIndex:CF.consumer._rowIndex });
+        await AN_DB.upsertConsumer(updated);
+        const idx = masterList.findIndex(c => c.conNo === CF.consumer.conNo);
+        if (idx !== -1) masterList[idx] = updated;
+      }
+    } catch(e) { console.warn('CF offline:', e); }
+    closeSheet(); applyFilters(); updateChipCounts();
+    toast(CF.mode==='add'?'Saved offline — will sync when connected':'Updated offline — will sync','');
+    AN_DB.requestSync(); btn.classList.remove('loading'); return;
+  }
+
+  // ── Online path ──────────────────────────────────────────
+  try {
+    const controller = new AbortController();
+    const tid = setTimeout(() => controller.abort(), TIMEOUT);
+
+    const payload = CF.mode === 'add'
+      ? { action:'addConsumer', token:session.token, officeId:session.officeId,
+          sheetName:'CONSUMER DATA ALL', consumer:consumerData }
+      : { action:'updateConsumer', token:session.token, officeId:session.officeId,
+          sheetName:'CONSUMER DATA ALL', rowIndex:CF.consumer._rowIndex, consumer:consumerData };
+
+    const res  = await fetch(API_URL, {
+      method:'POST', headers:{'Content-Type':'text/plain'},
+      body:JSON.stringify(payload), redirect:'follow', signal:controller.signal
+    });
+    clearTimeout(tid);
+    const json = await res.json();
+
+    if (json.success) {
+      if (CF.mode === 'add') {
+        const saved = normalize(json.consumer || { ...consumerData, _rowIndex:json.rowIndex||0, 'S.No.':json.sNo||'' });
+        await AN_DB.upsertConsumer(saved).catch(()=>{});
+        masterList.unshift(saved);
+      } else {
+        const updated = normalize({ ...consumerData, _rowIndex:CF.consumer._rowIndex,
+          'S.No.':CF.consumer.sNo, CreatedAt:CF.consumer.createdAt });
+        await AN_DB.upsertConsumer(updated).catch(()=>{});
+        const idx = masterList.findIndex(c => c.conNo === CF.consumer.conNo);
+        if (idx !== -1) masterList[idx] = updated;
+      }
+      closeSheet(); applyFilters(); updateChipCounts();
+      toast(CF.mode==='add'?'Consumer added successfully ✓':'Consumer updated successfully ✓','ok');
+    } else {
+      showCfErr(json.message || json.error || 'Failed to save. Please try again.');
+    }
+  } catch(err) {
+    showCfErr(err.name==='AbortError'?'Request timed out (30s). Check connection.':'Network error. Please retry.');
+  }
+  btn.classList.remove('loading');
+}
+
+function showCfErr(msg) {
+  $('cfErrMsg').textContent = msg;
+  $('cfErr').classList.add('show');
+}
 
 /* ════════════════════════════════════════════════════════════
    TABS
@@ -1468,115 +1482,78 @@ function openSheet(id) {
   $('backdrop').classList.add('show');
   $('backdrop').onclick = id === 'delSheet' ? null : closeSheet;
 }
-
 function closeSheet() {
   if (activeSheet) { $(activeSheet).classList.remove('open'); activeSheet=null; }
   $('backdrop').classList.remove('show');
   $('backdrop').onclick = closeSheet;
   window._bulkDelete = false;
-  // Restore scroll position
   requestAnimationFrame(() => window.scrollTo(0, lastScrollY));
 }
-
-function toggleEye(inputId, iconId) {
-  const inp=$(inputId), icon=$(iconId);
+function toggleEye(inputId,iconId) {
+  const inp=$(inputId),icon=$(iconId);
   inp.type=inp.type==='password'?'text':'password';
   icon.textContent=inp.type==='text'?'visibility':'visibility_off';
 }
 
 /* ════════════════════════════════════════════════════════════
-   LONG PRESS (with visual feedback)
+   LONG PRESS
 ════════════════════════════════════════════════════════════ */
 function attachLongPress(el, consumer) {
   el.addEventListener('pointerdown', e => {
     if (!isAdmin) return;
-    pressPos = { x: e.clientX, y: e.clientY };
-    pressCard = el;
-    el.classList.add('pressing'); // Visual feedback during long press
-    pressTimer = setTimeout(() => {
+    pressPos={x:e.clientX,y:e.clientY}; pressCard=el;
+    el.classList.add('pressing');
+    pressTimer=setTimeout(()=>{
       if (navigator.vibrate) navigator.vibrate(50);
-      el.classList.remove('pressing');
-      pressTimer = null;
-      enterSelectMode();
-      toggleCard(consumer.conNo, el);
-    }, 500);
+      el.classList.remove('pressing'); pressTimer=null;
+      enterSelectMode(); toggleCard(consumer.conNo,el);
+    },500);
   });
-
   el.addEventListener('pointermove', e => {
     if (!pressPos) return;
-    if (Math.abs(e.clientX-pressPos.x)>12 || Math.abs(e.clientY-pressPos.y)>12) {
-      clearPressTimer();
-    }
+    if (Math.abs(e.clientX-pressPos.x)>12||Math.abs(e.clientY-pressPos.y)>12) clearPressTimer();
   });
-
-  ['pointerup','pointercancel','pointerleave'].forEach(evt => {
-    el.addEventListener(evt, () => clearPressTimer());
-  });
+  ['pointerup','pointercancel','pointerleave'].forEach(evt => el.addEventListener(evt,()=>clearPressTimer()));
 }
-
 function clearPressTimer() {
-  clearTimeout(pressTimer); pressTimer=null; pressPos=null;
-  if (pressCard) { pressCard.classList.remove('pressing'); pressCard=null; }
+  clearTimeout(pressTimer);pressTimer=null;pressPos=null;
+  if (pressCard){pressCard.classList.remove('pressing');pressCard=null;}
 }
 
 /* ════════════════════════════════════════════════════════════
    SYNC
 ════════════════════════════════════════════════════════════ */
-function setSync(type, txt) {
-  $('syncDot').className    = `sync-dot ${type}`;
-  $('syncTxt').textContent  = txt;
-}
-function setRefreshSpin(on) { $('refreshBtn').classList.toggle('spin', on); }
-function onOnline()  { setSync('syncing','Back online — syncing…'); AN_DB.requestSync(); setTimeout(loadConsumers, 600); }
-function onOffline() { setSync('offline','Offline — edits save locally'); }
-function onSWMsg({ data }) {
+function setSync(type,txt){$('syncDot').className=`sync-dot ${type}`;$('syncTxt').textContent=txt;}
+function setRefreshSpin(on){$('refreshBtn').classList.toggle('spin',on);}
+function onOnline(){setSync('syncing','Back online — syncing…');AN_DB.requestSync();setTimeout(loadConsumers,600);}
+function onOffline(){setSync('offline','Offline — edits save locally');}
+function onSWMsg({data}){
   if (!data) return;
-  if (data.type==='SYNC_COMPLETE') { setSync('online',`${data.synced} change${data.synced!==1?'s':''} synced`); loadConsumers(false); }
-  if (data.type==='SYNC_FAILED')   { setSync('pending','Sync failed — will retry'); }
+  if (data.type==='SYNC_COMPLETE'){setSync('online',`${data.synced} change${data.synced!==1?'s':''} synced`);loadConsumers(false);}
+  if (data.type==='SYNC_FAILED'){setSync('pending','Sync failed — will retry');}
 }
 
 /* ════════════════════════════════════════════════════════════
-   ERROR + RIPPLE + TOAST + UTILS
+   UTILS
 ════════════════════════════════════════════════════════════ */
-function showErr(msg) {
-  $('consumerList').innerHTML=`<div class="err-bar"><span class="material-icons-round">warning_amber</span>${esc(msg)}</div>`;
-}
-
-function addRipple(el, e) {
-  const r=el.getBoundingClientRect(), sz=Math.max(r.width,r.height)*1.4;
-  const rip=document.createElement('span');
-  rip.className='ripple';
+function showErr(msg){$('consumerList').innerHTML=`<div class="err-bar"><span class="material-icons-round">warning_amber</span>${esc(msg)}</div>`;}
+function addRipple(el,e){
+  const r=el.getBoundingClientRect(),sz=Math.max(r.width,r.height)*1.4;
+  const rip=document.createElement('span');rip.className='ripple';
   rip.style.cssText=`width:${sz}px;height:${sz}px;left:${e.clientX-r.left-sz/2}px;top:${e.clientY-r.top-sz/2}px;`;
-  el.appendChild(rip);
-  setTimeout(()=>rip.remove(),600);
+  el.appendChild(rip);setTimeout(()=>rip.remove(),600);
 }
-
-function toast(msg, type='') {
-  const el=$('toast');
-  el.textContent=msg; el.className=`show ${type}`.trim();
-  clearTimeout(toastT);
-  toastT=setTimeout(()=>{ el.className=type.trim(); },2800);
+function toast(msg,type=''){
+  const el=$('toast');el.textContent=msg;el.className=`show ${type}`.trim();
+  clearTimeout(toastT);toastT=setTimeout(()=>{el.className=type.trim();},2800);
 }
-
-function esc(s) {
-  return String(s??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+function esc(s){return String(s??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function formatDate(ts){
+  if (!ts||ts==='—') return '—';
+  try{const d=new Date(ts);if(isNaN(d))return ts;return d.toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'});}
+  catch{return ts;}
 }
-
-function formatDate(ts) {
-  if (!ts || ts==='—') return '—';
-  try {
-    const d = new Date(ts);
-    if (isNaN(d)) return ts;
-    return d.toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'});
-  } catch { return ts; }
-}
-
-function timeAgo(ts) {
-  const d=Date.now()-ts;
-  if (d<60000)   return 'just now';
-  if (d<3600000) return `${Math.floor(d/60000)}m ago`;
-  return `${Math.floor(d/3600000)}h ago`;
-}
+function timeAgo(ts){const d=Date.now()-ts;if(d<60000)return 'just now';if(d<3600000)return `${Math.floor(d/60000)}m ago`;return `${Math.floor(d/3600000)}h ago`;}
 
 /* ── START ─────────────────────────────────────────────── */
 init();
