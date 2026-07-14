@@ -44,54 +44,28 @@
     -webkit-text-size-adjust:100%;
   }
   .hidden{display:none!important}
-
   .navbar,.search-sec,.bottom-nav,.c-card,.skeleton,
   .user-menu,.bottom-sheet,.search-wrap,.chip,.f-pill{
     transition:background-color var(--d) var(--ease),
                border-color var(--d) var(--ease),color var(--d) var(--ease);
   }
 
-  .splash{
-    position:fixed;inset:0;background:#080F1E;
-    display:flex;flex-direction:column;align-items:center;justify-content:center;
-    gap:10px;z-index:9999;transition:opacity .35s var(--ease);
-  }
+  .splash{position:fixed;inset:0;background:#080F1E;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;z-index:9999;transition:opacity .35s var(--ease);}
   .splash.out{opacity:0;pointer-events:none}
   .splash-bolt{font-size:52px;animation:bolt .9s ease-in-out infinite alternate}
   @keyframes bolt{from{transform:scale(.92)}to{transform:scale(1.06)}}
   .splash-name{font-family:var(--fd);font-size:20px;font-weight:700;color:#fff}
   .splash-sub{font-size:12px;color:rgba(255,255,255,.45)}
 
-  .update-banner{
-    background:var(--primary);color:#fff;padding:10px 16px;
-    display:flex;align-items:center;justify-content:space-between;gap:12px;
-    font-size:13px;font-family:var(--fd);font-weight:500;
-  }
-  .upd-btn{
-    background:rgba(255,255,255,.2);border:none;color:#fff;
-    padding:5px 12px;border-radius:10px;font-size:12px;
-    font-family:var(--fd);font-weight:600;cursor:pointer;white-space:nowrap;
-  }
+  .update-banner{background:var(--primary);color:#fff;padding:10px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px;font-size:13px;font-family:var(--fd);font-weight:500;}
+  .upd-btn{background:rgba(255,255,255,.2);border:none;color:#fff;padding:5px 12px;border-radius:10px;font-size:12px;font-family:var(--fd);font-weight:600;cursor:pointer;white-space:nowrap;}
 
-  .backdrop{
-    position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:290;
-    opacity:0;pointer-events:none;transition:opacity .3s var(--ease);
-    backdrop-filter:blur(2px);-webkit-backdrop-filter:blur(2px);
-  }
+  .backdrop{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:290;opacity:0;pointer-events:none;transition:opacity .3s var(--ease);backdrop-filter:blur(2px);-webkit-backdrop-filter:blur(2px);}
   .backdrop.show{opacity:1;pointer-events:all}
 
-  .bottom-sheet{
-    position:fixed;bottom:0;left:0;right:0;
-    background:var(--card);border-radius:24px 24px 0 0;
-    padding:8px 20px 32px;z-index:300;
-    transform:translateY(100%);transition:transform .35s var(--ease);
-    max-height:92vh;overflow-y:auto;
-  }
+  .bottom-sheet{position:fixed;bottom:0;left:0;right:0;background:var(--card);border-radius:24px 24px 0 0;padding:8px 20px 32px;z-index:300;transform:translateY(100%);transition:transform .35s var(--ease);max-height:92vh;overflow-y:auto;}
   .bottom-sheet.open{transform:translateY(0)}
-  .sheet-handle{
-    width:40px;height:4px;background:var(--card-b);border-radius:2px;
-    margin:10px auto 18px;cursor:grab;
-  }
+  .sheet-handle{width:40px;height:4px;background:var(--card-b);border-radius:2px;margin:10px auto 18px;cursor:grab;}
   .sheet-title{font-family:var(--fd);font-size:16px;font-weight:700;color:var(--t1);margin-bottom:18px;text-align:center}
 
   .sf{margin-bottom:13px}
@@ -101,7 +75,7 @@
   .siw .material-icons-round{color:var(--t2);font-size:18px;flex-shrink:0}
   .sinp{flex:1;background:none;border:none;outline:none;font-family:var(--fb);font-size:14px;color:var(--t1)}
   .sinp::placeholder{color:var(--t2)}
-  .sinp:disabled{opacity:0.5;cursor:not-allowed;}
+  .sinp:disabled{opacity:.5;cursor:not-allowed;}
   .eye{background:none;border:none;color:var(--t2);cursor:pointer;display:flex;padding:2px}
   .eye .material-icons-round{font-size:18px}
   .strength-bar{height:3px;border-radius:2px;background:var(--inp-b);overflow:hidden;margin-top:5px}
@@ -112,18 +86,28 @@
   .s-alert.err{background:rgba(211,47,47,.1);color:var(--danger);border:1px solid rgba(211,47,47,.2)}
   .s-alert.ok{background:rgba(46,125,50,.1);color:var(--success);border:1px solid rgba(46,125,50,.2)}
   .s-alert .material-icons-round{font-size:16px;flex-shrink:0}
-  .btn-sh{
-    width:100%;background:var(--primary);color:#fff;border:none;
-    border-radius:var(--rb);height:48px;font-family:var(--fd);font-size:15px;font-weight:600;
-    cursor:pointer;margin-top:8px;display:flex;align-items:center;justify-content:center;gap:8px;
-    transition:opacity .2s;
-  }
+  .btn-sh{width:100%;background:var(--primary);color:#fff;border:none;border-radius:var(--rb);height:48px;font-family:var(--fd);font-size:15px;font-weight:600;cursor:pointer;margin-top:8px;display:flex;align-items:center;justify-content:center;gap:8px;transition:opacity .2s;}
   .btn-sh:active{opacity:.85}
   .btn-sh .spin{width:18px;height:18px;border:2px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;display:none}
   .btn-sh.loading .spin{display:block}
   .btn-sh.loading .bl{display:none}
   @keyframes spin{to{transform:rotate(360deg)}}
   .btn-cancel{width:100%;background:var(--inp);border:1.5px solid var(--inp-b);border-radius:var(--rb);height:44px;font-family:var(--fd);font-size:14px;font-weight:500;color:var(--t1);cursor:pointer;margin-top:8px}
+
+  /* Consumer form selects */
+  .cf-sel-wrap{position:relative;display:flex;align-items:center;}
+  .cf-sel{flex:1;background:var(--inp);border:1.5px solid var(--inp-b);border-radius:var(--ri);height:46px;padding:0 40px 0 12px;color:var(--t1);font-family:var(--fb);font-size:14px;outline:none;-webkit-appearance:none;appearance:none;cursor:pointer;transition:border-color .15s;width:100%;}
+  .cf-sel:focus{border-color:var(--primary);}
+  .cf-sel-ico{position:absolute;right:10px;color:var(--t2);font-size:18px;pointer-events:none;}
+  .cf-sel option{background:#0F1F3C;color:#EEF4FF;}
+  [data-theme=light] .cf-sel option{background:#fff;color:#1A1A2E;}
+  /* Date input color-scheme */
+  input[type=date].sinp{color-scheme:dark;}
+  [data-theme=light] input[type=date].sinp{color-scheme:light;}
+  /* SD section separator in form */
+  .cf-section-hdr{font-size:10px;font-family:var(--fd);font-weight:700;color:var(--primary);text-transform:uppercase;letter-spacing:.6px;padding:14px 0 4px;border-top:1px solid var(--card-b);margin-top:4px;}
+  /* SD section header in detail */
+  .det-section-hdr{font-size:10px;font-family:var(--fd);font-weight:700;color:var(--primary);text-transform:uppercase;letter-spacing:.6px;padding:14px 0 4px;border-top:1px solid var(--card-b);margin-top:4px;}
 
   .ab-logo{text-align:center;font-size:48px;margin-bottom:8px}
   .ab-name{text-align:center;font-family:var(--fd);font-size:17px;font-weight:700;color:var(--t1);margin-bottom:3px}
@@ -158,11 +142,7 @@
 
   .det-phone-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end}
   .det-phone-num{font-size:13px;color:var(--t1);user-select:text;-webkit-user-select:text}
-  .det-phone-btn{
-    display:flex;align-items:center;gap:4px;padding:5px 12px;border-radius:10px;
-    font-size:12px;font-family:var(--fd);font-weight:600;text-decoration:none;
-    transition:opacity .2s;
-  }
+  .det-phone-btn{display:flex;align-items:center;gap:4px;padding:5px 12px;border-radius:10px;font-size:12px;font-family:var(--fd);font-weight:600;text-decoration:none;transition:opacity .2s;}
   .det-phone-btn:active{opacity:.7}
   .det-phone-btn .material-icons-round{font-size:15px}
   .det-phone-btn.call{background:rgba(46,125,50,.12);color:#2E7D32}
@@ -179,12 +159,7 @@
   .det-del{background:rgba(211,47,47,.1);color:var(--danger)}
   [data-theme=dark] .det-del{background:rgba(211,47,47,.15)}
 
-  .navbar{
-    position:fixed;top:0;left:0;right:0;height:var(--nav-h);
-    background:var(--primary);display:flex;align-items:center;
-    justify-content:space-between;padding:0 12px;z-index:100;
-    box-shadow:0 2px 10px rgba(0,0,0,.2);
-  }
+  .navbar{position:fixed;top:0;left:0;right:0;height:var(--nav-h);background:var(--primary);display:flex;align-items:center;justify-content:space-between;padding:0 12px;z-index:100;box-shadow:0 2px 10px rgba(0,0,0,.2);}
   .nav-left{display:flex;align-items:center;gap:10px}
   .nav-bolt{font-size:22px;line-height:1}
   .nav-app{font-family:var(--fd);font-size:15px;font-weight:700;color:#fff;line-height:1.2}
@@ -200,13 +175,7 @@
   .sel-cnt{flex:1;font-family:var(--fd);font-size:15px;font-weight:600;color:#fff}
   .sel-all-btn{background:rgba(255,255,255,.15);border:none;border-radius:20px;padding:6px 14px;font-family:var(--fd);font-size:12px;font-weight:500;color:#fff;cursor:pointer;white-space:nowrap}
 
-  .user-menu{
-    position:fixed;top:calc(var(--nav-h) + 8px);right:12px;
-    background:var(--card);border:1px solid var(--card-b);border-radius:20px;
-    padding:16px;z-index:200;min-width:210px;box-shadow:var(--sh-lg);
-    opacity:0;transform:translateY(-8px) scale(.96);pointer-events:none;
-    transition:opacity .2s var(--ease),transform .2s var(--ease);
-  }
+  .user-menu{position:fixed;top:calc(var(--nav-h) + 8px);right:12px;background:var(--card);border:1px solid var(--card-b);border-radius:20px;padding:16px;z-index:200;min-width:210px;box-shadow:var(--sh-lg);opacity:0;transform:translateY(-8px) scale(.96);pointer-events:none;transition:opacity .2s var(--ease),transform .2s var(--ease);}
   .user-menu.show{opacity:1;transform:none;pointer-events:all}
   .um-avatar{width:42px;height:42px;border-radius:50%;background:var(--primary);display:flex;align-items:center;justify-content:center;margin-bottom:8px}
   .um-avatar .material-icons-round{color:#fff;font-size:22px}
@@ -222,12 +191,7 @@
   .mi.install .material-icons-round{color:var(--success)}
   .menu-ov{position:fixed;inset:0;z-index:150}
 
-  .search-sec{
-    position:fixed;top:var(--nav-h);left:0;right:0;
-    background:var(--bg);padding:10px 14px 0;z-index:90;
-    border-bottom:1px solid var(--card-b);
-  }
-
+  .search-sec{position:fixed;top:var(--nav-h);left:0;right:0;background:var(--bg);padding:10px 14px 0;z-index:90;border-bottom:1px solid var(--card-b);}
   .search-wrap{display:flex;align-items:center;background:var(--inp);border:1.5px solid var(--inp-b);border-radius:var(--ri);padding:0 12px;gap:8px;height:44px}
   .search-wrap:focus-within{border-color:var(--primary)}
   .s-ico{color:var(--t2);font-size:20px!important;flex-shrink:0}
@@ -239,11 +203,7 @@
   .s-clr .material-icons-round{font-size:18px}
 
   .f-row{display:flex;align-items:center;gap:6px;padding:8px 0 4px}
-  .f-pill{
-    flex-shrink:0;background:var(--inp);border:1.5px solid var(--inp-b);
-    border-radius:20px;padding:3px 12px;font-size:11.5px;font-family:var(--fd);
-    font-weight:500;color:var(--t2);cursor:pointer;transition:all .15s;
-  }
+  .f-pill{flex-shrink:0;background:var(--inp);border:1.5px solid var(--inp-b);border-radius:20px;padding:3px 12px;font-size:11.5px;font-family:var(--fd);font-weight:500;color:var(--t2);cursor:pointer;transition:all .15s;}
   .f-pill.active{background:var(--primary);border-color:var(--primary);color:#fff}
   .f-pill.active-s{background:rgba(46,125,50,.15);border-color:rgba(46,125,50,.3);color:#2E7D32}
   .f-pill.inactive-s{background:rgba(120,120,120,.12);border-color:rgba(120,120,120,.2);color:#757575}
@@ -252,12 +212,7 @@
   [data-theme=dark] .f-pill.inactive-s{background:rgba(120,120,120,.2);color:#BDBDBD}
   [data-theme=dark] .f-pill.defaulter-s{background:rgba(211,47,47,.2);color:#EF9A9A}
   .f-sep{flex:1}
-  .sort-btn{
-    display:flex;align-items:center;gap:3px;background:var(--inp);
-    border:1.5px solid var(--inp-b);border-radius:10px;padding:3px 10px;
-    font-size:11px;font-family:var(--fd);font-weight:600;color:var(--t2);cursor:pointer;
-    white-space:nowrap;flex-shrink:0;
-  }
+  .sort-btn{display:flex;align-items:center;gap:3px;background:var(--inp);border:1.5px solid var(--inp-b);border-radius:10px;padding:3px 10px;font-size:11px;font-family:var(--fd);font-weight:600;color:var(--t2);cursor:pointer;white-space:nowrap;flex-shrink:0;}
   .sort-btn .material-icons-round{font-size:15px}
   .sort-btn.active{border-color:var(--primary);color:var(--primary)}
 
@@ -268,11 +223,7 @@
   .chip{flex-shrink:0;background:var(--inp);border:1.5px solid var(--inp-b);border-radius:20px;padding:4px 12px;font-size:11.5px;font-family:var(--fd);font-weight:500;color:var(--t2);cursor:pointer;transition:all .15s;white-space:nowrap}
   .chip.active{background:var(--primary);border-color:var(--primary);color:#fff}
 
-  .main{
-    padding-bottom:calc(var(--bnav-h) + 24px);
-    padding-left:14px;padding-right:14px;
-  }
-
+  .main{padding-bottom:calc(var(--bnav-h) + 24px);padding-left:14px;padding-right:14px;}
   .sync-row{display:flex;align-items:center;gap:8px;padding:10px 2px 8px}
   .sync-dot{width:8px;height:8px;border-radius:50%;background:#9E9E9E;flex-shrink:0;transition:background .4s}
   .sync-dot.online{background:#4CAF50}
@@ -287,14 +238,7 @@
   .refresh-btn .material-icons-round{font-size:18px}
   .refresh-btn.spin .material-icons-round{animation:spin .7s linear infinite}
 
-  .c-card{
-    background:var(--card);border:1px solid var(--card-b);
-    border-radius:var(--r);padding:13px 14px;margin-bottom:9px;
-    box-shadow:var(--sh);position:relative;overflow:hidden;
-    animation:fadeUp .28s var(--ease) both;cursor:pointer;
-    transition:transform .1s,border-color .15s,background .15s;
-    user-select:none;-webkit-user-select:none;
-  }
+  .c-card{background:var(--card);border:1px solid var(--card-b);border-radius:var(--r);padding:13px 14px;margin-bottom:9px;box-shadow:var(--sh);position:relative;overflow:hidden;animation:fadeUp .28s var(--ease) both;cursor:pointer;transition:transform .1s,border-color .15s,background .15s;user-select:none;-webkit-user-select:none;}
   @keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
   .c-card:active{transform:scale(.985)}
   .c-card.selected{border-color:var(--primary)}
@@ -362,32 +306,10 @@
   .bnav .material-icons-round{font-size:22px}
   #sentinel{height:20px}
 
-  #toast{
-    position:fixed;bottom:calc(var(--bnav-h) + 14px);left:50%;
-    transform:translateX(-50%) translateY(10px);
-    background:#1A2A4A;color:#fff;padding:9px 20px;border-radius:20px;
-    font-size:13px;font-family:var(--fb);z-index:999;white-space:nowrap;
-    box-shadow:0 4px 16px rgba(0,0,0,.3);opacity:0;pointer-events:none;
-    transition:opacity .25s,transform .25s var(--ease);
-  }
+  #toast{position:fixed;bottom:calc(var(--bnav-h) + 14px);left:50%;transform:translateX(-50%) translateY(10px);background:#1A2A4A;color:#fff;padding:9px 20px;border-radius:20px;font-size:13px;font-family:var(--fb);z-index:999;white-space:nowrap;box-shadow:0 4px 16px rgba(0,0,0,.3);opacity:0;pointer-events:none;transition:opacity .25s,transform .25s var(--ease);}
   #toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
   #toast.err{background:var(--danger)}
   #toast.ok{background:var(--success)}
-
-  /* ══ CONSUMER FORM SHEET — Step 6 ══════════════════════ */
-  /* Select wrapper — matches existing .siw height/border */
-  .cf-sel-wrap{position:relative;display:flex;align-items:center;}
-  .cf-sel{
-    flex:1;background:var(--inp);border:1.5px solid var(--inp-b);
-    border-radius:var(--ri);height:46px;padding:0 40px 0 12px;
-    color:var(--t1);font-family:var(--fb);font-size:14px;
-    outline:none;-webkit-appearance:none;appearance:none;
-    cursor:pointer;transition:border-color .15s;width:100%;
-  }
-  .cf-sel:focus{border-color:var(--primary);}
-  .cf-sel-ico{position:absolute;right:10px;color:var(--t2);font-size:18px;pointer-events:none;}
-  .cf-sel option{background:#0F1F3C;color:#EEF4FF;}
-  [data-theme=light] .cf-sel option{background:#fff;color:#1A1A2E;}
 
   </style>
 </head>
@@ -492,22 +414,10 @@
   <div class="ab-logo">⚡</div>
   <div class="ab-name">A&N Electricity</div>
   <div class="ab-ver">Consumer Manager v1.0.0</div>
-  <div class="ab-row">
-    <span class="material-icons-round">business</span>
-    <div><div class="ab-key">Department</div><div class="ab-val">A&N Islands Electricity Department</div></div>
-  </div>
-  <div class="ab-row">
-    <span class="material-icons-round">location_on</span>
-    <div><div class="ab-key">Office</div><div class="ab-val" id="aboutOffice">—</div></div>
-  </div>
-  <div class="ab-row">
-    <span class="material-icons-round">storage</span>
-    <div><div class="ab-key">Data</div><div class="ab-val">Google Sheets · Private &amp; Secure</div></div>
-  </div>
-  <div class="ab-row">
-    <span class="material-icons-round">offline_bolt</span>
-    <div><div class="ab-key">Platform</div><div class="ab-val">PWA · Works Offline · GitHub Pages</div></div>
-  </div>
+  <div class="ab-row"><span class="material-icons-round">business</span><div><div class="ab-key">Department</div><div class="ab-val">A&N Islands Electricity Department</div></div></div>
+  <div class="ab-row"><span class="material-icons-round">location_on</span><div><div class="ab-key">Office</div><div class="ab-val" id="aboutOffice">—</div></div></div>
+  <div class="ab-row"><span class="material-icons-round">storage</span><div><div class="ab-key">Data</div><div class="ab-val">Google Sheets · Private &amp; Secure</div></div></div>
+  <div class="ab-row"><span class="material-icons-round">offline_bolt</span><div><div class="ab-key">Platform</div><div class="ab-val">PWA · Works Offline · GitHub Pages</div></div></div>
 </div>
 
 <!-- CONSUMER DETAIL SHEET -->
@@ -529,48 +439,39 @@
   <button class="btn-cancel" onclick="closeSheet()">Cancel</button>
 </div>
 
-<!-- CONSUMER FORM SHEET — Step 6 (Add / Edit) -->
+<!-- CONSUMER FORM SHEET — Add / Edit (Step 6 + SD fields) -->
 <div class="bottom-sheet" id="cfSheet">
   <div class="sheet-handle" id="cfHandle"></div>
   <div class="sheet-title" id="cfTitle">Add Consumer</div>
-
-  <div class="s-alert err" id="cfErr">
-    <span class="material-icons-round">error_outline</span>
-    <span id="cfErrMsg"></span>
-  </div>
+  <div class="s-alert err" id="cfErr"><span class="material-icons-round">error_outline</span><span id="cfErrMsg"></span></div>
 
   <div class="sf">
     <label class="sl">Consumer No. <span style="color:var(--danger)">*</span></label>
-    <div class="siw">
-      <span class="material-icons-round">tag</span>
+    <div class="siw"><span class="material-icons-round">tag</span>
       <input class="sinp" type="text" id="cfConNo" placeholder="e.g. E/1001" maxlength="20" autocomplete="off">
     </div>
   </div>
   <div class="sf">
     <label class="sl">Consumer Name <span style="color:var(--danger)">*</span></label>
-    <div class="siw">
-      <span class="material-icons-round">person</span>
+    <div class="siw"><span class="material-icons-round">person</span>
       <input class="sinp" type="text" id="cfCName" placeholder="Full name" maxlength="100" autocomplete="off">
     </div>
   </div>
   <div class="sf">
     <label class="sl">Address</label>
-    <div class="siw">
-      <span class="material-icons-round">location_on</span>
+    <div class="siw"><span class="material-icons-round">location_on</span>
       <input class="sinp" type="text" id="cfAddr" placeholder="Full address" maxlength="200" autocomplete="off">
     </div>
   </div>
   <div class="sf">
     <label class="sl">Lab No.</label>
-    <div class="siw">
-      <span class="material-icons-round">science</span>
+    <div class="siw"><span class="material-icons-round">science</span>
       <input class="sinp" type="text" id="cfLabNo" placeholder="Lab number" maxlength="30" autocomplete="off">
     </div>
   </div>
   <div class="sf">
     <label class="sl">Meter No.</label>
-    <div class="siw">
-      <span class="material-icons-round">electric_meter</span>
+    <div class="siw"><span class="material-icons-round">electric_meter</span>
       <input class="sinp" type="text" id="cfMeter" placeholder="Meter serial number" maxlength="30" autocomplete="off">
     </div>
   </div>
@@ -579,23 +480,18 @@
     <div class="cf-sel-wrap">
       <select class="cf-sel" id="cfTransf">
         <option value="">— Select Area —</option>
-        <option value="AHS">AHS</option><option value="OBS">OBS</option>
-        <option value="SSN">SSN</option><option value="SP1">SP1</option>
-        <option value="PLC">PLC</option><option value="SPV">SPV</option>
-        <option value="RKM">RKM</option><option value="RBV">RBV</option>
-        <option value="SSP">SSP</option><option value="MP1">MP1</option>
-        <option value="CHS">CHS</option><option value="RGT1">RGT1</option>
-        <option value="SJM">SJM</option><option value="MGP1">MGP1</option>
-        <option value="SCT">SCT</option><option value="RJM">RJM</option>
-        <option value="PAO1">PAO1</option>
+        <option>AHS</option><option>OBS</option><option>SSN</option><option>SP1</option>
+        <option>PLC</option><option>SPV</option><option>RKM</option><option>RBV</option>
+        <option>SSP</option><option>MP1</option><option>CHS</option><option>RGT1</option>
+        <option>SJM</option><option>MGP1</option><option>SCT</option><option>RJM</option>
+        <option>PAO1</option>
       </select>
       <span class="material-icons-round cf-sel-ico">expand_more</span>
     </div>
   </div>
   <div class="sf">
     <label class="sl">Phone No.</label>
-    <div class="siw">
-      <span class="material-icons-round">phone</span>
+    <div class="siw"><span class="material-icons-round">phone</span>
       <input class="sinp" type="tel" id="cfPhone" placeholder="10-digit mobile" maxlength="15" inputmode="numeric" autocomplete="off">
     </div>
   </div>
@@ -611,9 +507,29 @@
     </div>
   </div>
 
+  <!-- Security Deposit Section -->
+  <div class="cf-section-hdr">Security Deposit</div>
+  <div class="sf">
+    <label class="sl">Passbook/SD No</label>
+    <div class="siw"><span class="material-icons-round">book</span>
+      <input class="sinp" type="text" id="cfSdNo" placeholder="Passbook/SD number" maxlength="50" autocomplete="off">
+    </div>
+  </div>
+  <div class="sf">
+    <label class="sl">SD Amount (₹)</label>
+    <div class="siw"><span class="material-icons-round">currency_rupee</span>
+      <input class="sinp" type="number" id="cfSdAmt" placeholder="Amount in rupees" min="0" autocomplete="off">
+    </div>
+  </div>
+  <div class="sf">
+    <label class="sl">SD Date</label>
+    <div class="siw"><span class="material-icons-round">calendar_today</span>
+      <input class="sinp" type="date" id="cfSdDate" autocomplete="off">
+    </div>
+  </div>
+
   <button class="btn-sh" id="cfBtn" onclick="saveConsumer()">
-    <span class="bl" id="cfBtnLbl">Add Consumer</span>
-    <div class="spin"></div>
+    <span class="bl" id="cfBtnLbl">Add Consumer</span><div class="spin"></div>
   </button>
   <button class="btn-cancel" onclick="closeSheet()">Cancel</button>
 </div>
@@ -633,19 +549,18 @@
     </button>
   </div>
   <div class="f-row">
-    <button class="f-pill active" data-status="ALL" onclick="setStatus(this,'ALL')">All Status</button>
-    <button class="f-pill" data-status="Active"    onclick="setStatus(this,'Active')">🟢 Active</button>
-    <button class="f-pill" data-status="Inactive"  onclick="setStatus(this,'Inactive')">⚫ Inactive</button>
-    <button class="f-pill" data-status="Defaulter" onclick="setStatus(this,'Defaulter')">🔴 Defaulter</button>
+    <button class="f-pill active" data-status="ALL"      onclick="setStatus(this,'ALL')">All Status</button>
+    <button class="f-pill" data-status="Active"          onclick="setStatus(this,'Active')">🟢 Active</button>
+    <button class="f-pill" data-status="Inactive"        onclick="setStatus(this,'Inactive')">⚫ Inactive</button>
+    <button class="f-pill" data-status="Defaulter"       onclick="setStatus(this,'Defaulter')">🔴 Defaulter</button>
     <div class="f-sep"></div>
     <button class="sort-btn" id="sortBtn" onclick="cycleSort()">
-      <span class="material-icons-round">sort</span>
-      <span id="sortLbl">A-Z</span>
+      <span class="material-icons-round">sort</span><span id="sortLbl">A-Z</span>
     </button>
   </div>
   <div class="chips-wrap">
     <div class="chips" id="chips">
-      <button class="chip active" data-area="ALL"   onclick="setArea(this,'ALL')">All</button>
+      <button class="chip active" data-area="ALL"  onclick="setArea(this,'ALL')">All</button>
       <button class="chip" data-area="AHS"  onclick="setArea(this,'AHS')">AHS</button>
       <button class="chip" data-area="OBS"  onclick="setArea(this,'OBS')">OBS</button>
       <button class="chip" data-area="SSN"  onclick="setArea(this,'SSN')">SSN</button>
@@ -718,844 +633,517 @@ const API_URL   = 'https://script.google.com/macros/s/AKfycbyeO7pIZrT1WKPHHuR8LK
 const PAGE_SIZE = 30;
 const TIMEOUT   = 30000;
 
-let session     = null;
-let isAdmin     = false;
-let masterList  = [];
-let filtered    = [];
-let displayedN  = 0;
-let activeArea  = 'ALL';
-let activeStatus= 'ALL';
-let sortOrder   = 'default';
-let searchQ     = '';
-let searchT     = null;
-let toastT      = null;
-let activeSheet = null;
-let lastScrollY = 0;
-let selectMode  = false;
-let selectedSet = new Set();
-let delRowIdx = 0, delConNo = '', delName = '';
-let pressTimer = null, pressPos = null, pressCard = null;
-let deferredInstall = null;
-let swReg = null;
+let session=null,isAdmin=false,masterList=[],filtered=[],displayedN=0;
+let activeArea='ALL',activeStatus='ALL',sortOrder='default',searchQ='';
+let searchT=null,toastT=null,activeSheet=null,lastScrollY=0;
+let selectMode=false,selectedSet=new Set();
+let delRowIdx=0,delConNo='',delName='';
+let pressTimer=null,pressPos=null,pressCard=null;
+let deferredInstall=null,swReg=null;
 
-// ── Consumer form state (Step 6) ──────────────────────────
+// Consumer form state — Step 6
 const CF = { mode:'add', consumer:null };
 
 const $ = id => document.getElementById(id);
 
-/* ════════════════════════════════════════════════════════════
-   INIT
-════════════════════════════════════════════════════════════ */
+/* ══ INIT ═══════════════════════════════════════════════ */
 async function init() {
   session = AN_DB.getSession();
   if (!session?.token) { location.replace('./login.html'); return; }
-  if (session.role === 'superadmin' || session.role === 'SuperAdmin') {
-    location.replace('./superadmin.html'); return;
-  }
+  if (session.role==='superadmin'||session.role==='SuperAdmin') { location.replace('./superadmin.html'); return; }
 
-  isAdmin = session.role === 'admin' || session.role === 'Admin';
+  isAdmin = session.role==='admin'||session.role==='Admin';
 
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('./sw.js').then(reg => {
-      swReg = reg;
-      navigator.serviceWorker.addEventListener('message', onSWMsg);
-      reg.addEventListener('updatefound', () => {
-        const newSW = reg.installing;
-        if (!newSW) return;
-        newSW.addEventListener('statechange', () => {
-          if (newSW.state === 'installed' && navigator.serviceWorker.controller) {
-            $('updateBanner').classList.remove('hidden');
-          }
+      swReg=reg;
+      navigator.serviceWorker.addEventListener('message',onSWMsg);
+      reg.addEventListener('updatefound',()=>{
+        const nw=reg.installing; if (!nw) return;
+        nw.addEventListener('statechange',()=>{
+          if (nw.state==='installed'&&navigator.serviceWorker.controller) $('updateBanner').classList.remove('hidden');
         });
       });
-    }).catch(() => {});
+    }).catch(()=>{});
   }
 
-  window.addEventListener('beforeinstallprompt', e => {
-    e.preventDefault();
-    deferredInstall = e;
-    $('installBtn').classList.remove('hidden');
+  window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferredInstall=e;$('installBtn').classList.remove('hidden');});
+  window.addEventListener('online',onOnline);
+  window.addEventListener('offline',onOffline);
+
+  history.pushState(null,'');
+  window.addEventListener('popstate',()=>{
+    // cfSheet closes first (Step 6)
+    if (activeSheet==='cfSheet'){closeSheet();history.pushState(null,'');return;}
+    if (activeSheet){closeSheet();history.pushState(null,'');return;}
+    if (selectMode){exitSelectMode();history.pushState(null,'');return;}
   });
 
-  window.addEventListener('online',  onOnline);
-  window.addEventListener('offline', onOffline);
+  window.addEventListener('scroll',()=>{lastScrollY=window.scrollY;},{passive:true});
+  applyTheme(localStorage.getItem('an_elect_theme')||'dark');
 
-  history.pushState(null, '');
-  window.addEventListener('popstate', () => {
-    // Close consumer form first (Step 6)
-    if (activeSheet === 'cfSheet') { closeSheet(); history.pushState(null, ''); return; }
-    if (activeSheet)  { closeSheet(); history.pushState(null, ''); return; }
-    if (selectMode)   { exitSelectMode(); history.pushState(null, ''); return; }
-  });
-
-  window.addEventListener('scroll', () => { lastScrollY = window.scrollY; }, { passive: true });
-
-  applyTheme(localStorage.getItem('an_elect_theme') || 'dark');
-
-  $('navOffice').textContent   = session.officeName || 'My Office';
-  $('uName').textContent       = session.fullName   || session.username;
+  $('navOffice').textContent   = session.officeName||'My Office';
+  $('uName').textContent       = session.fullName||session.username;
   $('uRole').textContent       = session.role;
-  $('aboutOffice').textContent = session.officeName || 'My Office';
+  $('aboutOffice').textContent = session.officeName||'My Office';
 
-  if (isAdmin) {
-    $('bnav-admin').classList.remove('hidden');
-    $('selectBtn').classList.remove('hidden');
-  }
+  if (isAdmin){$('bnav-admin').classList.remove('hidden');$('selectBtn').classList.remove('hidden');}
 
   await AN_DB.setApiUrl(API_URL);
-
   adjustLayout();
-  window.addEventListener('resize', adjustLayout);
+  window.addEventListener('resize',adjustLayout);
   document.fonts.ready.then(adjustLayout);
 
-  new IntersectionObserver(entries => {
-    if (entries[0].isIntersecting && displayedN < filtered.length) appendCards();
-  }, { threshold: 0.1 }).observe($('sentinel'));
+  new IntersectionObserver(entries=>{
+    if (entries[0].isIntersecting&&displayedN<filtered.length) appendCards();
+  },{threshold:0.1}).observe($('sentinel'));
 
   setupSwipeClose();
-
   await loadConsumers();
   hideSplash();
 }
 
-function adjustLayout() {
-  const navH    = $('navbar').offsetHeight;
-  const searchH = $('searchSec').offsetHeight;
-  $('main').style.paddingTop = (navH + searchH + 4) + 'px';
+function adjustLayout(){
+  const navH=$('navbar').offsetHeight, searchH=$('searchSec').offsetHeight;
+  $('main').style.paddingTop=(navH+searchH+4)+'px';
 }
+function hideSplash(){const s=$('splash');s.classList.add('out');setTimeout(()=>s.style.display='none',400);}
 
-function hideSplash() {
-  const s = $('splash');
-  s.classList.add('out');
-  setTimeout(() => s.style.display = 'none', 400);
-}
+async function installApp(){if(!deferredInstall)return;closeUserMenu();deferredInstall.prompt();const{outcome}=await deferredInstall.userChoice;deferredInstall=null;$('installBtn').classList.add('hidden');if(outcome==='accepted')toast('App installed! ✅','ok');}
+function applyUpdate(){if(swReg?.waiting)swReg.waiting.postMessage({type:'SKIP_WAITING'});window.location.reload();}
 
-async function installApp() {
-  if (!deferredInstall) return;
-  closeUserMenu();
-  deferredInstall.prompt();
-  const { outcome } = await deferredInstall.userChoice;
-  deferredInstall = null;
-  $('installBtn').classList.add('hidden');
-  if (outcome === 'accepted') toast('App installed! ✅', 'ok');
-}
-
-function applyUpdate() {
-  if (swReg?.waiting) { swReg.waiting.postMessage({ type: 'SKIP_WAITING' }); }
-  window.location.reload();
-}
-
-function setupSwipeClose() {
-  const handles = ['cpHandle','aboutHandle','detHandle','delHandle','cfHandle'];
-  handles.forEach(id => {
-    const el = $(id);
-    if (!el) return;
-    let startY = 0;
-    el.addEventListener('touchstart', e => { startY = e.touches[0].clientY; }, { passive: true });
-    el.addEventListener('touchmove',  e => {
-      const dy = e.touches[0].clientY - startY;
-      if (dy > 70) closeSheet();
-    }, { passive: true });
+function setupSwipeClose(){
+  // cfHandle added for consumer form swipe-to-close
+  ['cpHandle','aboutHandle','detHandle','delHandle','cfHandle'].forEach(id=>{
+    const el=$(id); if (!el) return;
+    let startY=0;
+    el.addEventListener('touchstart',e=>{startY=e.touches[0].clientY;},{passive:true});
+    el.addEventListener('touchmove',e=>{if(e.touches[0].clientY-startY>70)closeSheet();},{passive:true});
   });
 }
 
-/* ════════════════════════════════════════════════════════════
-   LOAD CONSUMERS
-════════════════════════════════════════════════════════════ */
-async function loadConsumers(showSkeleton = true) {
-  if (showSkeleton) renderSkeleton();
-  setRefreshSpin(true);
-  setSync('syncing', 'Loading…');
+/* ══ LOAD CONSUMERS ═════════════════════════════════════ */
+async function loadConsumers(showSkeleton=true){
+  if(showSkeleton)renderSkeleton();
+  setRefreshSpin(true);setSync('syncing','Loading…');
 
-  const cached = await AN_DB.getAllConsumers();
-  if (cached.length) {
-    masterList = cached;
-    applyFilters();
-    updateChipCounts();
-    setSync('syncing', 'Refreshing…');
+  const cached=await AN_DB.getAllConsumers();
+  if(cached.length){masterList=cached;applyFilters();updateChipCounts();setSync('syncing','Refreshing…');}
+
+  if(!navigator.onLine){setRefreshSpin(false);if(!cached.length)showErr('No cached data. Connect and refresh.');setSync('offline','Offline — showing cached data');return;}
+
+  try{
+    const controller=new AbortController();
+    const tid=setTimeout(()=>controller.abort(),TIMEOUT);
+    const res=await fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain'},
+      body:JSON.stringify({action:'getConsumers',token:session.token,officeId:session.officeId,sheetName:'CONSUMER DATA ALL'}),
+      signal:controller.signal});
+    clearTimeout(tid);
+    const json=await res.json();
+
+    if(json.success&&Array.isArray(json.data)){
+      const list=json.data.map(normalize);
+      await AN_DB.setAllConsumers(list);await AN_DB.setLastSync(Date.now());
+      masterList=list;applyFilters();updateChipCounts();setSync('online',`Synced ${timeAgo(Date.now())}`);
+    } else if(json.code==='UNAUTHORIZED'||json.error==='SESSION_EXPIRED'){
+      await AN_DB.clearSession();alert('Session expired. Please log in again.');location.replace('./login.html');
+    } else {setSync('online','Loaded from cache');console.warn('[App]',json.message||json.error);}
+  } catch(err){
+    if(err.name==='AbortError'){setSync('offline','Request timed out — check connection');toast('Network timeout. Try again.','err');}
+    else{if(!cached.length)showErr('Could not connect. Check your internet.');setSync('offline','Offline — showing cached data');}
   }
-
-  if (!navigator.onLine) {
-    setRefreshSpin(false);
-    if (!cached.length) showErr('No cached data. Connect to internet and refresh.');
-    setSync('offline', 'Offline — showing cached data');
-    return;
-  }
-
-  try {
-    const controller = new AbortController();
-    const timeoutId  = setTimeout(() => controller.abort(), TIMEOUT);
-
-    const res  = await fetch(API_URL, {
-      method: 'POST', headers: { 'Content-Type': 'text/plain' },
-      body: JSON.stringify({
-        action: 'getConsumers', token: session.token,
-        officeId: session.officeId, sheetName: 'CONSUMER DATA ALL'
-      }),
-      signal: controller.signal
-    });
-    clearTimeout(timeoutId);
-
-    const json = await res.json();
-
-    if (json.success && Array.isArray(json.data)) {
-      const list = json.data.map(normalize);
-      await AN_DB.setAllConsumers(list);
-      await AN_DB.setLastSync(Date.now());
-      masterList = list;
-      applyFilters();
-      updateChipCounts();
-      setSync('online', `Synced ${timeAgo(Date.now())}`);
-    } else if (json.code === 'UNAUTHORIZED' || json.error === 'SESSION_EXPIRED') {
-      await AN_DB.clearSession();
-      alert('Session expired. Please log in again.');
-      location.replace('./login.html');
-    } else {
-      setSync('online', 'Loaded from cache');
-      console.warn('[App]', json.message || json.error);
-    }
-  } catch (err) {
-    if (err.name === 'AbortError') {
-      setSync('offline', 'Request timed out — check connection');
-      toast('Network timeout. Try again.', 'err');
-    } else {
-      if (!cached.length) showErr('Could not connect. Check your internet.');
-      setSync('offline', 'Offline — showing cached data');
-    }
-  }
-
   setRefreshSpin(false);
 }
 
-function refreshData() { loadConsumers(); }
+function refreshData(){loadConsumers();}
 
-function normalize(c) {
-  function get(...keys) {
-    for (const k of keys) {
-      const v = c[k];
-      if (v !== undefined && v !== null && String(v).trim() !== '' && String(v).trim() !== '0') {
-        return String(v).trim();
-      }
-    }
+/* ══ NORMALIZE — maps sheet PascalCase → camelCase ═════ */
+function normalize(c){
+  function get(...keys){
+    for(const k of keys){const v=c[k];if(v!==undefined&&v!==null&&String(v).trim()!==''&&String(v).trim()!=='0')return String(v).trim();}
     return '';
   }
-  const meterRaw = c['MeterNo'] || c.meterNo || c['Meter No'] || '';
+  const meterRaw=c['MeterNo']||c.meterNo||c['Meter No']||'';
   return {
-    _rowIndex:    c._rowIndex || 0,
+    _rowIndex:    c._rowIndex||0,
     sNo:          get('S.No.','sNo'),
     conNo:        get('ConNo','conNo'),
     consumerName: get('ConsumerName','Consumer Name','consumerName'),
     address:      get('Address','address'),
     labNo:        get('LabNo','labNo','Lab No'),
-    meterNo:      meterRaw ? String(meterRaw).trim() : '',
+    meterNo:      meterRaw?String(meterRaw).trim():'',
     transfCode:   get('TransfCode','transfCode','Transf Code','AreaCode','areaCode'),
     phoneNo:      get('PhoneNo','phoneNo','Phone','phone'),
-    status:       get('Status','status') || 'Active',
+    status:       get('Status','status')||'Active',
     lastEditedBy: get('LastEditedBy','lastEditedBy'),
     lastEditedAt: get('LastEditedAt','lastEditedAt'),
     createdAt:    get('CreatedAt','createdAt'),
+    // SD fields — new columns in sheet
+    sdPassbookNo: get('Passbook/SD No','sdPassbookNo'),
+    sdAmount:     get('SD Amount','sdAmount'),
+    sdDate:       get('SD Date','sdDate'),
   };
 }
 
-function updateChipCounts() {
-  const counts = {};
-  masterList.forEach(c => { if (c.transfCode) counts[c.transfCode] = (counts[c.transfCode]||0)+1; });
-  document.querySelectorAll('.chip').forEach(chip => {
-    const area = chip.dataset.area;
-    if (!area) return;
-    if (area === 'ALL') chip.textContent = `All (${masterList.length})`;
-    else if (counts[area]) chip.textContent = `${area} · ${counts[area]}`;
+function updateChipCounts(){
+  const counts={};
+  masterList.forEach(c=>{if(c.transfCode)counts[c.transfCode]=(counts[c.transfCode]||0)+1;});
+  document.querySelectorAll('.chip').forEach(chip=>{
+    const area=chip.dataset.area;if(!area)return;
+    if(area==='ALL')chip.textContent=`All (${masterList.length})`;
+    else if(counts[area])chip.textContent=`${area} · ${counts[area]}`;
   });
 }
 
-/* ════════════════════════════════════════════════════════════
-   FILTER + RENDER
-════════════════════════════════════════════════════════════ */
-function applyFilters() {
-  filtered = masterList;
-  if (activeArea !== 'ALL') filtered = filtered.filter(c => c.transfCode === activeArea);
-  if (activeStatus !== 'ALL') filtered = filtered.filter(c =>
-    (c.status || 'Active').toLowerCase() === activeStatus.toLowerCase());
-  if (searchQ.trim()) {
-    const q = searchQ.toLowerCase().trim();
-    filtered = filtered.filter(c =>
-      (c.consumerName || '').toLowerCase().includes(q) ||
-      (c.conNo        || '').toLowerCase().includes(q) ||
-      (c.meterNo      || '').includes(q) ||
-      (c.phoneNo      || '').includes(q) ||
-      (c.address      || '').toLowerCase().includes(q));
+/* ══ FILTER + RENDER ════════════════════════════════════ */
+function applyFilters(){
+  filtered=masterList;
+  if(activeArea!=='ALL')filtered=filtered.filter(c=>c.transfCode===activeArea);
+  if(activeStatus!=='ALL')filtered=filtered.filter(c=>(c.status||'Active').toLowerCase()===activeStatus.toLowerCase());
+  if(searchQ.trim()){
+    const q=searchQ.toLowerCase().trim();
+    filtered=filtered.filter(c=>
+      (c.consumerName||'').toLowerCase().includes(q)||
+      (c.conNo||'').toLowerCase().includes(q)||
+      (c.meterNo||'').includes(q)||
+      (c.phoneNo||'').includes(q)||
+      (c.address||'').toLowerCase().includes(q)||
+      (c.sdPassbookNo||'').toLowerCase().includes(q)  // SD No is searchable
+    );
   }
-  if (sortOrder === 'asc')  filtered = [...filtered].sort((a,b) => (a.consumerName||'').localeCompare(b.consumerName||''));
-  else if (sortOrder === 'desc') filtered = [...filtered].sort((a,b) => (b.consumerName||'').localeCompare(a.consumerName||''));
+  if(sortOrder==='asc')filtered=[...filtered].sort((a,b)=>(a.consumerName||'').localeCompare(b.consumerName||''));
+  else if(sortOrder==='desc')filtered=[...filtered].sort((a,b)=>(b.consumerName||'').localeCompare(a.consumerName||''));
 
-  $('cntTxt').textContent = filtered.length ? `${filtered.length} consumer${filtered.length !== 1 ? 's' : ''}` : '';
+  $('cntTxt').textContent=filtered.length?`${filtered.length} consumer${filtered.length!==1?'s':''}` :'';
 
-  if (!filtered.length) {
-    $('consumerList').innerHTML = '';
-    $('emptyState').classList.remove('hidden');
-    if (searchQ || activeArea !== 'ALL' || activeStatus !== 'ALL') {
-      $('emptyIco').textContent = 'search_off'; $('emptyTtl').textContent = 'No results';
-      $('emptySub').textContent = 'Try different search, area, or status filter';
+  if(!filtered.length){
+    $('consumerList').innerHTML='';$('emptyState').classList.remove('hidden');
+    if(searchQ||activeArea!=='ALL'||activeStatus!=='ALL'){
+      $('emptyIco').textContent='search_off';$('emptyTtl').textContent='No results';$('emptySub').textContent='Try different search, area, or status filter';
     } else {
-      $('emptyIco').textContent = 'people_outline'; $('emptyTtl').textContent = 'No consumers yet';
-      $('emptySub').textContent = 'Tap + to add the first consumer';
+      $('emptyIco').textContent='people_outline';$('emptyTtl').textContent='No consumers yet';$('emptySub').textContent='Tap + to add the first consumer';
     }
     return;
   }
-  $('emptyState').classList.add('hidden');
-  displayedN = 0;
-  $('consumerList').innerHTML = '';
-  appendCards();
+  $('emptyState').classList.add('hidden');displayedN=0;$('consumerList').innerHTML='';appendCards();
 }
 
-function appendCards() {
-  const frag = document.createDocumentFragment();
-  const end  = Math.min(displayedN + PAGE_SIZE, filtered.length);
-  for (let i = displayedN; i < end; i++) {
-    const card = makeCard(filtered[i]);
-    card.style.animationDelay = ((i - displayedN) * 0.03) + 's';
-    frag.appendChild(card);
-  }
-  $('consumerList').appendChild(frag);
-  displayedN = end;
+function appendCards(){
+  const frag=document.createDocumentFragment();
+  const end=Math.min(displayedN+PAGE_SIZE,filtered.length);
+  for(let i=displayedN;i<end;i++){const card=makeCard(filtered[i]);card.style.animationDelay=((i-displayedN)*.03)+'s';frag.appendChild(card);}
+  $('consumerList').appendChild(frag);displayedN=end;
 }
 
-function makeCard(c) {
-  const div = document.createElement('div');
-  div.className = 'c-card';
-  if (selectMode && selectedSet.has(c.conNo)) div.classList.add('selected');
-  const status = (c.status || 'Active').toLowerCase();
-  const area   = c.transfCode ? `<span class="area-badge">${esc(c.transfCode)}</span>` : '';
-  const meter  = c.meterNo   ? `<div class="c-mi meter"><span class="material-icons-round">electric_meter</span>${esc(c.meterNo)}</div>` : '';
-  const phone  = c.phoneNo   ? `<div class="c-mi phone"><span class="material-icons-round">phone</span>${esc(c.phoneNo)}</div>` : '';
-  const addr   = c.address   ? `<div class="c-mi addr"><span class="material-icons-round">location_on</span>${esc(c.address).substring(0,28)}</div>` : '';
-  const check  = selectMode  ? `<div class="c-check"><span class="material-icons-round">check</span></div>` : '';
-  const arrow  = selectMode  ? '' : `<span class="c-arrow material-icons-round">chevron_right</span>`;
-  div.innerHTML = `
-    <div class="c-inner">
-      ${check}
-      <div class="c-body">
-        <div class="c-row1">
-          <span class="c-conno">${esc(c.conNo || '—')}</span>
-          <div class="badges">${area}<span class="status-badge ${status}">${esc(c.status||'Active')}</span></div>
-        </div>
-        <div class="c-name">${esc(c.consumerName || '—')}</div>
-        <div class="c-meta">${meter}${phone}${addr}</div>
-      </div>
-      ${arrow}
-    </div>`;
-  if (selectMode) {
-    div.addEventListener('click', () => toggleCard(c.conNo, div));
-  } else {
-    div.addEventListener('click', () => openDetail(c));
-    attachLongPress(div, c);
-    div.addEventListener('pointerdown', e => addRipple(div, e));
-  }
+function makeCard(c){
+  const div=document.createElement('div');div.className='c-card';
+  if(selectMode&&selectedSet.has(c.conNo))div.classList.add('selected');
+  const status=(c.status||'Active').toLowerCase();
+  const area=c.transfCode?`<span class="area-badge">${esc(c.transfCode)}</span>`:'';
+  const meter=c.meterNo?`<div class="c-mi meter"><span class="material-icons-round">electric_meter</span>${esc(c.meterNo)}</div>`:'';
+  const phone=c.phoneNo?`<div class="c-mi phone"><span class="material-icons-round">phone</span>${esc(c.phoneNo)}</div>`:'';
+  const addr=c.address?`<div class="c-mi addr"><span class="material-icons-round">location_on</span>${esc(c.address).substring(0,28)}</div>`:'';
+  const check=selectMode?`<div class="c-check"><span class="material-icons-round">check</span></div>`:'';
+  const arrow=selectMode?'':`<span class="c-arrow material-icons-round">chevron_right</span>`;
+  div.innerHTML=`<div class="c-inner">${check}<div class="c-body"><div class="c-row1"><span class="c-conno">${esc(c.conNo||'—')}</span><div class="badges">${area}<span class="status-badge ${status}">${esc(c.status||'Active')}</span></div></div><div class="c-name">${esc(c.consumerName||'—')}</div><div class="c-meta">${meter}${phone}${addr}</div></div>${arrow}</div>`;
+  if(selectMode){div.addEventListener('click',()=>toggleCard(c.conNo,div));}
+  else{div.addEventListener('click',()=>openDetail(c));attachLongPress(div,c);div.addEventListener('pointerdown',e=>addRipple(div,e));}
   return div;
 }
 
-function renderSkeleton() {
+function renderSkeleton(){
   $('emptyState').classList.add('hidden');
-  $('consumerList').innerHTML = Array(6).fill(`
-    <div class="skeleton">
-      <div class="sk-row"><div class="sk" style="width:30%;height:11px"></div><div class="sk" style="width:18%;height:11px"></div></div>
-      <div class="sk" style="width:62%;height:14px;margin-bottom:8px"></div>
-      <div class="sk" style="width:42%;height:11px"></div>
-    </div>`).join('');
+  $('consumerList').innerHTML=Array(6).fill(`<div class="skeleton"><div class="sk-row"><div class="sk" style="width:30%;height:11px"></div><div class="sk" style="width:18%;height:11px"></div></div><div class="sk" style="width:62%;height:14px;margin-bottom:8px"></div><div class="sk" style="width:42%;height:11px"></div></div>`).join('');
 }
 
-/* ════════════════════════════════════════════════════════════
-   CONSUMER DETAIL
-════════════════════════════════════════════════════════════ */
-function openDetail(c) {
-  lastScrollY = window.scrollY;
-  $('detName').textContent  = c.consumerName || '—';
-  $('detConno').textContent = 'Consumer No: ' + (c.conNo || '—');
+/* ══ CONSUMER DETAIL ════════════════════════════════════ */
+function openDetail(c){
+  lastScrollY=window.scrollY;
+  $('detName').textContent=c.consumerName||'—';
+  $('detConno').textContent='Consumer No: '+(c.conNo||'—');
 
-  let fieldsHtml = '';
-  const addField = (label, value) => {
-    fieldsHtml += `<div class="det-field"><span class="det-label">${label}</span><span class="det-value">${value}</span></div>`;
-  };
+  let fieldsHtml='';
+  const addField=(label,value)=>{fieldsHtml+=`<div class="det-field"><span class="det-label">${label}</span><span class="det-value">${value}</span></div>`;};
 
-  addField('Serial No', esc(c.sNo || '—'));
-  addField('Meter No', esc(c.meterNo || '—'));
-  addField('Area Code', esc(c.transfCode || '—'));
-  addField('Address', esc(c.address || '—'));
-  addField('Lab No', esc(c.labNo || '—'));
+  addField('Serial No',esc(c.sNo||'—'));
+  addField('Meter No',esc(c.meterNo||'—'));
+  addField('Area Code',esc(c.transfCode||'—'));
+  addField('Address',esc(c.address||'—'));
+  addField('Lab No',esc(c.labNo||'—'));
 
-  if (c.phoneNo) {
-    const clean = c.phoneNo.replace(/\D/g,'');
-    fieldsHtml += `<div class="det-field"><span class="det-label">Phone</span>
-      <div class="det-phone-row">
-        <span class="det-phone-num">${esc(c.phoneNo)}</span>
-        <a href="tel:${esc(c.phoneNo)}" class="det-phone-btn call">
-          <span class="material-icons-round">call</span>Call</a>
-        ${clean.length >= 10 ? `<a href="https://wa.me/91${clean.slice(-10)}" target="_blank" rel="noopener" class="det-phone-btn wa">
-          <span class="material-icons-round">message</span>WA</a>` : ''}
-      </div></div>`;
-  } else { addField('Phone', '—'); }
+  if(c.phoneNo){
+    const clean=c.phoneNo.replace(/\D/g,'');
+    fieldsHtml+=`<div class="det-field"><span class="det-label">Phone</span><div class="det-phone-row"><span class="det-phone-num">${esc(c.phoneNo)}</span><a href="tel:${esc(c.phoneNo)}" class="det-phone-btn call"><span class="material-icons-round">call</span>Call</a>${clean.length>=10?`<a href="https://wa.me/91${clean.slice(-10)}" target="_blank" rel="noopener" class="det-phone-btn wa"><span class="material-icons-round">message</span>WA</a>`:''}</div></div>`;
+  } else addField('Phone','—');
 
-  const st = (c.status || 'Active').toLowerCase();
-  fieldsHtml += `<div class="det-field"><span class="det-label">Status</span>
-    <span class="det-badge ${st}">${esc(c.status || 'Active')}</span></div>`;
-  addField('Last Edited By', esc(c.lastEditedBy || '—'));
-  addField('Created', esc(formatDate(c.createdAt)));
+  const st=(c.status||'Active').toLowerCase();
+  fieldsHtml+=`<div class="det-field"><span class="det-label">Status</span><span class="det-badge ${st}">${esc(c.status||'Active')}</span></div>`;
+  addField('Last Edited By',esc(c.lastEditedBy||'—'));
+  addField('Created',esc(formatDate(c.createdAt)));
 
-  $('detFields').innerHTML = fieldsHtml;
+  // Security Deposit section
+  fieldsHtml+=`<div class="det-section-hdr">Security Deposit</div>`;
+  addField('Passbook/SD No', esc(c.sdPassbookNo||'—'));
+  addField('SD Amount', c.sdAmount ? '₹ '+esc(c.sdAmount) : '—');
+  addField('SD Date', c.sdDate ? esc(formatDate(c.sdDate)) : '—');
 
-  const delBtn = isAdmin ? `<button class="det-btn det-del" onclick="confirmDelete(${c._rowIndex},'${esc(c.conNo)}','${esc(c.consumerName)}')">
-    <span class="material-icons-round">delete</span>Delete</button>` : '';
+  $('detFields').innerHTML=fieldsHtml;
 
-  $('detActions').innerHTML = `
-    <button class="det-btn det-edit" onclick="openEditForm('${esc(c.conNo)}')">
-      <span class="material-icons-round">edit</span>Edit</button>${delBtn}`;
+  const delBtn=isAdmin?`<button class="det-btn det-del" onclick="confirmDelete(${c._rowIndex},'${esc(c.conNo)}','${esc(c.consumerName)}')"><span class="material-icons-round">delete</span>Delete</button>`:'';
+  $('detActions').innerHTML=`<button class="det-btn det-edit" onclick="openEditForm('${esc(c.conNo)}')"><span class="material-icons-round">edit</span>Edit</button>${delBtn}`;
 
   openSheet('detailSheet');
 }
 
-/* ════════════════════════════════════════════════════════════
-   SEARCH, FILTER, SORT
-════════════════════════════════════════════════════════════ */
-$('searchInp').addEventListener('input', e => {
-  searchQ = e.target.value;
-  $('sClear').classList.toggle('hidden', !searchQ);
-  clearTimeout(searchT);
-  searchT = setTimeout(applyFilters, 280);
-});
-function clearSearch() {
-  $('searchInp').value = ''; searchQ = '';
-  $('sClear').classList.add('hidden'); applyFilters();
-}
-function setArea(el, code) {
-  activeArea = code;
-  document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
-  el.classList.add('active'); applyFilters();
-}
-function setStatus(el, status) {
-  activeStatus = status;
-  document.querySelectorAll('.f-pill').forEach(p => p.classList.remove('active','active-s','inactive-s','defaulter-s'));
-  if (status === 'ALL') el.classList.add('active');
-  else if (status === 'Active')    el.classList.add('active-s');
-  else if (status === 'Inactive')  el.classList.add('inactive-s');
-  else if (status === 'Defaulter') el.classList.add('defaulter-s');
+/* ══ SEARCH, FILTER, SORT ═══════════════════════════════ */
+$('searchInp').addEventListener('input',e=>{searchQ=e.target.value;$('sClear').classList.toggle('hidden',!searchQ);clearTimeout(searchT);searchT=setTimeout(applyFilters,280);});
+function clearSearch(){$('searchInp').value='';searchQ='';$('sClear').classList.add('hidden');applyFilters();}
+function setArea(el,code){activeArea=code;document.querySelectorAll('.chip').forEach(c=>c.classList.remove('active'));el.classList.add('active');applyFilters();}
+function setStatus(el,status){
+  activeStatus=status;
+  document.querySelectorAll('.f-pill').forEach(p=>p.classList.remove('active','active-s','inactive-s','defaulter-s'));
+  if(status==='ALL')el.classList.add('active');
+  else if(status==='Active')el.classList.add('active-s');
+  else if(status==='Inactive')el.classList.add('inactive-s');
+  else if(status==='Defaulter')el.classList.add('defaulter-s');
   applyFilters();
 }
-function cycleSort() {
-  const orders = ['default','asc','desc'], labels = ['Default','A → Z','Z → A'];
-  const current = orders.indexOf(sortOrder);
-  sortOrder = orders[(current + 1) % 3];
-  $('sortLbl').textContent = labels[orders.indexOf(sortOrder)];
-  $('sortBtn').classList.toggle('active', sortOrder !== 'default');
-  applyFilters();
+function cycleSort(){
+  const orders=['default','asc','desc'],labels=['Default','A → Z','Z → A'];
+  const current=orders.indexOf(sortOrder);sortOrder=orders[(current+1)%3];
+  $('sortLbl').textContent=labels[orders.indexOf(sortOrder)];
+  $('sortBtn').classList.toggle('active',sortOrder!=='default');applyFilters();
 }
 
-/* ════════════════════════════════════════════════════════════
-   THEME
-════════════════════════════════════════════════════════════ */
-function applyTheme(t) {
-  document.documentElement.setAttribute('data-theme', t);
-  $('themeIcon').textContent  = t === 'dark' ? 'dark_mode' : 'light_mode';
-  $('themeColorMeta').content = t === 'dark' ? '#0F1F3C' : '#0052B4';
-  localStorage.setItem('an_elect_theme', t);
-}
-$('themeToggle').addEventListener('click', () => {
-  applyTheme(document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
-});
+/* ══ THEME ══════════════════════════════════════════════ */
+function applyTheme(t){document.documentElement.setAttribute('data-theme',t);$('themeIcon').textContent=t==='dark'?'dark_mode':'light_mode';$('themeColorMeta').content=t==='dark'?'#0F1F3C':'#0052B4';localStorage.setItem('an_elect_theme',t);}
+$('themeToggle').addEventListener('click',()=>applyTheme(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark'));
 
-/* ════════════════════════════════════════════════════════════
-   USER MENU
-════════════════════════════════════════════════════════════ */
-$('userMenuBtn').addEventListener('click', () => {
-  const open = $('userMenu').classList.contains('show');
-  if (open) closeUserMenu();
-  else { $('userMenu').classList.add('show'); $('menuOv').classList.remove('hidden'); }
-});
-function closeUserMenu() { $('userMenu').classList.remove('show'); $('menuOv').classList.add('hidden'); }
+/* ══ USER MENU ══════════════════════════════════════════ */
+$('userMenuBtn').addEventListener('click',()=>{const open=$('userMenu').classList.contains('show');if(open)closeUserMenu();else{$('userMenu').classList.add('show');$('menuOv').classList.remove('hidden');}});
+function closeUserMenu(){$('userMenu').classList.remove('show');$('menuOv').classList.add('hidden');}
 
-/* ════════════════════════════════════════════════════════════
-   CHANGE PASSWORD
-════════════════════════════════════════════════════════════ */
-function openChangePass() {
-  closeUserMenu();
-  $('cpCur').value = $('cpNew').value = $('cpCfm').value = '';
-  $('cpErr').classList.remove('show'); $('cpOk').classList.remove('show');
-  $('sfi').style.width = '0%'; $('stxt').textContent = '';
-  openSheet('cpSheet');
-}
-function chkStrength(v) {
-  const fi=$('sfi'),tx=$('stxt');
-  if (!v) { fi.style.width='0%';tx.textContent='';return; }
-  let s=0;
-  if (v.length>=8) s++; if (/[A-Z]/.test(v)) s++; if (/[0-9]/.test(v)) s++; if (/[^A-Za-z0-9]/.test(v)) s++;
-  const L=[{w:'25%',b:'#F44336',t:'Too weak'},{w:'50%',b:'#FF9800',t:'Weak'},{w:'75%',b:'#FFC107',t:'Good'},{w:'100%',b:'#4CAF50',t:'Strong ✓'}][s-1]||{w:'25%',b:'#F44336',t:'Too weak'};
-  fi.style.width=L.w;fi.style.background=L.b;tx.textContent=L.t;
-}
-async function submitCP() {
+/* ══ CHANGE PASSWORD ════════════════════════════════════ */
+function openChangePass(){closeUserMenu();$('cpCur').value=$('cpNew').value=$('cpCfm').value='';$('cpErr').classList.remove('show');$('cpOk').classList.remove('show');$('sfi').style.width='0%';$('stxt').textContent='';openSheet('cpSheet');}
+function chkStrength(v){const fi=$('sfi'),tx=$('stxt');if(!v){fi.style.width='0%';tx.textContent='';return;}let s=0;if(v.length>=8)s++;if(/[A-Z]/.test(v))s++;if(/[0-9]/.test(v))s++;if(/[^A-Za-z0-9]/.test(v))s++;const L=[{w:'25%',b:'#F44336',t:'Too weak'},{w:'50%',b:'#FF9800',t:'Weak'},{w:'75%',b:'#FFC107',t:'Good'},{w:'100%',b:'#4CAF50',t:'Strong ✓'}][s-1]||{w:'25%',b:'#F44336',t:'Too weak'};fi.style.width=L.w;fi.style.background=L.b;tx.textContent=L.t;}
+async function submitCP(){
   const cur=$('cpCur').value.trim(),nw=$('cpNew').value.trim(),cfm=$('cpCfm').value.trim();
   $('cpErr').classList.remove('show');$('cpOk').classList.remove('show');
-  if (!cur||!nw||!cfm){showCpErr('All fields required.');return;}
-  if (nw.length<8){showCpErr('Min 8 characters.');return;}
-  if (nw!==cfm){showCpErr('Passwords do not match.');return;}
+  if(!cur||!nw||!cfm){showCpErr('All fields required.');return;}
+  if(nw.length<8){showCpErr('Min 8 characters.');return;}
+  if(nw!==cfm){showCpErr('Passwords do not match.');return;}
   const btn=$('cpBtn');btn.classList.add('loading');
-  try {
-    const res=await fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain'},
-      body:JSON.stringify({action:'changePassword',username:session.username,currentPassword:cur,newPassword:nw})});
-    const json=await res.json();
-    if (json.success){$('cpOk').classList.add('show');setTimeout(closeSheet,2000);}
-    else showCpErr(json.message||'Failed.');
-  } catch {showCpErr('Network error.');}
+  try{const res=await fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({action:'changePassword',username:session.username,currentPassword:cur,newPassword:nw})});const json=await res.json();if(json.success){$('cpOk').classList.add('show');setTimeout(closeSheet,2000);}else showCpErr(json.message||'Failed.');}catch{showCpErr('Network error.');}
   btn.classList.remove('loading');
 }
 function showCpErr(msg){$('cpErrMsg').textContent=msg;$('cpErr').classList.add('show');}
 function openAbout(){closeUserMenu();openSheet('aboutSheet');}
 
-/* ════════════════════════════════════════════════════════════
-   LOGOUT
-════════════════════════════════════════════════════════════ */
-async function handleLogout() {
-  closeUserMenu();
-  try{await fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({action:'logout',token:session.token})});}catch{}
-  await AN_DB.clearAllData();
-  await AN_DB.clearSession();
-  location.replace('./login.html');
-}
+/* ══ LOGOUT ═════════════════════════════════════════════ */
+async function handleLogout(){closeUserMenu();try{await fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({action:'logout',token:session.token})});}catch{}await AN_DB.clearAllData();await AN_DB.clearSession();location.replace('./login.html');}
 
-/* ════════════════════════════════════════════════════════════
-   SELECT MODE
-════════════════════════════════════════════════════════════ */
-function enterSelectMode() {
-  if (!isAdmin) return;
-  selectMode=true;selectedSet.clear();
-  $('selBar').classList.remove('hidden');$('navbar').classList.add('hidden');
-  $('fabBtn').classList.add('hidden');$('bottomNav').classList.add('hide');
-  updateSelUI();applyFilters();
-}
-function exitSelectMode() {
-  selectMode=false;selectedSet.clear();
-  $('selBar').classList.add('hidden');$('navbar').classList.remove('hidden');
-  $('fabBtn').classList.remove('hidden');$('bottomNav').classList.remove('hide');
-  $('delBar').classList.add('hidden');applyFilters();
-}
-function toggleCard(conNo,el) {
-  if (selectedSet.has(conNo)){selectedSet.delete(conNo);el.classList.remove('selected');}
-  else{selectedSet.add(conNo);el.classList.add('selected');}
-  updateSelUI();
-}
-function toggleSelectAll() {
-  const allSel=selectedSet.size===filtered.length;
-  selectedSet.clear();
-  if (!allSel) filtered.forEach(c=>selectedSet.add(c.conNo));
-  document.querySelectorAll('.c-card').forEach(card=>card.classList.toggle('selected',!allSel));
-  updateSelUI();
-}
-function updateSelUI() {
-  const n=selectedSet.size;
-  $('selCnt').textContent=n===0?'Tap cards to select':`${n} selected`;
-  $('delBarCnt').textContent=n;
-  $('delBar').classList.toggle('hidden',n===0);
-  $('selAllBtn').textContent=n===filtered.length?'Deselect All':'Select All';
-}
+/* ══ SELECT MODE ════════════════════════════════════════ */
+function enterSelectMode(){if(!isAdmin)return;selectMode=true;selectedSet.clear();$('selBar').classList.remove('hidden');$('navbar').classList.add('hidden');$('fabBtn').classList.add('hidden');$('bottomNav').classList.add('hide');updateSelUI();applyFilters();}
+function exitSelectMode(){selectMode=false;selectedSet.clear();$('selBar').classList.add('hidden');$('navbar').classList.remove('hidden');$('fabBtn').classList.remove('hidden');$('bottomNav').classList.remove('hide');$('delBar').classList.add('hidden');applyFilters();}
+function toggleCard(conNo,el){if(selectedSet.has(conNo)){selectedSet.delete(conNo);el.classList.remove('selected');}else{selectedSet.add(conNo);el.classList.add('selected');}updateSelUI();}
+function toggleSelectAll(){const allSel=selectedSet.size===filtered.length;selectedSet.clear();if(!allSel)filtered.forEach(c=>selectedSet.add(c.conNo));document.querySelectorAll('.c-card').forEach(card=>card.classList.toggle('selected',!allSel));updateSelUI();}
+function updateSelUI(){const n=selectedSet.size;$('selCnt').textContent=n===0?'Tap cards to select':`${n} selected`;$('delBarCnt').textContent=n;$('delBar').classList.toggle('hidden',n===0);$('selAllBtn').textContent=n===filtered.length?'Deselect All':'Select All';}
 
-/* ════════════════════════════════════════════════════════════
-   DELETE
-════════════════════════════════════════════════════════════ */
-function bulkDeleteConfirm() {
-  const n=selectedSet.size;if(!n)return;
-  $('delWho').textContent=`${n} consumer${n!==1?'s':''} will be permanently deleted.`;
-  window._bulkDelete=true;openSheet('delSheet');
-}
-async function doDelete() {
-  closeSheet();
-  if (window._bulkDelete){window._bulkDelete=false;await executeBulkDelete();}
-  else await executeSingleDelete();
-}
-async function executeBulkDelete() {
-  const conNos=[...selectedSet];if(!conNos.length)return;
-  toast(`Deleting ${conNos.length} consumers…`);
+/* ══ DELETE ═════════════════════════════════════════════ */
+function bulkDeleteConfirm(){const n=selectedSet.size;if(!n)return;$('delWho').textContent=`${n} consumer${n!==1?'s':''} will be permanently deleted.`;window._bulkDelete=true;openSheet('delSheet');}
+async function doDelete(){closeSheet();if(window._bulkDelete){window._bulkDelete=false;await executeBulkDelete();}else await executeSingleDelete();}
+async function executeBulkDelete(){
+  const conNos=[...selectedSet];if(!conNos.length)return;toast(`Deleting ${conNos.length} consumers…`);
   const toDelete=conNos.map(conNo=>masterList.find(c=>c.conNo===conNo)).filter(Boolean).sort((a,b)=>b._rowIndex-a._rowIndex);
   let deleted=0,failed=0;
-  for (const c of toDelete) {
-    try {
-      if (navigator.onLine) {
-        const res=await fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain'},
-          body:JSON.stringify({action:'deleteConsumer',token:session.token,officeId:session.officeId,
-            sheetName:'CONSUMER DATA ALL',rowIndex:c._rowIndex,conNo:c.conNo,consumerName:c.consumerName})});
-        const json=await res.json();
-        if (json.success){await AN_DB.deleteConsumer(c.conNo);masterList=masterList.filter(x=>x.conNo!==c.conNo);deleted++;}
-        else failed++;
-      } else {
-        await AN_DB.deleteConsumer(c.conNo);
-        await AN_DB.addPendingChange('deleteConsumer',{rowIndex:c._rowIndex,conNo:c.conNo},session.officeId);
-        masterList=masterList.filter(x=>x.conNo!==c.conNo);deleted++;
-      }
-    } catch{failed++;}
+  for(const c of toDelete){
+    try{
+      if(navigator.onLine){const res=await fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({action:'deleteConsumer',token:session.token,officeId:session.officeId,sheetName:'CONSUMER DATA ALL',rowIndex:c._rowIndex,conNo:c.conNo,consumerName:c.consumerName})});const json=await res.json();if(json.success){await AN_DB.deleteConsumer(c.conNo);masterList=masterList.filter(x=>x.conNo!==c.conNo);deleted++;}else failed++;}
+      else{await AN_DB.deleteConsumer(c.conNo);await AN_DB.addPendingChange('deleteConsumer',{rowIndex:c._rowIndex,conNo:c.conNo},session.officeId);masterList=masterList.filter(x=>x.conNo!==c.conNo);deleted++;}
+    }catch{failed++;}
   }
-  exitSelectMode();
-  toast(`Deleted ${deleted}${failed?` · ${failed} failed`:''}`,deleted>0?'ok':'err');
-  if (navigator.onLine) setTimeout(()=>loadConsumers(false),800);
-  else AN_DB.requestSync();
+  exitSelectMode();toast(`Deleted ${deleted}${failed?` · ${failed} failed`:''}`,deleted>0?'ok':'err');
+  if(navigator.onLine)setTimeout(()=>loadConsumers(false),800);else AN_DB.requestSync();
 }
-function confirmDelete(rowIdx,conNo,name) {
-  closeSheet();delRowIdx=rowIdx;delConNo=conNo;delName=name;
-  window._bulkDelete=false;$('delWho').textContent=name;
-  setTimeout(()=>openSheet('delSheet'),150);
-}
-async function executeSingleDelete() {
-  try {
-    if (navigator.onLine) {
-      const res=await fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain'},
-        body:JSON.stringify({action:'deleteConsumer',token:session.token,officeId:session.officeId,
-          sheetName:'CONSUMER DATA ALL',rowIndex:delRowIdx,conNo:delConNo,consumerName:delName})});
-      const json=await res.json();
-      if (json.success){
-        await AN_DB.deleteConsumer(delConNo);masterList=masterList.filter(c=>c.conNo!==delConNo);
-        applyFilters();toast('Consumer deleted','ok');
-        if (navigator.onLine) setTimeout(()=>loadConsumers(false),800);
-      } else toast(json.error||json.message||'Delete failed','err');
-    } else {
-      await AN_DB.deleteConsumer(delConNo);
-      await AN_DB.addPendingChange('deleteConsumer',{rowIndex:delRowIdx,conNo:delConNo},session.officeId);
-      masterList=masterList.filter(c=>c.conNo!==delConNo);applyFilters();
-      toast('Deleted offline — will sync when online');AN_DB.requestSync();
-    }
-  } catch{toast('Error deleting','err');}
+function confirmDelete(rowIdx,conNo,name){closeSheet();delRowIdx=rowIdx;delConNo=conNo;delName=name;window._bulkDelete=false;$('delWho').textContent=name;setTimeout(()=>openSheet('delSheet'),150);}
+async function executeSingleDelete(){
+  try{
+    if(navigator.onLine){const res=await fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({action:'deleteConsumer',token:session.token,officeId:session.officeId,sheetName:'CONSUMER DATA ALL',rowIndex:delRowIdx,conNo:delConNo,consumerName:delName})});const json=await res.json();if(json.success){await AN_DB.deleteConsumer(delConNo);masterList=masterList.filter(c=>c.conNo!==delConNo);applyFilters();toast('Consumer deleted','ok');if(navigator.onLine)setTimeout(()=>loadConsumers(false),800);}else toast(json.error||json.message||'Delete failed','err');}
+    else{await AN_DB.deleteConsumer(delConNo);await AN_DB.addPendingChange('deleteConsumer',{rowIndex:delRowIdx,conNo:delConNo},session.officeId);masterList=masterList.filter(c=>c.conNo!==delConNo);applyFilters();toast('Deleted offline — will sync when online');AN_DB.requestSync();}
+  }catch{toast('Error deleting','err');}
 }
 
-/* ════════════════════════════════════════════════════════════
-   ADD / EDIT CONSUMER — Step 6
-════════════════════════════════════════════════════════════ */
-function openAddForm() {
-  CF.mode = 'add'; CF.consumer = null;
-  $('cfTitle').textContent  = 'Add Consumer';
-  $('cfBtnLbl').textContent = 'Add Consumer';
+/* ══ ADD / EDIT CONSUMER — Step 6 ══════════════════════ */
+
+// Helper: convert any date string to YYYY-MM-DD for date input
+function toDateInput(v){
+  if(!v)return'';
+  try{const d=new Date(v);return isNaN(d)?''':d.toISOString().split('T')[0];}
+  catch{return'';}
+}
+
+function openAddForm(){
+  CF.mode='add'; CF.consumer=null;
+  $('cfTitle').textContent='Add Consumer';
+  $('cfBtnLbl').textContent='Add Consumer';
   // Clear all fields
-  $('cfConNo').value  = ''; $('cfConNo').disabled = false;
-  $('cfCName').value  = '';
-  $('cfAddr').value   = '';
-  $('cfLabNo').value  = '';
-  $('cfMeter').value  = '';
-  $('cfTransf').value = '';
-  $('cfPhone').value  = '';
-  $('cfStatus').value = 'Active';
-  $('cfErr').classList.remove('show'); $('cfErrMsg').textContent = '';
+  $('cfConNo').value=''; $('cfConNo').disabled=false;
+  $('cfCName').value=''; $('cfAddr').value=''; $('cfLabNo').value='';
+  $('cfMeter').value=''; $('cfTransf').value=''; $('cfPhone').value='';
+  $('cfStatus').value='Active';
+  $('cfSdNo').value=''; $('cfSdAmt').value=''; $('cfSdDate').value='';
+  $('cfErr').classList.remove('show'); $('cfErrMsg').textContent='';
   $('cfBtn').classList.remove('loading');
   openSheet('cfSheet');
-  setTimeout(() => $('cfConNo').focus(), 380);
+  setTimeout(()=>$('cfConNo').focus(),380);
 }
 
-function openEditForm(conNo) {
-  const c = masterList.find(x => x.conNo === conNo);
-  if (!c) { toast('Consumer not found. Please reload.', 'err'); return; }
-  if (!c._rowIndex) { toast('Row index missing. Please reload app.', 'err'); return; }
+function openEditForm(conNo){
+  const c=masterList.find(x=>x.conNo===conNo);
+  if(!c){toast('Consumer not found. Please reload.','err');return;}
+  if(!c._rowIndex){toast('Row index missing. Please reload app.','err');return;}
 
-  CF.mode = 'edit'; CF.consumer = c;
-  $('cfTitle').textContent  = 'Edit Consumer';
-  $('cfBtnLbl').textContent = 'Save Changes';
+  CF.mode='edit'; CF.consumer=c;
+  $('cfTitle').textContent='Edit Consumer';
+  $('cfBtnLbl').textContent='Save Changes';
   // Pre-fill — raw values (NOT esc, inputs are not innerHTML)
-  $('cfConNo').value  = c.conNo         || '';
-  $('cfConNo').disabled = true;           // Lock ConNo on edit
-  $('cfCName').value  = c.consumerName  || '';
-  $('cfAddr').value   = c.address       || '';
-  $('cfLabNo').value  = c.labNo         || '';
-  $('cfMeter').value  = c.meterNo       || '';
-  $('cfTransf').value = c.transfCode    || '';
-  $('cfPhone').value  = c.phoneNo       || '';
-  $('cfStatus').value = c.status        || 'Active';
-  $('cfErr').classList.remove('show'); $('cfErrMsg').textContent = '';
+  $('cfConNo').value=c.conNo||''; $('cfConNo').disabled=true;
+  $('cfCName').value=c.consumerName||'';
+  $('cfAddr').value=c.address||'';
+  $('cfLabNo').value=c.labNo||'';
+  $('cfMeter').value=c.meterNo||'';
+  $('cfTransf').value=c.transfCode||'';
+  $('cfPhone').value=c.phoneNo||'';
+  $('cfStatus').value=c.status||'Active';
+  // SD fields
+  $('cfSdNo').value=c.sdPassbookNo||'';
+  $('cfSdAmt').value=c.sdAmount||'';
+  $('cfSdDate').value=toDateInput(c.sdDate);
+  $('cfErr').classList.remove('show'); $('cfErrMsg').textContent='';
   $('cfBtn').classList.remove('loading');
-
-  // Close detail sheet then open form
+  // Close detail then open form
   closeSheet();
-  setTimeout(() => openSheet('cfSheet'), 200);
+  setTimeout(()=>openSheet('cfSheet'),200);
 }
 
-async function saveConsumer() {
-  const conNo  = $('cfConNo').value.trim();
-  const cName  = $('cfCName').value.trim();
-  const addr   = $('cfAddr').value.trim();
-  const labNo  = $('cfLabNo').value.trim();
-  const meter  = $('cfMeter').value.trim();
-  const transf = $('cfTransf').value;
-  const phone  = $('cfPhone').value.trim();
-  const status = $('cfStatus').value;
+async function saveConsumer(){
+  const conNo   =$('cfConNo').value.trim();
+  const cName   =$('cfCName').value.trim();
+  const addr    =$('cfAddr').value.trim();
+  const labNo   =$('cfLabNo').value.trim();
+  const meter   =$('cfMeter').value.trim();
+  const transf  =$('cfTransf').value;
+  const phone   =$('cfPhone').value.trim();
+  const status  =$('cfStatus').value;
+  const sdNo    =$('cfSdNo').value.trim();
+  const sdAmt   =$('cfSdAmt').value.trim();
+  const sdDate  =$('cfSdDate').value;
 
   $('cfErr').classList.remove('show');
+  if(!conNo){showCfErr('Consumer No. is required.');$('cfConNo').focus();return;}
+  if(!cName){showCfErr('Consumer Name is required.');$('cfCName').focus();return;}
+  if(!session?.token){location.replace('./login.html');return;}
 
-  if (!conNo) { showCfErr('Consumer No. is required.'); $('cfConNo').focus(); return; }
-  if (!cName) { showCfErr('Consumer Name is required.'); $('cfCName').focus(); return; }
-  if (!session?.token) { location.replace('./login.html'); return; }
+  const btn=$('cfBtn'); btn.classList.add('loading');
 
-  const btn = $('cfBtn'); btn.classList.add('loading');
-
-  // PascalCase — matches sheet column names
-  const consumerData = {
+  const consumerData={
     ConNo:conNo, ConsumerName:cName, Address:addr,
     LabNo:labNo, MeterNo:meter, TransfCode:transf,
-    PhoneNo:phone, Status:status
+    PhoneNo:phone, Status:status,
+    'Passbook/SD No':sdNo, 'SD Amount':sdAmt, 'SD Date':sdDate
   };
 
-  // ── Offline path ────────────────────────────────────────
-  if (!navigator.onLine) {
-    try {
-      if (CF.mode === 'add') {
-        await AN_DB.addPendingChange('addConsumer', consumerData, session.officeId);
-        const tmp = normalize({ ...consumerData, _rowIndex: -1 });
-        await AN_DB.upsertConsumer(tmp);
-        masterList.unshift(tmp);
+  if(!navigator.onLine){
+    try{
+      if(CF.mode==='add'){
+        await AN_DB.addPendingChange('addConsumer',consumerData,session.officeId);
+        const tmp=normalize({...consumerData,_rowIndex:-1});
+        await AN_DB.upsertConsumer(tmp); masterList.unshift(tmp);
       } else {
-        await AN_DB.addPendingChange('updateConsumer',
-          { rowIndex:CF.consumer._rowIndex, consumer:consumerData }, session.officeId);
-        const updated = normalize({ ...consumerData, _rowIndex:CF.consumer._rowIndex });
+        await AN_DB.addPendingChange('updateConsumer',{rowIndex:CF.consumer._rowIndex,consumer:consumerData},session.officeId);
+        const updated=normalize({...consumerData,_rowIndex:CF.consumer._rowIndex});
         await AN_DB.upsertConsumer(updated);
-        const idx = masterList.findIndex(c => c.conNo === CF.consumer.conNo);
-        if (idx !== -1) masterList[idx] = updated;
+        const idx=masterList.findIndex(c=>c.conNo===CF.consumer.conNo);
+        if(idx!==-1)masterList[idx]=updated;
       }
-    } catch(e) { console.warn('CF offline:', e); }
+    }catch(e){console.warn('CF offline:',e);}
     closeSheet(); applyFilters(); updateChipCounts();
     toast(CF.mode==='add'?'Saved offline — will sync when connected':'Updated offline — will sync','');
     AN_DB.requestSync(); btn.classList.remove('loading'); return;
   }
 
-  // ── Online path ──────────────────────────────────────────
-  try {
-    const controller = new AbortController();
-    const tid = setTimeout(() => controller.abort(), TIMEOUT);
+  try{
+    const controller=new AbortController();
+    const tid=setTimeout(()=>controller.abort(),TIMEOUT);
+    const payload=CF.mode==='add'
+      ?{action:'addConsumer',token:session.token,officeId:session.officeId,sheetName:'CONSUMER DATA ALL',consumer:consumerData}
+      :{action:'updateConsumer',token:session.token,officeId:session.officeId,sheetName:'CONSUMER DATA ALL',rowIndex:CF.consumer._rowIndex,consumer:consumerData};
 
-    const payload = CF.mode === 'add'
-      ? { action:'addConsumer', token:session.token, officeId:session.officeId,
-          sheetName:'CONSUMER DATA ALL', consumer:consumerData }
-      : { action:'updateConsumer', token:session.token, officeId:session.officeId,
-          sheetName:'CONSUMER DATA ALL', rowIndex:CF.consumer._rowIndex, consumer:consumerData };
-
-    const res  = await fetch(API_URL, {
-      method:'POST', headers:{'Content-Type':'text/plain'},
-      body:JSON.stringify(payload), redirect:'follow', signal:controller.signal
-    });
+    const res=await fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify(payload),redirect:'follow',signal:controller.signal});
     clearTimeout(tid);
-    const json = await res.json();
+    const json=await res.json();
 
-    if (json.success) {
-      if (CF.mode === 'add') {
-        const saved = normalize(json.consumer || { ...consumerData, _rowIndex:json.rowIndex||0, 'S.No.':json.sNo||'' });
+    if(json.success){
+      if(CF.mode==='add'){
+        const saved=normalize(json.consumer||{...consumerData,_rowIndex:json.rowIndex||0,'S.No.':json.sNo||''});
         await AN_DB.upsertConsumer(saved).catch(()=>{});
         masterList.unshift(saved);
       } else {
-        const updated = normalize({ ...consumerData, _rowIndex:CF.consumer._rowIndex,
-          'S.No.':CF.consumer.sNo, CreatedAt:CF.consumer.createdAt });
+        const updated=normalize({...consumerData,_rowIndex:CF.consumer._rowIndex,'S.No.':CF.consumer.sNo,CreatedAt:CF.consumer.createdAt});
         await AN_DB.upsertConsumer(updated).catch(()=>{});
-        const idx = masterList.findIndex(c => c.conNo === CF.consumer.conNo);
-        if (idx !== -1) masterList[idx] = updated;
+        const idx=masterList.findIndex(c=>c.conNo===CF.consumer.conNo);
+        if(idx!==-1)masterList[idx]=updated;
       }
       closeSheet(); applyFilters(); updateChipCounts();
-      toast(CF.mode==='add'?'Consumer added successfully ✓':'Consumer updated successfully ✓','ok');
+      toast(CF.mode==='add'?'Consumer added successfully':'Consumer updated successfully','ok');
     } else {
-      showCfErr(json.message || json.error || 'Failed to save. Please try again.');
+      showCfErr(json.message||json.error||'Failed to save. Please try again.');
     }
-  } catch(err) {
+  } catch(err){
     showCfErr(err.name==='AbortError'?'Request timed out (30s). Check connection.':'Network error. Please retry.');
   }
   btn.classList.remove('loading');
 }
 
-function showCfErr(msg) {
-  $('cfErrMsg').textContent = msg;
-  $('cfErr').classList.add('show');
+function showCfErr(msg){$('cfErrMsg').textContent=msg;$('cfErr').classList.add('show');}
+
+function toDateInput(v){
+  if(!v) return '';
+  try{const d=new Date(v);return isNaN(d)?'':d.toISOString().split('T')[0];}
+  catch{return '';}
 }
 
-/* ════════════════════════════════════════════════════════════
-   TABS
-════════════════════════════════════════════════════════════ */
-function switchTab(tab) {
-  document.querySelectorAll('.bnav').forEach(b => b.classList.remove('active'));
-  $(`bnav-${tab}`)?.classList.add('active');
-  if (tab==='activity') toast('Activity Log — coming soon!');
-  if (tab==='admin')    toast('Admin Panel — coming soon!');
-}
+/* == TABS =============================================== */
+function switchTab(tab){document.querySelectorAll('.bnav').forEach(b=>b.classList.remove('active'));document.getElementById('bnav-'+tab)?.classList.add('active');if(tab==='activity')toast('Activity Log — coming soon!');if(tab==='admin')toast('Admin Panel — coming soon!');}
 
-/* ════════════════════════════════════════════════════════════
-   SHEETS
-════════════════════════════════════════════════════════════ */
-function openSheet(id) {
-  if (activeSheet) $(activeSheet).classList.remove('open');
-  activeSheet = id;
-  $(id).classList.add('open');
-  $('backdrop').classList.add('show');
-  $('backdrop').onclick = id === 'delSheet' ? null : closeSheet;
-}
-function closeSheet() {
-  if (activeSheet) { $(activeSheet).classList.remove('open'); activeSheet=null; }
-  $('backdrop').classList.remove('show');
-  $('backdrop').onclick = closeSheet;
-  window._bulkDelete = false;
-  requestAnimationFrame(() => window.scrollTo(0, lastScrollY));
-}
-function toggleEye(inputId,iconId) {
-  const inp=$(inputId),icon=$(iconId);
-  inp.type=inp.type==='password'?'text':'password';
-  icon.textContent=inp.type==='text'?'visibility':'visibility_off';
-}
+/* == SHEETS ============================================= */
+function openSheet(id){if(activeSheet)document.getElementById(activeSheet).classList.remove('open');activeSheet=id;document.getElementById(id).classList.add('open');$('backdrop').classList.add('show');$('backdrop').onclick=id==='delSheet'?null:closeSheet;}
+function closeSheet(){if(activeSheet){document.getElementById(activeSheet).classList.remove('open');activeSheet=null;}$('backdrop').classList.remove('show');$('backdrop').onclick=closeSheet;window._bulkDelete=false;requestAnimationFrame(()=>window.scrollTo(0,lastScrollY));}
+function toggleEye(inputId,iconId){const inp=document.getElementById(inputId),icon=document.getElementById(iconId);inp.type=inp.type==='password'?'text':'password';icon.textContent=inp.type==='text'?'visibility':'visibility_off';}
 
-/* ════════════════════════════════════════════════════════════
-   LONG PRESS
-════════════════════════════════════════════════════════════ */
-function attachLongPress(el, consumer) {
-  el.addEventListener('pointerdown', e => {
-    if (!isAdmin) return;
-    pressPos={x:e.clientX,y:e.clientY}; pressCard=el;
-    el.classList.add('pressing');
-    pressTimer=setTimeout(()=>{
-      if (navigator.vibrate) navigator.vibrate(50);
-      el.classList.remove('pressing'); pressTimer=null;
-      enterSelectMode(); toggleCard(consumer.conNo,el);
-    },500);
-  });
-  el.addEventListener('pointermove', e => {
-    if (!pressPos) return;
-    if (Math.abs(e.clientX-pressPos.x)>12||Math.abs(e.clientY-pressPos.y)>12) clearPressTimer();
-  });
-  ['pointerup','pointercancel','pointerleave'].forEach(evt => el.addEventListener(evt,()=>clearPressTimer()));
+/* == LONG PRESS ========================================= */
+function attachLongPress(el,consumer){
+  el.addEventListener('pointerdown',e=>{if(!isAdmin)return;pressPos={x:e.clientX,y:e.clientY};pressCard=el;el.classList.add('pressing');pressTimer=setTimeout(()=>{if(navigator.vibrate)navigator.vibrate(50);el.classList.remove('pressing');pressTimer=null;enterSelectMode();toggleCard(consumer.conNo,el);},500);});
+  el.addEventListener('pointermove',e=>{if(!pressPos)return;if(Math.abs(e.clientX-pressPos.x)>12||Math.abs(e.clientY-pressPos.y)>12)clearPressTimer();});
+  ['pointerup','pointercancel','pointerleave'].forEach(evt=>el.addEventListener(evt,()=>clearPressTimer()));
 }
-function clearPressTimer() {
-  clearTimeout(pressTimer);pressTimer=null;pressPos=null;
-  if (pressCard){pressCard.classList.remove('pressing');pressCard=null;}
-}
+function clearPressTimer(){clearTimeout(pressTimer);pressTimer=null;pressPos=null;if(pressCard){pressCard.classList.remove('pressing');pressCard=null;}}
 
-/* ════════════════════════════════════════════════════════════
-   SYNC
-════════════════════════════════════════════════════════════ */
-function setSync(type,txt){$('syncDot').className=`sync-dot ${type}`;$('syncTxt').textContent=txt;}
+/* == SYNC =============================================== */
+function setSync(type,txt){$('syncDot').className='sync-dot '+type;$('syncTxt').textContent=txt;}
 function setRefreshSpin(on){$('refreshBtn').classList.toggle('spin',on);}
-function onOnline(){setSync('syncing','Back online — syncing…');AN_DB.requestSync();setTimeout(loadConsumers,600);}
+function onOnline(){setSync('syncing','Back online — syncing...');AN_DB.requestSync();setTimeout(loadConsumers,600);}
 function onOffline(){setSync('offline','Offline — edits save locally');}
-function onSWMsg({data}){
-  if (!data) return;
-  if (data.type==='SYNC_COMPLETE'){setSync('online',`${data.synced} change${data.synced!==1?'s':''} synced`);loadConsumers(false);}
-  if (data.type==='SYNC_FAILED'){setSync('pending','Sync failed — will retry');}
-}
+function onSWMsg({data}){if(!data)return;if(data.type==='SYNC_COMPLETE'){setSync('online',data.synced+' change'+(data.synced!==1?'s':'')+' synced');loadConsumers(false);}if(data.type==='SYNC_FAILED')setSync('pending','Sync failed — will retry');}
 
-/* ════════════════════════════════════════════════════════════
-   UTILS
-════════════════════════════════════════════════════════════ */
-function showErr(msg){$('consumerList').innerHTML=`<div class="err-bar"><span class="material-icons-round">warning_amber</span>${esc(msg)}</div>`;}
-function addRipple(el,e){
-  const r=el.getBoundingClientRect(),sz=Math.max(r.width,r.height)*1.4;
-  const rip=document.createElement('span');rip.className='ripple';
-  rip.style.cssText=`width:${sz}px;height:${sz}px;left:${e.clientX-r.left-sz/2}px;top:${e.clientY-r.top-sz/2}px;`;
-  el.appendChild(rip);setTimeout(()=>rip.remove(),600);
-}
-function toast(msg,type=''){
-  const el=$('toast');el.textContent=msg;el.className=`show ${type}`.trim();
-  clearTimeout(toastT);toastT=setTimeout(()=>{el.className=type.trim();},2800);
-}
-function esc(s){return String(s??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
-function formatDate(ts){
-  if (!ts||ts==='—') return '—';
-  try{const d=new Date(ts);if(isNaN(d))return ts;return d.toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'});}
-  catch{return ts;}
-}
-function timeAgo(ts){const d=Date.now()-ts;if(d<60000)return 'just now';if(d<3600000)return `${Math.floor(d/60000)}m ago`;return `${Math.floor(d/3600000)}h ago`;}
+/* == UTILS ============================================== */
+function showErr(msg){$('consumerList').innerHTML='<div class="err-bar"><span class="material-icons-round">warning_amber</span>'+esc(msg)+'</div>';}
+function addRipple(el,e){const r=el.getBoundingClientRect(),sz=Math.max(r.width,r.height)*1.4;const rip=document.createElement('span');rip.className='ripple';rip.style.cssText='width:'+sz+'px;height:'+sz+'px;left:'+(e.clientX-r.left-sz/2)+'px;top:'+(e.clientY-r.top-sz/2)+'px;';el.appendChild(rip);setTimeout(()=>rip.remove(),600);}
+function toast(msg,type){const el=$('toast');el.textContent=msg;el.className='show '+(type||'').trim();clearTimeout(toastT);toastT=setTimeout(()=>{el.className=(type||'').trim();},2800);}
+function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function formatDate(ts){if(!ts||ts==='—')return'—';try{const d=new Date(ts);if(isNaN(d))return ts;return d.toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'});}catch{return ts;}}
+function timeAgo(ts){const d=Date.now()-ts;if(d<60000)return'just now';if(d<3600000)return Math.floor(d/60000)+'m ago';return Math.floor(d/3600000)+'h ago';}
 
-/* ── START ─────────────────────────────────────────────── */
 init();
 </script>
 </body>
