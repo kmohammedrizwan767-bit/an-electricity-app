@@ -90,7 +90,6 @@
     .bio-divider{display:none;align-items:center;gap:.75rem;margin:.9rem 0 .2rem;font-size:.72rem;color:var(--text-2);letter-spacing:.04em;text-transform:uppercase;}
     .bio-divider.visible{display:flex;}
     .bio-divider::before,.bio-divider::after{content:'';flex:1;height:1px;background:var(--inp-border);}
-
     .btn-bio{width:100%;height:50px;background:var(--inp-bg);border:1.5px solid var(--inp-border);border-radius:14px;font-family:var(--ff-display);font-size:.9rem;font-weight:500;color:var(--text-1);cursor:pointer;display:none;align-items:center;justify-content:center;gap:.55rem;margin-top:.5rem;transition:background var(--ease),border-color var(--ease),transform .15s;position:relative;overflow:hidden;}
     .btn-bio.visible{display:flex;}
     .btn-bio:active{transform:scale(.975);background:var(--card);}
@@ -174,7 +173,7 @@
           <div class="spin"></div>
         </button>
 
-        <!-- Biometric quick-login (shown only when credential registered + device supports it) -->
+        <!-- Biometric quick-login — visible only when credential + device support confirmed -->
         <div class="bio-divider" id="bioDivider">or</div>
         <button class="btn-bio" id="btnBio" type="button">
           <span class="material-icons-round bio-btn-icon">fingerprint</span>
@@ -216,7 +215,7 @@
   </div>
   <div class="ver-tag">v1.1 &mdash; AN Electricity</div>
 
-  <!-- ── Biometric Registration Overlay (shown after first successful login) ── -->
+  <!-- ── Biometric Registration Overlay ── -->
   <div id="bioOverlay" class="bio-overlay">
     <div class="bio-reg-sheet">
       <div class="bio-reg-icon">
@@ -239,11 +238,18 @@
 
     /* ── Config ── */
     const CFG = {
-      API_URL: 'https://script.google.com/macros/s/AKfycbyeO7pIZrT1WKPHHuR8LKxhPKgf4uELmkSkIgUefNwT88JdCBiAoTAfgKTyCBKEMmBowQ/exec',
-      SESSION_KEY: 'an_elect_session',
-      THEME_KEY:   'an_elect_theme',
-      BIO_KEY:     'an_bio_cred',     // JSON: {credId, username, fullName, registeredAt}
-      BIO_SKIP_KEY:'an_bio_skip',     // '1' = user chose "Maybe Later"
+      API_URL:       'https://script.google.com/macros/s/AKfycbyeO7pIZrT1WKPHHuR8LKxhPKgf4uELmkSkIgUefNwT88JdCBiAoTAfgKTyCBKEMmBowQ/exec',
+      SESSION_KEY:   'an_elect_session',
+      THEME_KEY:     'an_elect_theme',
+      BIO_KEY:       'an_bio_cred',     // {credId, username, fullName, registeredAt}
+      BIO_SKIP_KEY:  'an_bio_skip',     // '1' = user chose "Maybe Later"
+      /*
+       * BIO_VAULT_KEY — a copy of the session that survives logout.
+       * handleLogout() in index.html clears 'an_elect_session' but NOT this key.
+       * Fingerprint auth restores from vault → redirects → index.html validates with server.
+       * Cleared only when the server reports token expired (index.html session expiry handler).
+       */
+      BIO_VAULT_KEY: 'an_bio_vault',
       ROUTES: { superadmin: 'superadmin.html', admin: 'index.html', employee: 'index.html' }
     };
 
@@ -264,22 +270,40 @@
       applyTheme(html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
     });
 
-    /* ── Session helpers ── */
+    /* ── Session ── */
     function getSession() {
       try { const r = localStorage.getItem(CFG.SESSION_KEY); return r ? JSON.parse(r) : null; }
       catch { return null; }
     }
+
+    /*
+     * saveSession — writes active session AND biometric vault.
+     * Vault intentionally persists through logout so fingerprint can restore it.
+     */
     function saveSession(data, rememberMe) {
       const s = {
-        token: data.token, role: data.role, userId: data.userId,
-        username: data.username, fullName: data.fullName,
-        officeId: data.officeId, officeName: data.officeName,
-        rememberMe, savedAt: Date.now()
+        token:      data.token,
+        role:       data.role,
+        userId:     data.userId,
+        username:   data.username,
+        fullName:   data.fullName,
+        officeId:   data.officeId,
+        officeName: data.officeName,
+        rememberMe,
+        savedAt:    Date.now()
       };
-      localStorage.setItem(CFG.SESSION_KEY, JSON.stringify(s));
+      localStorage.setItem(CFG.SESSION_KEY,   JSON.stringify(s));
+      localStorage.setItem(CFG.BIO_VAULT_KEY, JSON.stringify(s)); // vault copy
       AN_DB.saveSession(s);
       AN_DB.setApiUrl(CFG.API_URL);
     }
+
+    /* ── Biometric vault ── */
+    function getBioVault() {
+      try { const r = localStorage.getItem(CFG.BIO_VAULT_KEY); return r ? JSON.parse(r) : null; }
+      catch { return null; }
+    }
+    function clearBioVault() { localStorage.removeItem(CFG.BIO_VAULT_KEY); }
 
     /* ── Service Worker ── */
     if ('serviceWorker' in navigator) {
@@ -310,10 +334,10 @@
 
     async function apiCall(payload) {
       const res = await fetch(CFG.API_URL, {
-        method: 'POST',
+        method:  'POST',
         headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify(payload),
-        redirect: 'follow'
+        body:    JSON.stringify(payload),
+        redirect:'follow'
       });
       if (!res.ok) throw new Error('HTTP ' + res.status);
       return res.json();
@@ -326,10 +350,9 @@
     }
 
     /* ════════════════════════════════════════════════
-       WebAuthn / Biometric helpers
+       WebAuthn / Biometric
     ════════════════════════════════════════════════ */
 
-    /* ArrayBuffer -> base64 string (safe for large buffers) */
     function ab2b64(buffer) {
       let binary = '';
       const bytes = new Uint8Array(buffer);
@@ -337,44 +360,37 @@
       return btoa(binary);
     }
 
-    /* base64 string -> Uint8Array */
     function b642u8(base64) {
       const binary = atob(base64);
-      const bytes = new Uint8Array(binary.length);
+      const bytes  = new Uint8Array(binary.length);
       for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
       return bytes;
     }
 
-    /* Returns true if device has a platform authenticator (fingerprint / face) */
     async function isBiometricAvailable() {
       if (!window.PublicKeyCredential) return false;
       try { return await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable(); }
       catch { return false; }
     }
 
-    /* Get stored credential data or null */
     function getBioCred() {
       try { const r = localStorage.getItem(CFG.BIO_KEY); return r ? JSON.parse(r) : null; }
       catch { return null; }
     }
 
-    /* Remove stored credential */
     function clearBioCred() { localStorage.removeItem(CFG.BIO_KEY); }
 
-    /* ── Register biometric (called once after successful login) ── */
+    /* ── Register biometric after first password login ── */
     async function registerBiometric(username, fullName) {
-      const challenge    = crypto.getRandomValues(new Uint8Array(32));
-      const userIdBytes  = new TextEncoder().encode(username);
-
       const credential = await navigator.credentials.create({
         publicKey: {
-          challenge,
+          challenge: crypto.getRandomValues(new Uint8Array(32)),
           rp: {
             name: 'AN Electricity Consumer Manager',
-            id:   window.location.hostname          // e.g. kmohammedrizwan767-bit.github.io
+            id:   window.location.hostname
           },
           user: {
-            id:          userIdBytes,
+            id:          new TextEncoder().encode(username),
             name:        username,
             displayName: fullName || username
           },
@@ -383,11 +399,11 @@
             { alg: -257, type: 'public-key' }    // RS256
           ],
           authenticatorSelection: {
-            authenticatorAttachment: 'platform',  // device biometric only (no security key)
-            userVerification: 'required',
-            requireResidentKey: false
+            authenticatorAttachment: 'platform',  // device biometric only
+            userVerification:        'required',
+            requireResidentKey:      false
           },
-          timeout: 60000,
+          timeout:     60000,
           attestation: 'none'
         }
       });
@@ -403,7 +419,20 @@
       return true;
     }
 
-    /* ── Authenticate with biometric, then redirect ── */
+    /*
+     * authBiometric
+     * ─────────────────────────────────────────────────────────────
+     * Flow:
+     *   1. WebAuthn get() — verifies fingerprint matches registered credential
+     *   2. Read session from biometric vault (survives logout)
+     *   3. Restore vault as active session in localStorage
+     *   4. Redirect — index.html validates token with server on next API call
+     *
+     * If server token still valid  → user gets in seamlessly.
+     * If server token expired      → index.html UNAUTHORIZED handler:
+     *                                clears session + vault + redirects to login.
+     *                                Next password login re-fills vault. Fingerprint works again.
+     */
     async function authBiometric() {
       const bioCred = getBioCred();
       if (!bioCred) return;
@@ -413,31 +442,32 @@
       btn.classList.add('loading');
 
       try {
-        const challenge    = crypto.getRandomValues(new Uint8Array(32));
-        const credIdBytes  = b642u8(bioCred.credId);
-
         const assertion = await navigator.credentials.get({
           publicKey: {
-            challenge,
-            allowCredentials: [{ id: credIdBytes, type: 'public-key' }],
+            challenge:        crypto.getRandomValues(new Uint8Array(32)),
+            allowCredentials:[{ id: b642u8(bioCred.credId), type: 'public-key' }],
             userVerification: 'required',
-            timeout: 60000
+            timeout:          60000
           }
         });
 
-        if (!assertion) throw new Error('No assertion returned');
+        if (!assertion) throw new Error('No assertion');
 
-        // WebAuthn succeeded — check that a session token exists locally
-        const session = getSession();
-        if (!session || !session.token) {
-          // User logged out or session was cleared — biometric cannot issue a new session
+        // WebAuthn succeeded — restore session from vault
+        const vault = getBioVault();
+        if (!vault || !vault.token) {
+          // Vault empty: user registered biometric but has never signed in on this device
           showErr('loginErr', 'loginErrMsg',
-            'Session expired. Please sign in with your password to continue.');
+            'Please sign in with your password once to activate fingerprint login.');
           return;
         }
 
-        // Session token exists — redirect; index.html will validate with server
-        window.location.replace(CFG.ROUTES[session.role] || 'index.html');
+        // Write vault back as active session
+        localStorage.setItem(CFG.SESSION_KEY, JSON.stringify(vault));
+        AN_DB.saveSession(vault);
+
+        // Redirect — index.html will validate token with server
+        window.location.replace(CFG.ROUTES[vault.role] || 'index.html');
 
       } catch (err) {
         console.warn('[Biometric]', err.name, err.message);
@@ -445,8 +475,9 @@
         if (err.name === 'NotAllowedError') {
           // User cancelled or timed out — silent, let them use password
         } else if (err.name === 'InvalidStateError' || err.name === 'NotFoundError') {
-          // Credential was removed from device (e.g. factory reset, new fingerprints enrolled)
+          // Credential removed from device (factory reset, new fingerprints enrolled)
           clearBioCred();
+          clearBioVault();
           btn.classList.remove('visible');
           $('bioDivider').classList.remove('visible');
           showErr('loginErr', 'loginErrMsg',
@@ -469,22 +500,21 @@
         setLoading('btnEnableBio', true);
         try {
           await registerBiometric(username, fullName);
-          // Registered (or failed silently) — always redirect after
         } catch (err) {
-          // User cancelled WebAuthn create() or device denied — just redirect
           console.warn('[BioRegister]', err.name, err.message);
+          // Cancelled/failed — just redirect
         } finally {
           window.location.replace(redirectUrl);
         }
       };
 
       $('btnSkipBio').onclick = () => {
-        localStorage.setItem(CFG.BIO_SKIP_KEY, '1'); // don't ask again
+        localStorage.setItem(CFG.BIO_SKIP_KEY, '1');
         window.location.replace(redirectUrl);
       };
     }
 
-    /* ── On page load: show fingerprint button if credential exists ── */
+    /* ── Show fingerprint button on page load ── */
     async function checkBiometricOnLoad() {
       const bioCred = getBioCred();
       if (!bioCred) return;
@@ -492,7 +522,6 @@
       const available = await isBiometricAvailable();
       if (!available) return;
 
-      // Show button with stored user's display name
       const displayName = bioCred.fullName || bioCred.username;
       $('bioLabel').textContent = 'Continue as ' + displayName;
       $('bioDivider').classList.add('visible');
@@ -500,18 +529,18 @@
     }
 
     /* ════════════════════════════════════════════════
-       Login flow
+       Login
     ════════════════════════════════════════════════ */
     async function handleLogin() {
-      const username  = $('username').value.trim();
-      const password  = $('password').value;
+      const username   = $('username').value.trim();
+      const password   = $('password').value;
       const rememberMe = $('rememberMe').checked;
 
       hideAll('loginErr');
       $('contactHint').classList.remove('show');
 
-      if (!username) { showErr('loginErr', 'loginErrMsg', 'Username is required.');  return; }
-      if (!password) { showErr('loginErr', 'loginErrMsg', 'Password is required.');  return; }
+      if (!username) { showErr('loginErr', 'loginErrMsg', 'Username is required.'); return; }
+      if (!password) { showErr('loginErr', 'loginErrMsg', 'Password is required.'); return; }
 
       setLoading('btnLogin', true);
       try {
@@ -519,14 +548,11 @@
 
         if (result.success) {
           if (result.forcePasswordChange) {
-            // Must change password before entering app
             window.__tempLogin = { result, rememberMe, username, password };
             showChangePassScreen();
           } else {
-            saveSession(result, rememberMe);
-            const redirectUrl = CFG.ROUTES[result.role] || 'index.html';
-
-            // Offer biometric registration if: device supports it, not yet registered, not skipped
+            saveSession(result, rememberMe); // writes session + vault
+            const redirectUrl  = CFG.ROUTES[result.role] || 'index.html';
             const bioAvailable = await isBiometricAvailable();
             const hasCred      = getBioCred();
             const bioSkipped   = localStorage.getItem(CFG.BIO_SKIP_KEY);
@@ -555,7 +581,7 @@
       $('newPass').focus();
     }
 
-    /* ── Force password change flow ── */
+    /* ── Force password change ── */
     async function handleChangePass() {
       const newPass     = $('newPass').value;
       const confirmPass = $('confirmPass').value;
@@ -576,10 +602,8 @@
 
         if (result.success) {
           $('cpOk').classList.add('show');
-          saveSession(tmp.result, tmp.rememberMe);
-          const redirectUrl = CFG.ROUTES[tmp.result.role] || 'index.html';
-
-          // Offer biometric after forced password change too
+          saveSession(tmp.result, tmp.rememberMe); // writes session + vault
+          const redirectUrl  = CFG.ROUTES[tmp.result.role] || 'index.html';
           const bioAvailable = await isBiometricAvailable();
           const hasCred      = getBioCred();
           const bioSkipped   = localStorage.getItem(CFG.BIO_SKIP_KEY);
