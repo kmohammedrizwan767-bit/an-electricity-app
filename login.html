@@ -6,7 +6,7 @@
   <meta name="theme-color" id="themeColor" content="#0052B4">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <title>A&N Electricity \u2014 Login</title>
+  <title>A&N Electricity &#8212; Login</title>
   <link rel="manifest" href="./manifest.json">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -43,7 +43,6 @@
     .alert .material-icons-round{font-size:18px;flex-shrink:0;margin-top:1px;}
     .alert-err{background:var(--err-bg);color:var(--err);border-color:var(--err-border);}
     .alert-ok{background:var(--ok-bg);color:var(--ok);border-color:var(--ok-border);}
-    /* Contact Admin hint */
     .contact-hint{display:none;align-items:flex-start;gap:.5rem;padding:.6rem .875rem;border-radius:10px;font-size:.8rem;line-height:1.5;margin-bottom:.75rem;background:rgba(0,82,180,.07);color:var(--text-2);border:1px solid rgba(0,82,180,.15);}
     .contact-hint.show{display:flex}
     .contact-hint .material-icons-round{font-size:16px;flex-shrink:0;margin-top:1px;color:var(--primary);}
@@ -86,12 +85,44 @@
     .ver-tag{position:fixed;bottom:.65rem;left:50%;transform:translateX(-50%);font-size:.7rem;color:var(--text-2);opacity:.45;z-index:1;white-space:nowrap;}
     @media(max-width:360px){.card{padding:1.5rem 1.125rem}.logo-box{width:64px;height:64px}.logo-box .material-icons-round{font-size:32px;}}
     @media(min-height:700px){.logo-area{margin-bottom:1.875rem;}}
+
+    /* ── Biometric Login ─────────────────────────────── */
+    .bio-divider{display:none;align-items:center;gap:.75rem;margin:.9rem 0 .2rem;font-size:.72rem;color:var(--text-2);letter-spacing:.04em;text-transform:uppercase;}
+    .bio-divider.visible{display:flex;}
+    .bio-divider::before,.bio-divider::after{content:'';flex:1;height:1px;background:var(--inp-border);}
+
+    .btn-bio{width:100%;height:50px;background:var(--inp-bg);border:1.5px solid var(--inp-border);border-radius:14px;font-family:var(--ff-display);font-size:.9rem;font-weight:500;color:var(--text-1);cursor:pointer;display:none;align-items:center;justify-content:center;gap:.55rem;margin-top:.5rem;transition:background var(--ease),border-color var(--ease),transform .15s;position:relative;overflow:hidden;}
+    .btn-bio.visible{display:flex;}
+    .btn-bio:active{transform:scale(.975);background:var(--card);}
+    .btn-bio:disabled{opacity:.6;cursor:not-allowed;transform:none;}
+    .bio-btn-icon{font-size:22px!important;color:var(--primary);}
+    [data-theme="dark"] .bio-btn-icon{color:#4D91FF;}
+    .bio-btn-lbl{transition:opacity .15s;}
+    .bio-spin{display:none;width:18px;height:18px;border:2px solid rgba(0,82,180,.25);border-top-color:var(--primary);border-radius:50%;animation:spin .65s linear infinite;position:absolute;}
+    [data-theme="dark"] .bio-spin{border-color:rgba(77,145,255,.2);border-top-color:#4D91FF;}
+    .btn-bio.loading .bio-btn-icon,.btn-bio.loading .bio-btn-lbl{opacity:0;}
+    .btn-bio.loading .bio-spin{display:block;}
+
+    /* ── Biometric Registration Overlay ─────────────── */
+    .bio-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:200;display:none;align-items:flex-end;justify-content:center;padding:.75rem;-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px);}
+    .bio-overlay.show{display:flex;}
+    .bio-reg-sheet{background:var(--card);border:1.5px solid var(--card-border);border-radius:24px 24px 20px 20px;padding:2rem 1.5rem 1.5rem;width:100%;max-width:390px;text-align:center;animation:slideUp .32s cubic-bezier(.25,.46,.45,.94) both;}
+    @keyframes slideUp{from{transform:translateY(80px);opacity:0}to{transform:translateY(0);opacity:1}}
+    .bio-reg-icon{width:72px;height:72px;background:linear-gradient(135deg,rgba(0,82,180,.11),rgba(0,82,180,.05));border-radius:50%;display:inline-flex;align-items:center;justify-content:center;margin-bottom:1rem;box-shadow:0 4px 16px rgba(0,82,180,.12);}
+    .bio-reg-icon .material-icons-round{font-size:34px;color:var(--primary);}
+    [data-theme="dark"] .bio-reg-icon{background:linear-gradient(135deg,rgba(77,145,255,.14),rgba(77,145,255,.06));box-shadow:0 4px 16px rgba(0,0,0,.28);}
+    [data-theme="dark"] .bio-reg-icon .material-icons-round{color:#4D91FF;}
+    .bio-reg-title{font-family:var(--ff-display);font-size:1.1rem;font-weight:600;color:var(--text-1);margin-bottom:.4rem;}
+    .bio-reg-desc{font-size:.83rem;color:var(--text-2);line-height:1.55;margin-bottom:1.4rem;padding:0 .25rem;}
+    .btn-skip{width:100%;height:44px;background:none;border:none;font-family:var(--ff-body);font-size:.87rem;color:var(--text-2);cursor:pointer;margin-top:.4rem;border-radius:10px;transition:color var(--ease);}
+    .btn-skip:active{color:var(--text-1);}
   </style>
 </head>
 <body>
   <button id="themeToggle" aria-label="Toggle dark/light mode">
     <span class="material-icons-round" id="themeIcon">light_mode</span>
   </button>
+
   <div class="wrap">
     <div class="logo-area">
       <div class="logo-box"><span class="material-icons-round">bolt</span></div>
@@ -100,7 +131,8 @@
     </div>
     <div class="card">
       <div class="pulse-line" aria-hidden="true"></div>
-      <!-- LOGIN SCREEN -->
+
+      <!-- ── LOGIN SCREEN ── -->
       <div id="screenLogin" class="screen">
         <div class="card-title">Welcome back</div>
         <div class="card-sub">Sign in to your office account</div>
@@ -108,7 +140,6 @@
           <span class="material-icons-round">error_outline</span>
           <span id="loginErrMsg">Invalid credentials. Try again.</span>
         </div>
-        <!-- Contact Admin hint — shown after failed login -->
         <div class="contact-hint" id="contactHint">
           <span class="material-icons-round">support_agent</span>
           Forgot your password? Contact your office Admin to reset it.
@@ -142,8 +173,17 @@
           <span class="btn-lbl">Sign In</span>
           <div class="spin"></div>
         </button>
+
+        <!-- Biometric quick-login (shown only when credential registered + device supports it) -->
+        <div class="bio-divider" id="bioDivider">or</div>
+        <button class="btn-bio" id="btnBio" type="button">
+          <span class="material-icons-round bio-btn-icon">fingerprint</span>
+          <span class="bio-btn-lbl" id="bioLabel">Sign in with Fingerprint</span>
+          <div class="bio-spin"></div>
+        </button>
       </div>
-      <!-- FORCE CHANGE PASSWORD SCREEN -->
+
+      <!-- ── FORCE CHANGE PASSWORD SCREEN ── -->
       <div id="screenChangePass" class="screen hidden">
         <div class="card-title">Set New Password</div>
         <div class="card-sub">Required before you can continue</div>
@@ -174,69 +214,408 @@
     </div>
     <div class="footer">Andaman &amp; Nicobar Islands<br><strong>Electricity Department</strong></div>
   </div>
-  <div class="ver-tag">v1.0 &mdash; AN Electricity</div>
+  <div class="ver-tag">v1.1 &mdash; AN Electricity</div>
+
+  <!-- ── Biometric Registration Overlay (shown after first successful login) ── -->
+  <div id="bioOverlay" class="bio-overlay">
+    <div class="bio-reg-sheet">
+      <div class="bio-reg-icon">
+        <span class="material-icons-round">fingerprint</span>
+      </div>
+      <div class="bio-reg-title">Enable Fingerprint Login</div>
+      <div class="bio-reg-desc">Sign in instantly next time using your fingerprint or face unlock &#8212; no password needed.</div>
+      <button class="btn-primary" id="btnEnableBio" type="button">
+        <span class="material-icons-round">fingerprint</span>
+        <span class="btn-lbl">Enable Fingerprint</span>
+        <div class="spin"></div>
+      </button>
+      <button class="btn-skip" id="btnSkipBio" type="button">Maybe Later</button>
+    </div>
+  </div>
+
   <script src="./db.js"></script>
   <script>
     'use strict';
-    const CFG={API_URL:'https://script.google.com/macros/s/AKfycbyeO7pIZrT1WKPHHuR8LKxhPKgf4uELmkSkIgUefNwT88JdCBiAoTAfgKTyCBKEMmBowQ/exec',SESSION_KEY:'an_elect_session',THEME_KEY:'an_elect_theme',ROUTES:{superadmin:'superadmin.html',admin:'index.html',employee:'index.html'}};
-    const $=id=>document.getElementById(id);
-    const html=document.documentElement;
-    function applyTheme(theme){html.setAttribute('data-theme',theme);$('themeIcon').textContent=theme==='dark'?'dark_mode':'light_mode';$('themeColor').content=theme==='dark'?'#0D1D36':'#0052B4';localStorage.setItem(CFG.THEME_KEY,theme);}
-    const _savedTheme=localStorage.getItem(CFG.THEME_KEY);
-    const _prefersDark=window.matchMedia('(prefers-color-scheme: dark)').matches;
-    applyTheme(_savedTheme||(_prefersDark?'dark':'light'));
-    $('themeToggle').addEventListener('click',()=>{applyTheme(html.getAttribute('data-theme')==='dark'?'light':'dark');});
-    function getSession(){try{const raw=localStorage.getItem(CFG.SESSION_KEY);return raw?JSON.parse(raw):null;}catch{return null;}}
-    function saveSession(data,rememberMe){const s={token:data.token,role:data.role,userId:data.userId,username:data.username,fullName:data.fullName,officeId:data.officeId,officeName:data.officeName,rememberMe:rememberMe,savedAt:Date.now()};localStorage.setItem(CFG.SESSION_KEY,JSON.stringify(s));AN_DB.saveSession(s);AN_DB.setApiUrl(CFG.API_URL);}
-    if('serviceWorker' in navigator){window.addEventListener('load',()=>{navigator.serviceWorker.register('./sw.js').then(reg=>console.log('[App] SW registered:',reg.scope)).catch(err=>console.warn('[App] SW failed:',err));});}
-    (function checkSession(){const s=getSession();if(s&&s.token){window.location.replace(CFG.ROUTES[s.role]||'index.html');}})();
-    function toggleEye(inputId,iconId){const inp=$(inputId),icon=$(iconId);const show=inp.type==='password';inp.type=show?'text':'password';icon.textContent=show?'visibility':'visibility_off';}
-    window.toggleEye=toggleEye;
-    function showErr(alertId,msgId,msg){$(msgId).textContent=msg;$(alertId).classList.add('show');}
-    function hideAll(...ids){ids.forEach(id=>$(id).classList.remove('show'));}
-    async function apiCall(payload){const res=await fetch(CFG.API_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(payload),redirect:'follow'});if(!res.ok)throw new Error('HTTP '+res.status);return await res.json();}
-    function setLoading(btnId,state){const btn=$(btnId);btn.classList.toggle('loading',state);btn.disabled=state;}
-    async function handleLogin(){
-      const username=$('username').value.trim(),password=$('password').value,rememberMe=$('rememberMe').checked;
-      hideAll('loginErr');$('contactHint').classList.remove('show');
-      if(!username){showErr('loginErr','loginErrMsg','Username is required.');return;}
-      if(!password){showErr('loginErr','loginErrMsg','Password is required.');return;}
-      setLoading('btnLogin',true);
-      try{
-        const result=await apiCall({action:'login',username,password,rememberMe});
-        if(result.success){
-          if(result.forcePasswordChange){window.__tempLogin={result,rememberMe,username,password};showChangePassScreen();}
-          else{saveSession(result,rememberMe);window.location.replace(CFG.ROUTES[result.role]||'index.html');}
-        }else{
-          showErr('loginErr','loginErrMsg',result.message||'Invalid username or password.');
-          // Show contact admin hint after failed login
+
+    /* ── Config ── */
+    const CFG = {
+      API_URL: 'https://script.google.com/macros/s/AKfycbyeO7pIZrT1WKPHHuR8LKxhPKgf4uELmkSkIgUefNwT88JdCBiAoTAfgKTyCBKEMmBowQ/exec',
+      SESSION_KEY: 'an_elect_session',
+      THEME_KEY:   'an_elect_theme',
+      BIO_KEY:     'an_bio_cred',     // JSON: {credId, username, fullName, registeredAt}
+      BIO_SKIP_KEY:'an_bio_skip',     // '1' = user chose "Maybe Later"
+      ROUTES: { superadmin: 'superadmin.html', admin: 'index.html', employee: 'index.html' }
+    };
+
+    const $ = id => document.getElementById(id);
+    const html = document.documentElement;
+
+    /* ── Theme ── */
+    function applyTheme(theme) {
+      html.setAttribute('data-theme', theme);
+      $('themeIcon').textContent = theme === 'dark' ? 'dark_mode' : 'light_mode';
+      $('themeColor').content = theme === 'dark' ? '#0D1D36' : '#0052B4';
+      localStorage.setItem(CFG.THEME_KEY, theme);
+    }
+    const _saved = localStorage.getItem(CFG.THEME_KEY);
+    const _dark  = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    applyTheme(_saved || (_dark ? 'dark' : 'light'));
+    $('themeToggle').addEventListener('click', () => {
+      applyTheme(html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
+    });
+
+    /* ── Session helpers ── */
+    function getSession() {
+      try { const r = localStorage.getItem(CFG.SESSION_KEY); return r ? JSON.parse(r) : null; }
+      catch { return null; }
+    }
+    function saveSession(data, rememberMe) {
+      const s = {
+        token: data.token, role: data.role, userId: data.userId,
+        username: data.username, fullName: data.fullName,
+        officeId: data.officeId, officeName: data.officeName,
+        rememberMe, savedAt: Date.now()
+      };
+      localStorage.setItem(CFG.SESSION_KEY, JSON.stringify(s));
+      AN_DB.saveSession(s);
+      AN_DB.setApiUrl(CFG.API_URL);
+    }
+
+    /* ── Service Worker ── */
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js')
+          .then(r => console.log('[SW] registered:', r.scope))
+          .catch(e => console.warn('[SW] failed:', e));
+      });
+    }
+
+    /* ── Redirect if already logged in ── */
+    (function checkSession() {
+      const s = getSession();
+      if (s && s.token) window.location.replace(CFG.ROUTES[s.role] || 'index.html');
+    })();
+
+    /* ── UI helpers ── */
+    function toggleEye(inputId, iconId) {
+      const inp = $(inputId), icon = $(iconId);
+      const show = inp.type === 'password';
+      inp.type = show ? 'text' : 'password';
+      icon.textContent = show ? 'visibility' : 'visibility_off';
+    }
+    window.toggleEye = toggleEye;
+
+    function showErr(alertId, msgId, msg) { $(msgId).textContent = msg; $(alertId).classList.add('show'); }
+    function hideAll(...ids) { ids.forEach(id => $(id).classList.remove('show')); }
+
+    async function apiCall(payload) {
+      const res = await fetch(CFG.API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify(payload),
+        redirect: 'follow'
+      });
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      return res.json();
+    }
+
+    function setLoading(btnId, state) {
+      const btn = $(btnId);
+      btn.classList.toggle('loading', state);
+      btn.disabled = state;
+    }
+
+    /* ════════════════════════════════════════════════
+       WebAuthn / Biometric helpers
+    ════════════════════════════════════════════════ */
+
+    /* ArrayBuffer -> base64 string (safe for large buffers) */
+    function ab2b64(buffer) {
+      let binary = '';
+      const bytes = new Uint8Array(buffer);
+      for (let i = 0; i < bytes.byteLength; i++) binary += String.fromCharCode(bytes[i]);
+      return btoa(binary);
+    }
+
+    /* base64 string -> Uint8Array */
+    function b642u8(base64) {
+      const binary = atob(base64);
+      const bytes = new Uint8Array(binary.length);
+      for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+      return bytes;
+    }
+
+    /* Returns true if device has a platform authenticator (fingerprint / face) */
+    async function isBiometricAvailable() {
+      if (!window.PublicKeyCredential) return false;
+      try { return await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable(); }
+      catch { return false; }
+    }
+
+    /* Get stored credential data or null */
+    function getBioCred() {
+      try { const r = localStorage.getItem(CFG.BIO_KEY); return r ? JSON.parse(r) : null; }
+      catch { return null; }
+    }
+
+    /* Remove stored credential */
+    function clearBioCred() { localStorage.removeItem(CFG.BIO_KEY); }
+
+    /* ── Register biometric (called once after successful login) ── */
+    async function registerBiometric(username, fullName) {
+      const challenge    = crypto.getRandomValues(new Uint8Array(32));
+      const userIdBytes  = new TextEncoder().encode(username);
+
+      const credential = await navigator.credentials.create({
+        publicKey: {
+          challenge,
+          rp: {
+            name: 'AN Electricity Consumer Manager',
+            id:   window.location.hostname          // e.g. kmohammedrizwan767-bit.github.io
+          },
+          user: {
+            id:          userIdBytes,
+            name:        username,
+            displayName: fullName || username
+          },
+          pubKeyCredParams: [
+            { alg: -7,   type: 'public-key' },   // ES256
+            { alg: -257, type: 'public-key' }    // RS256
+          ],
+          authenticatorSelection: {
+            authenticatorAttachment: 'platform',  // device biometric only (no security key)
+            userVerification: 'required',
+            requireResidentKey: false
+          },
+          timeout: 60000,
+          attestation: 'none'
+        }
+      });
+
+      if (!credential) return false;
+
+      localStorage.setItem(CFG.BIO_KEY, JSON.stringify({
+        credId:       ab2b64(credential.rawId),
+        username,
+        fullName:     fullName || username,
+        registeredAt: Date.now()
+      }));
+      return true;
+    }
+
+    /* ── Authenticate with biometric, then redirect ── */
+    async function authBiometric() {
+      const bioCred = getBioCred();
+      if (!bioCred) return;
+
+      const btn = $('btnBio');
+      btn.disabled = true;
+      btn.classList.add('loading');
+
+      try {
+        const challenge    = crypto.getRandomValues(new Uint8Array(32));
+        const credIdBytes  = b642u8(bioCred.credId);
+
+        const assertion = await navigator.credentials.get({
+          publicKey: {
+            challenge,
+            allowCredentials: [{ id: credIdBytes, type: 'public-key' }],
+            userVerification: 'required',
+            timeout: 60000
+          }
+        });
+
+        if (!assertion) throw new Error('No assertion returned');
+
+        // WebAuthn succeeded — check that a session token exists locally
+        const session = getSession();
+        if (!session || !session.token) {
+          // User logged out or session was cleared — biometric cannot issue a new session
+          showErr('loginErr', 'loginErrMsg',
+            'Session expired. Please sign in with your password to continue.');
+          return;
+        }
+
+        // Session token exists — redirect; index.html will validate with server
+        window.location.replace(CFG.ROUTES[session.role] || 'index.html');
+
+      } catch (err) {
+        console.warn('[Biometric]', err.name, err.message);
+
+        if (err.name === 'NotAllowedError') {
+          // User cancelled or timed out — silent, let them use password
+        } else if (err.name === 'InvalidStateError' || err.name === 'NotFoundError') {
+          // Credential was removed from device (e.g. factory reset, new fingerprints enrolled)
+          clearBioCred();
+          btn.classList.remove('visible');
+          $('bioDivider').classList.remove('visible');
+          showErr('loginErr', 'loginErrMsg',
+            'Fingerprint not recognized. Please sign in with your password.');
+        } else {
+          showErr('loginErr', 'loginErrMsg',
+            'Fingerprint failed. Please try again or sign in with your password.');
+        }
+      } finally {
+        btn.disabled = false;
+        btn.classList.remove('loading');
+      }
+    }
+
+    /* ── Show biometric registration overlay ── */
+    function showBioPrompt(username, fullName, redirectUrl) {
+      $('bioOverlay').classList.add('show');
+
+      $('btnEnableBio').onclick = async () => {
+        setLoading('btnEnableBio', true);
+        try {
+          await registerBiometric(username, fullName);
+          // Registered (or failed silently) — always redirect after
+        } catch (err) {
+          // User cancelled WebAuthn create() or device denied — just redirect
+          console.warn('[BioRegister]', err.name, err.message);
+        } finally {
+          window.location.replace(redirectUrl);
+        }
+      };
+
+      $('btnSkipBio').onclick = () => {
+        localStorage.setItem(CFG.BIO_SKIP_KEY, '1'); // don't ask again
+        window.location.replace(redirectUrl);
+      };
+    }
+
+    /* ── On page load: show fingerprint button if credential exists ── */
+    async function checkBiometricOnLoad() {
+      const bioCred = getBioCred();
+      if (!bioCred) return;
+
+      const available = await isBiometricAvailable();
+      if (!available) return;
+
+      // Show button with stored user's display name
+      const displayName = bioCred.fullName || bioCred.username;
+      $('bioLabel').textContent = 'Continue as ' + displayName;
+      $('bioDivider').classList.add('visible');
+      $('btnBio').classList.add('visible');
+    }
+
+    /* ════════════════════════════════════════════════
+       Login flow
+    ════════════════════════════════════════════════ */
+    async function handleLogin() {
+      const username  = $('username').value.trim();
+      const password  = $('password').value;
+      const rememberMe = $('rememberMe').checked;
+
+      hideAll('loginErr');
+      $('contactHint').classList.remove('show');
+
+      if (!username) { showErr('loginErr', 'loginErrMsg', 'Username is required.');  return; }
+      if (!password) { showErr('loginErr', 'loginErrMsg', 'Password is required.');  return; }
+
+      setLoading('btnLogin', true);
+      try {
+        const result = await apiCall({ action: 'login', username, password, rememberMe });
+
+        if (result.success) {
+          if (result.forcePasswordChange) {
+            // Must change password before entering app
+            window.__tempLogin = { result, rememberMe, username, password };
+            showChangePassScreen();
+          } else {
+            saveSession(result, rememberMe);
+            const redirectUrl = CFG.ROUTES[result.role] || 'index.html';
+
+            // Offer biometric registration if: device supports it, not yet registered, not skipped
+            const bioAvailable = await isBiometricAvailable();
+            const hasCred      = getBioCred();
+            const bioSkipped   = localStorage.getItem(CFG.BIO_SKIP_KEY);
+
+            if (bioAvailable && !hasCred && !bioSkipped) {
+              showBioPrompt(result.username, result.fullName, redirectUrl);
+            } else {
+              window.location.replace(redirectUrl);
+            }
+          }
+        } else {
+          showErr('loginErr', 'loginErrMsg', result.message || 'Invalid username or password.');
           $('contactHint').classList.add('show');
         }
-      }catch(err){console.error('[Login]',err);showErr('loginErr','loginErrMsg','Could not connect. Check your internet and try again.');}
-      finally{setLoading('btnLogin',false);}
+      } catch (err) {
+        console.error('[Login]', err);
+        showErr('loginErr', 'loginErrMsg', 'Could not connect. Check your internet and try again.');
+      } finally {
+        setLoading('btnLogin', false);
+      }
     }
-    function showChangePassScreen(){$('screenLogin').classList.add('hidden');$('screenChangePass').classList.remove('hidden');$('newPass').focus();}
-    async function handleChangePass(){
-      const newPass=$('newPass').value,confirmPass=$('confirmPass').value;
-      hideAll('cpErr','cpOk');
-      if(newPass.length<8){showErr('cpErr','cpErrMsg','Password must be at least 8 characters.');return;}
-      if(newPass!==confirmPass){showErr('cpErr','cpErrMsg','Passwords do not match.');return;}
-      setLoading('btnChangePass',true);
-      try{
-        const tmp=window.__tempLogin;
-        const result=await apiCall({action:'changePassword',username:tmp.username,currentPassword:tmp.password,newPassword:newPass});
-        if(result.success){$('cpOk').classList.add('show');saveSession(tmp.result,tmp.rememberMe);setTimeout(()=>{window.location.replace(CFG.ROUTES[tmp.result.role]||'index.html');},1500);}
-        else showErr('cpErr','cpErrMsg',result.message||'Failed to update password.');
-      }catch(err){console.error('[ChangePass]',err);showErr('cpErr','cpErrMsg','Connection failed. Try again.');}
-      finally{setLoading('btnChangePass',false);}
+
+    function showChangePassScreen() {
+      $('screenLogin').classList.add('hidden');
+      $('screenChangePass').classList.remove('hidden');
+      $('newPass').focus();
     }
-    $('btnLogin').addEventListener('click',handleLogin);
-    $('btnChangePass').addEventListener('click',handleChangePass);
-    ['username','password'].forEach(id=>{$(id).addEventListener('keydown',e=>{if(e.key==='Enter')handleLogin();});});
-    ['newPass','confirmPass'].forEach(id=>{$(id).addEventListener('keydown',e=>{if(e.key==='Enter')handleChangePass();});});
-    // Hide error + contact hint on input
-    ['username','password'].forEach(id=>{$(id).addEventListener('input',()=>{hideAll('loginErr');$('contactHint').classList.remove('show');});});
-    ['newPass','confirmPass'].forEach(id=>{$(id).addEventListener('input',()=>hideAll('cpErr'));});
+
+    /* ── Force password change flow ── */
+    async function handleChangePass() {
+      const newPass     = $('newPass').value;
+      const confirmPass = $('confirmPass').value;
+      hideAll('cpErr', 'cpOk');
+
+      if (newPass.length < 8) { showErr('cpErr', 'cpErrMsg', 'Password must be at least 8 characters.'); return; }
+      if (newPass !== confirmPass) { showErr('cpErr', 'cpErrMsg', 'Passwords do not match.'); return; }
+
+      setLoading('btnChangePass', true);
+      try {
+        const tmp    = window.__tempLogin;
+        const result = await apiCall({
+          action:          'changePassword',
+          username:        tmp.username,
+          currentPassword: tmp.password,
+          newPassword:     newPass
+        });
+
+        if (result.success) {
+          $('cpOk').classList.add('show');
+          saveSession(tmp.result, tmp.rememberMe);
+          const redirectUrl = CFG.ROUTES[tmp.result.role] || 'index.html';
+
+          // Offer biometric after forced password change too
+          const bioAvailable = await isBiometricAvailable();
+          const hasCred      = getBioCred();
+          const bioSkipped   = localStorage.getItem(CFG.BIO_SKIP_KEY);
+
+          if (bioAvailable && !hasCred && !bioSkipped) {
+            setTimeout(() => showBioPrompt(tmp.username, tmp.result.fullName, redirectUrl), 1200);
+          } else {
+            setTimeout(() => window.location.replace(redirectUrl), 1500);
+          }
+        } else {
+          showErr('cpErr', 'cpErrMsg', result.message || 'Failed to update password.');
+        }
+      } catch (err) {
+        console.error('[ChangePass]', err);
+        showErr('cpErr', 'cpErrMsg', 'Connection failed. Try again.');
+      } finally {
+        setLoading('btnChangePass', false);
+      }
+    }
+
+    /* ── Event listeners ── */
+    $('btnLogin').addEventListener('click', handleLogin);
+    $('btnChangePass').addEventListener('click', handleChangePass);
+    $('btnBio').addEventListener('click', authBiometric);
+
+    ['username', 'password'].forEach(id => {
+      $(id).addEventListener('keydown', e => { if (e.key === 'Enter') handleLogin(); });
+      $(id).addEventListener('input',   () => { hideAll('loginErr'); $('contactHint').classList.remove('show'); });
+    });
+    ['newPass', 'confirmPass'].forEach(id => {
+      $(id).addEventListener('keydown', e => { if (e.key === 'Enter') handleChangePass(); });
+      $(id).addEventListener('input',   () => hideAll('cpErr'));
+    });
+
+    /* ── Init ── */
+    checkBiometricOnLoad();
   </script>
 </body>
 </html>
