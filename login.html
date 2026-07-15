@@ -6,583 +6,130 @@
   <meta name="theme-color" id="themeColor" content="#0052B4">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <title>A&amp;N Electricity — Login</title>
-
-  <!-- PWA Manifest -->
+  <title>A&N Electricity \u2014 Login</title>
   <link rel="manifest" href="./manifest.json">
-
-  <!-- Google Fonts: Poppins (display) + Roboto (body) -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
-  <!-- Material Icons -->
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
-
   <style>
-    /* ══════════════════════════════════════════
-       THEME VARIABLES
-    ══════════════════════════════════════════ */
-    :root {
-      /* Brand */
-      --primary:        #0052B4;
-      --primary-light:  #1976D2;
-      --primary-dark:   #003A82;
-      --accent:         #FFC107;
-
-      /* Light mode */
-      --bg:             #EEF2F7;
-      --card:           #FFFFFF;
-      --card-border:    #D1DCF0;
-      --text-1:         #1A1A2E;
-      --text-2:         #5A6A85;
-      --inp-bg:         #F4F7FF;
-      --inp-border:     #C5D0E8;
-      --inp-focus:      #0052B4;
-      --icon-clr:       #8096B2;
-      --theme-btn-bg:   #E8EEFA;
-      --theme-btn-clr:  #0052B4;
-      --shadow:         0 8px 32px rgba(0,82,180,0.13);
-      --err:            #D32F2F;
-      --err-bg:         rgba(211,47,47,0.08);
-      --err-border:     rgba(211,47,47,0.2);
-      --ok:             #2E7D32;
-      --ok-bg:          rgba(46,125,50,0.08);
-      --ok-border:      rgba(46,125,50,0.2);
-
-      /* Fonts */
-      --ff-display: 'Poppins', sans-serif;
-      --ff-body:    'Roboto', sans-serif;
-
-      /* Motion */
-      --ease: 0.28s ease;
-    }
-
-    [data-theme="dark"] {
-      --bg:             #080F1E;
-      --card:           #0D1D36;
-      --card-border:    #162A4A;
-      --text-1:         #E8F0FE;
-      --text-2:         #7A99CC;
-      --inp-bg:         #081428;
-      --inp-border:     #162A4A;
-      --inp-focus:      #4D91FF;
-      --icon-clr:       #4A6A99;
-      --theme-btn-bg:   #162A4A;
-      --theme-btn-clr:  #4D91FF;
-      --shadow:         0 8px 40px rgba(0,0,0,0.45);
-      --err:            #EF5350;
-      --err-bg:         rgba(239,83,80,0.1);
-      --err-border:     rgba(239,83,80,0.25);
-      --ok:             #66BB6A;
-      --ok-bg:          rgba(102,187,106,0.1);
-      --ok-border:      rgba(102,187,106,0.25);
-    }
-
-    /* ══════════════════════════════════════════
-       RESET
-    ══════════════════════════════════════════ */
-    *, *::before, *::after {
-      margin: 0; padding: 0;
-      box-sizing: border-box;
-      -webkit-tap-highlight-color: transparent;
-    }
-
-    body {
-      font-family: var(--ff-body);
-      background: var(--bg);
-      color: var(--text-1);
-      min-height: 100vh;
-      min-height: 100dvh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 1.25rem 1rem;
-      transition: background var(--ease), color var(--ease);
-      position: relative;
-      overflow-x: hidden;
-    }
-
-    /* Ambient glow bg */
-    body::before {
-      content: '';
-      position: fixed; inset: 0;
-      background:
-        radial-gradient(ellipse 60% 40% at 15% 15%, rgba(0,82,180,0.09) 0%, transparent 60%),
-        radial-gradient(ellipse 50% 40% at 85% 85%, rgba(255,193,7,0.06) 0%, transparent 55%);
-      pointer-events: none;
-      z-index: 0;
-    }
-    [data-theme="dark"] body::before {
-      background:
-        radial-gradient(ellipse 60% 40% at 15% 15%, rgba(0,82,180,0.22) 0%, transparent 60%),
-        radial-gradient(ellipse 50% 40% at 85% 85%, rgba(255,193,7,0.07) 0%, transparent 55%);
-    }
-
-    /* ══════════════════════════════════════════
-       THEME TOGGLE BUTTON
-    ══════════════════════════════════════════ */
-    #themeToggle {
-      position: fixed;
-      top: 0.875rem; right: 0.875rem;
-      z-index: 99;
-      width: 44px; height: 44px;
-      border-radius: 50%;
-      border: none;
-      background: var(--theme-btn-bg);
-      color: var(--theme-btn-clr);
-      cursor: pointer;
-      display: flex; align-items: center; justify-content: center;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.14);
-      transition: background var(--ease), color var(--ease), transform 0.15s;
-    }
-    #themeToggle:active { transform: scale(0.9); }
-    #themeToggle .material-icons-round { font-size: 21px; }
-
-    /* ══════════════════════════════════════════
-       WRAPPER
-    ══════════════════════════════════════════ */
-    .wrap {
-      width: 100%;
-      max-width: 390px;
-      position: relative;
-      z-index: 1;
-      animation: fadeUp 0.4s ease both;
-    }
-
-    @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(22px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
-
-    /* ══════════════════════════════════════════
-       LOGO SECTION
-    ══════════════════════════════════════════ */
-    .logo-area {
-      text-align: center;
-      margin-bottom: 1.5rem;
-    }
-
-    .logo-box {
-      width: 72px; height: 72px;
-      background: linear-gradient(140deg, var(--primary-dark) 0%, var(--primary-light) 100%);
-      border-radius: 20px;
-      display: inline-flex;
-      align-items: center; justify-content: center;
-      box-shadow: 0 8px 24px rgba(0,82,180,0.32);
-      position: relative;
-      overflow: hidden;
-    }
-
-    /* Shine sweep on logo */
-    .logo-box::after {
-      content: '';
-      position: absolute;
-      top: 0; left: -120%;
-      width: 55%; height: 100%;
-      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.18), transparent);
-      animation: logoShine 3.5s ease infinite;
-    }
-    @keyframes logoShine {
-      0%   { left: -120%; }
-      45%, 100% { left: 220%; }
-    }
-
-    .logo-box .material-icons-round {
-      font-size: 38px;
-      color: var(--accent);
-      position: relative;
-      z-index: 1;
-    }
-
-    .logo-name {
-      font-family: var(--ff-display);
-      font-size: 1.2rem;
-      font-weight: 700;
-      color: var(--text-1);
-      letter-spacing: -0.02em;
-      margin-top: 0.75rem;
-    }
-
-    .logo-sub {
-      font-size: 0.75rem;
-      color: var(--text-2);
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      margin-top: 0.2rem;
-    }
-
-    /* ══════════════════════════════════════════
-       CARD
-    ══════════════════════════════════════════ */
-    .card {
-      background: var(--card);
-      border: 1.5px solid var(--card-border);
-      border-radius: 24px;
-      padding: 1.75rem 1.5rem 1.5rem;
-      box-shadow: var(--shadow);
-      position: relative;
-      overflow: hidden;
-      transition: background var(--ease), border-color var(--ease), box-shadow var(--ease);
-    }
-
-    /* ── Signature element: animated electric pulse line ── */
-    .pulse-line {
-      position: absolute;
-      top: 0; left: 0; right: 0;
-      height: 3px;
-      background: linear-gradient(90deg,
-        transparent 0%,
-        var(--primary) 20%,
-        var(--accent) 50%,
-        var(--primary) 80%,
-        transparent 100%);
-      background-size: 250% 100%;
-      animation: pulseFlow 2.8s ease-in-out infinite;
-    }
-    @keyframes pulseFlow {
-      0%   { background-position: 200% 0; opacity: 0.6; }
-      50%  { opacity: 1; }
-      100% { background-position: -200% 0; opacity: 0.6; }
-    }
-
-    .card-title {
-      font-family: var(--ff-display);
-      font-size: 1.25rem;
-      font-weight: 600;
-      color: var(--text-1);
-      margin-bottom: 0.25rem;
-    }
-
-    .card-sub {
-      font-size: 0.83rem;
-      color: var(--text-2);
-      margin-bottom: 1.5rem;
-    }
-
-    /* ══════════════════════════════════════════
-       SCREENS (login vs change-pass)
-    ══════════════════════════════════════════ */
-    .screen { display: block; }
-    .screen.hidden { display: none; }
-
-    /* ══════════════════════════════════════════
-       ALERT BANNER
-    ══════════════════════════════════════════ */
-    .alert {
-      display: none;
-      align-items: flex-start;
-      gap: 0.5rem;
-      padding: 0.7rem 0.875rem;
-      border-radius: 10px;
-      font-size: 0.83rem;
-      line-height: 1.45;
-      margin-bottom: 1rem;
-      border: 1px solid;
-    }
-    .alert.show { display: flex; }
-    .alert .material-icons-round { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
-
-    .alert-err {
-      background: var(--err-bg);
-      color: var(--err);
-      border-color: var(--err-border);
-    }
-    .alert-ok {
-      background: var(--ok-bg);
-      color: var(--ok);
-      border-color: var(--ok-border);
-    }
-
-    /* ══════════════════════════════════════════
-       FORM INPUTS
-    ══════════════════════════════════════════ */
-    .field { margin-bottom: 0.95rem; }
-
-    .field-label {
-      display: block;
-      font-size: 0.78rem;
-      font-weight: 500;
-      color: var(--text-2);
-      letter-spacing: 0.03em;
-      margin-bottom: 0.35rem;
-    }
-
-    .inp-wrap {
-      position: relative;
-      display: flex;
-      align-items: center;
-    }
-
-    .inp-icon {
-      position: absolute;
-      left: 0.85rem;
-      color: var(--icon-clr);
-      font-size: 20px !important;
-      pointer-events: none;
-      transition: color var(--ease);
-    }
-
-    .inp-wrap:focus-within .inp-icon { color: var(--inp-focus); }
-
-    .inp {
-      width: 100%;
-      height: 50px;
-      background: var(--inp-bg);
-      border: 1.5px solid var(--inp-border);
-      border-radius: 12px;
-      padding: 0 3rem 0 2.85rem;
-      font-family: var(--ff-body);
-      font-size: 0.95rem;
-      color: var(--text-1);
-      outline: none;
-      transition: border-color var(--ease), background var(--ease), box-shadow var(--ease);
-      -webkit-appearance: none;
-    }
-
-    .inp::placeholder { color: var(--icon-clr); font-size: 0.875rem; }
-
-    .inp:focus {
-      border-color: var(--inp-focus);
-      background: var(--card);
-      box-shadow: 0 0 0 3px rgba(0,82,180,0.1);
-    }
-    [data-theme="dark"] .inp:focus {
-      box-shadow: 0 0 0 3px rgba(77,145,255,0.14);
-    }
-
-    .btn-eye {
-      position: absolute;
-      right: 0.6rem;
-      background: none; border: none;
-      cursor: pointer;
-      color: var(--icon-clr);
-      padding: 0.4rem;
-      border-radius: 8px;
-      display: flex; align-items: center;
-      transition: color var(--ease);
-    }
-    .btn-eye:active { color: var(--inp-focus); }
-    .btn-eye .material-icons-round { font-size: 20px; }
-
-    /* ══════════════════════════════════════════
-       REMEMBER ME TOGGLE
-    ══════════════════════════════════════════ */
-    .options-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin: 1.1rem 0 1.35rem;
-    }
-
-    .remember-label {
-      display: flex; align-items: center; gap: 0.55rem;
-      cursor: pointer; user-select: none;
-    }
-
-    /* Hidden real checkbox */
-    #rememberMe { display: none; }
-
-    /* Pill track */
-    .toggle-track {
-      width: 42px; height: 24px;
-      background: var(--inp-border);
-      border-radius: 12px;
-      position: relative;
-      flex-shrink: 0;
-      transition: background var(--ease);
-    }
-
-    /* Thumb */
-    .toggle-track::after {
-      content: '';
-      position: absolute;
-      top: 4px; left: 4px;
-      width: 16px; height: 16px;
-      background: #fff;
-      border-radius: 50%;
-      box-shadow: 0 1px 4px rgba(0,0,0,0.22);
-      transition: transform var(--ease);
-    }
-
-    /* Checked state */
-    #rememberMe:checked + .toggle-track {
-      background: var(--primary);
-    }
-    [data-theme="dark"] #rememberMe:checked + .toggle-track {
-      background: #4D91FF;
-    }
-    #rememberMe:checked + .toggle-track::after {
-      transform: translateX(18px);
-    }
-
-    .remember-text {
-      font-size: 0.85rem;
-      color: var(--text-2);
-    }
-
-    /* ══════════════════════════════════════════
-       PRIMARY BUTTON
-    ══════════════════════════════════════════ */
-    .btn-primary {
-      width: 100%;
-      height: 52px;
-      background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary-light) 100%);
-      color: #fff;
-      border: none;
-      border-radius: 14px;
-      font-family: var(--ff-display);
-      font-size: 0.975rem;
-      font-weight: 600;
-      letter-spacing: 0.02em;
-      cursor: pointer;
-      display: flex; align-items: center; justify-content: center;
-      gap: 0.45rem;
-      box-shadow: 0 4px 18px rgba(0,82,180,0.38);
-      transition: transform 0.15s, box-shadow 0.15s, opacity var(--ease);
-      position: relative;
-      overflow: hidden;
-    }
-
-    /* Shimmer hover */
-    .btn-primary::before {
-      content: '';
-      position: absolute;
-      top: 0; left: -110%;
-      width: 55%; height: 100%;
-      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.14), transparent);
-      transition: left 0.5s ease;
-    }
-    .btn-primary:hover::before  { left: 160%; }
-
-    .btn-primary:active         { transform: scale(0.975); box-shadow: 0 2px 10px rgba(0,82,180,0.3); }
-    .btn-primary:disabled       { opacity: 0.65; cursor: not-allowed; transform: none; }
-    .btn-primary .material-icons-round { font-size: 20px; }
-
-    /* Spinner (inside button) */
-    .spin {
-      display: none;
-      width: 20px; height: 20px;
-      border: 2.5px solid rgba(255,255,255,0.3);
-      border-top-color: #fff;
-      border-radius: 50%;
-      animation: spin 0.65s linear infinite;
-    }
-    .btn-primary.loading .spin       { display: block; }
-    .btn-primary.loading .btn-lbl    { display: none; }
-    .btn-primary.loading .material-icons-round { display: none; }
-
-    @keyframes spin { to { transform: rotate(360deg); } }
-
-    /* ══════════════════════════════════════════
-       FOOTER
-    ══════════════════════════════════════════ */
-    .footer {
-      text-align: center;
-      margin-top: 1.5rem;
-      font-size: 0.78rem;
-      color: var(--text-2);
-      line-height: 1.6;
-    }
-    .footer strong {
-      color: var(--primary);
-      font-weight: 500;
-    }
-    [data-theme="dark"] .footer strong { color: #4D91FF; }
-
-    .ver-tag {
-      position: fixed;
-      bottom: 0.65rem;
-      left: 50%;
-      transform: translateX(-50%);
-      font-size: 0.7rem;
-      color: var(--text-2);
-      opacity: 0.45;
-      z-index: 1;
-      white-space: nowrap;
-    }
-
-    /* ══════════════════════════════════════════
-       RESPONSIVE TWEAKS
-    ══════════════════════════════════════════ */
-    @media (max-width: 360px) {
-      .card { padding: 1.5rem 1.125rem; }
-      .logo-box { width: 64px; height: 64px; }
-      .logo-box .material-icons-round { font-size: 32px; }
-    }
-
-    @media (min-height: 700px) {
-      .logo-area { margin-bottom: 1.875rem; }
-    }
+    :root{--primary:#0052B4;--primary-light:#1976D2;--primary-dark:#003A82;--accent:#FFC107;--bg:#EEF2F7;--card:#FFFFFF;--card-border:#D1DCF0;--text-1:#1A1A2E;--text-2:#5A6A85;--inp-bg:#F4F7FF;--inp-border:#C5D0E8;--inp-focus:#0052B4;--icon-clr:#8096B2;--theme-btn-bg:#E8EEFA;--theme-btn-clr:#0052B4;--shadow:0 8px 32px rgba(0,82,180,0.13);--err:#D32F2F;--err-bg:rgba(211,47,47,0.08);--err-border:rgba(211,47,47,0.2);--ok:#2E7D32;--ok-bg:rgba(46,125,50,0.08);--ok-border:rgba(46,125,50,0.2);--ff-display:'Poppins',sans-serif;--ff-body:'Roboto',sans-serif;--ease:0.28s ease;}
+    [data-theme="dark"]{--bg:#080F1E;--card:#0D1D36;--card-border:#162A4A;--text-1:#E8F0FE;--text-2:#7A99CC;--inp-bg:#081428;--inp-border:#162A4A;--inp-focus:#4D91FF;--icon-clr:#4A6A99;--theme-btn-bg:#162A4A;--theme-btn-clr:#4D91FF;--shadow:0 8px 40px rgba(0,0,0,0.45);--err:#EF5350;--err-bg:rgba(239,83,80,0.1);--err-border:rgba(239,83,80,0.25);--ok:#66BB6A;--ok-bg:rgba(102,187,106,0.1);--ok-border:rgba(102,187,106,0.25);}
+    *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+    body{font-family:var(--ff-body);background:var(--bg);color:var(--text-1);min-height:100vh;min-height:100dvh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:1.25rem 1rem;transition:background var(--ease),color var(--ease);position:relative;overflow-x:hidden;}
+    body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 60% 40% at 15% 15%,rgba(0,82,180,0.09) 0%,transparent 60%),radial-gradient(ellipse 50% 40% at 85% 85%,rgba(255,193,7,0.06) 0%,transparent 55%);pointer-events:none;z-index:0;}
+    [data-theme="dark"] body::before{background:radial-gradient(ellipse 60% 40% at 15% 15%,rgba(0,82,180,0.22) 0%,transparent 60%),radial-gradient(ellipse 50% 40% at 85% 85%,rgba(255,193,7,0.07) 0%,transparent 55%);}
+    #themeToggle{position:fixed;top:.875rem;right:.875rem;z-index:99;width:44px;height:44px;border-radius:50%;border:none;background:var(--theme-btn-bg);color:var(--theme-btn-clr);cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 10px rgba(0,0,0,.14);transition:background var(--ease),color var(--ease),transform 0.15s;}
+    #themeToggle:active{transform:scale(0.9);}
+    #themeToggle .material-icons-round{font-size:21px;}
+    .wrap{width:100%;max-width:390px;position:relative;z-index:1;animation:fadeUp .4s ease both;}
+    @keyframes fadeUp{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:translateY(0)}}
+    .logo-area{text-align:center;margin-bottom:1.5rem;}
+    .logo-box{width:72px;height:72px;background:linear-gradient(140deg,var(--primary-dark) 0%,var(--primary-light) 100%);border-radius:20px;display:inline-flex;align-items:center;justify-content:center;box-shadow:0 8px 24px rgba(0,82,180,.32);position:relative;overflow:hidden;}
+    .logo-box::after{content:'';position:absolute;top:0;left:-120%;width:55%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.18),transparent);animation:logoShine 3.5s ease infinite;}
+    @keyframes logoShine{0%{left:-120%}45%,100%{left:220%}}
+    .logo-box .material-icons-round{font-size:38px;color:var(--accent);position:relative;z-index:1;}
+    .logo-name{font-family:var(--ff-display);font-size:1.2rem;font-weight:700;color:var(--text-1);letter-spacing:-.02em;margin-top:.75rem;}
+    .logo-sub{font-size:.75rem;color:var(--text-2);letter-spacing:.08em;text-transform:uppercase;margin-top:.2rem;}
+    .card{background:var(--card);border:1.5px solid var(--card-border);border-radius:24px;padding:1.75rem 1.5rem 1.5rem;box-shadow:var(--shadow);position:relative;overflow:hidden;transition:background var(--ease),border-color var(--ease),box-shadow var(--ease);}
+    .pulse-line{position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,transparent 0%,var(--primary) 20%,var(--accent) 50%,var(--primary) 80%,transparent 100%);background-size:250% 100%;animation:pulseFlow 2.8s ease-in-out infinite;}
+    @keyframes pulseFlow{0%{background-position:200% 0;opacity:.6}50%{opacity:1}100%{background-position:-200% 0;opacity:.6}}
+    .card-title{font-family:var(--ff-display);font-size:1.25rem;font-weight:600;color:var(--text-1);margin-bottom:.25rem;}
+    .card-sub{font-size:.83rem;color:var(--text-2);margin-bottom:1.5rem;}
+    .screen{display:block}
+    .screen.hidden{display:none}
+    .alert{display:none;align-items:flex-start;gap:.5rem;padding:.7rem .875rem;border-radius:10px;font-size:.83rem;line-height:1.45;margin-bottom:.75rem;border:1px solid;}
+    .alert.show{display:flex}
+    .alert .material-icons-round{font-size:18px;flex-shrink:0;margin-top:1px;}
+    .alert-err{background:var(--err-bg);color:var(--err);border-color:var(--err-border);}
+    .alert-ok{background:var(--ok-bg);color:var(--ok);border-color:var(--ok-border);}
+    /* Contact Admin hint */
+    .contact-hint{display:none;align-items:flex-start;gap:.5rem;padding:.6rem .875rem;border-radius:10px;font-size:.8rem;line-height:1.5;margin-bottom:.75rem;background:rgba(0,82,180,.07);color:var(--text-2);border:1px solid rgba(0,82,180,.15);}
+    .contact-hint.show{display:flex}
+    .contact-hint .material-icons-round{font-size:16px;flex-shrink:0;margin-top:1px;color:var(--primary);}
+    [data-theme="dark"] .contact-hint{background:rgba(77,145,255,.08);border-color:rgba(77,145,255,.2);}
+    .field{margin-bottom:.95rem;}
+    .field-label{display:block;font-size:.78rem;font-weight:500;color:var(--text-2);letter-spacing:.03em;margin-bottom:.35rem;}
+    .inp-wrap{position:relative;display:flex;align-items:center;}
+    .inp-icon{position:absolute;left:.85rem;color:var(--icon-clr);font-size:20px!important;pointer-events:none;transition:color var(--ease);}
+    .inp-wrap:focus-within .inp-icon{color:var(--inp-focus);}
+    .inp{width:100%;height:50px;background:var(--inp-bg);border:1.5px solid var(--inp-border);border-radius:12px;padding:0 3rem 0 2.85rem;font-family:var(--ff-body);font-size:.95rem;color:var(--text-1);outline:none;transition:border-color var(--ease),background var(--ease),box-shadow var(--ease);-webkit-appearance:none;}
+    .inp::placeholder{color:var(--icon-clr);font-size:.875rem;}
+    .inp:focus{border-color:var(--inp-focus);background:var(--card);box-shadow:0 0 0 3px rgba(0,82,180,.1);}
+    [data-theme="dark"] .inp:focus{box-shadow:0 0 0 3px rgba(77,145,255,.14);}
+    .btn-eye{position:absolute;right:.6rem;background:none;border:none;cursor:pointer;color:var(--icon-clr);padding:.4rem;border-radius:8px;display:flex;align-items:center;transition:color var(--ease);}
+    .btn-eye:active{color:var(--inp-focus);}
+    .btn-eye .material-icons-round{font-size:20px;}
+    .options-row{display:flex;align-items:center;justify-content:space-between;margin:1.1rem 0 1.35rem;}
+    .remember-label{display:flex;align-items:center;gap:.55rem;cursor:pointer;user-select:none;}
+    #rememberMe{display:none;}
+    .toggle-track{width:42px;height:24px;background:var(--inp-border);border-radius:12px;position:relative;flex-shrink:0;transition:background var(--ease);}
+    .toggle-track::after{content:'';position:absolute;top:4px;left:4px;width:16px;height:16px;background:#fff;border-radius:50%;box-shadow:0 1px 4px rgba(0,0,0,.22);transition:transform var(--ease);}
+    #rememberMe:checked + .toggle-track{background:var(--primary);}
+    [data-theme="dark"] #rememberMe:checked + .toggle-track{background:#4D91FF;}
+    #rememberMe:checked + .toggle-track::after{transform:translateX(18px);}
+    .remember-text{font-size:.85rem;color:var(--text-2);}
+    .btn-primary{width:100%;height:52px;background:linear-gradient(135deg,var(--primary-dark) 0%,var(--primary-light) 100%);color:#fff;border:none;border-radius:14px;font-family:var(--ff-display);font-size:.975rem;font-weight:600;letter-spacing:.02em;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:.45rem;box-shadow:0 4px 18px rgba(0,82,180,.38);transition:transform .15s,box-shadow .15s,opacity var(--ease);position:relative;overflow:hidden;}
+    .btn-primary::before{content:'';position:absolute;top:0;left:-110%;width:55%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.14),transparent);transition:left .5s ease;}
+    .btn-primary:hover::before{left:160%;}
+    .btn-primary:active{transform:scale(.975);box-shadow:0 2px 10px rgba(0,82,180,.3);}
+    .btn-primary:disabled{opacity:.65;cursor:not-allowed;transform:none;}
+    .btn-primary .material-icons-round{font-size:20px;}
+    .spin{display:none;width:20px;height:20px;border:2.5px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .65s linear infinite;}
+    .btn-primary.loading .spin{display:block;}
+    .btn-primary.loading .btn-lbl{display:none;}
+    .btn-primary.loading .material-icons-round{display:none;}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    .footer{text-align:center;margin-top:1.5rem;font-size:.78rem;color:var(--text-2);line-height:1.6;}
+    .footer strong{color:var(--primary);font-weight:500;}
+    [data-theme="dark"] .footer strong{color:#4D91FF;}
+    .ver-tag{position:fixed;bottom:.65rem;left:50%;transform:translateX(-50%);font-size:.7rem;color:var(--text-2);opacity:.45;z-index:1;white-space:nowrap;}
+    @media(max-width:360px){.card{padding:1.5rem 1.125rem}.logo-box{width:64px;height:64px}.logo-box .material-icons-round{font-size:32px;}}
+    @media(min-height:700px){.logo-area{margin-bottom:1.875rem;}}
   </style>
 </head>
-
 <body>
-
-  <!-- Theme Toggle -->
   <button id="themeToggle" aria-label="Toggle dark/light mode">
     <span class="material-icons-round" id="themeIcon">light_mode</span>
   </button>
-
   <div class="wrap">
-
-    <!-- Logo -->
     <div class="logo-area">
-      <div class="logo-box">
-        <span class="material-icons-round">bolt</span>
-      </div>
+      <div class="logo-box"><span class="material-icons-round">bolt</span></div>
       <div class="logo-name">A&amp;N Electricity Dept.</div>
       <div class="logo-sub">Consumer Manager</div>
     </div>
-
-    <!-- Card -->
     <div class="card">
       <div class="pulse-line" aria-hidden="true"></div>
-
-      <!-- ── SCREEN 1: LOGIN ── -->
+      <!-- LOGIN SCREEN -->
       <div id="screenLogin" class="screen">
         <div class="card-title">Welcome back</div>
         <div class="card-sub">Sign in to your office account</div>
-
-        <!-- Error alert -->
         <div class="alert alert-err" id="loginErr">
           <span class="material-icons-round">error_outline</span>
           <span id="loginErrMsg">Invalid credentials. Try again.</span>
         </div>
-
-        <!-- Username -->
+        <!-- Contact Admin hint — shown after failed login -->
+        <div class="contact-hint" id="contactHint">
+          <span class="material-icons-round">support_agent</span>
+          Forgot your password? Contact your office Admin to reset it.
+        </div>
         <div class="field">
           <label class="field-label" for="username">Username</label>
           <div class="inp-wrap">
             <span class="material-icons-round inp-icon">person_outline</span>
-            <input
-              class="inp" type="text" id="username"
-              placeholder="Enter your username"
-              autocomplete="username"
-              autocapitalize="none"
-              autocorrect="off"
-              spellcheck="false">
+            <input class="inp" type="text" id="username" placeholder="Enter your username" autocomplete="username" autocapitalize="none" autocorrect="off" spellcheck="false">
           </div>
         </div>
-
-        <!-- Password -->
         <div class="field">
           <label class="field-label" for="password">Password</label>
           <div class="inp-wrap">
             <span class="material-icons-round inp-icon">lock_outline</span>
-            <input
-              class="inp" type="password" id="password"
-              placeholder="Enter your password"
-              autocomplete="current-password">
-            <button class="btn-eye" type="button"
-              onclick="toggleEye('password','eyeIcon1')"
-              aria-label="Show/hide password">
+            <input class="inp" type="password" id="password" placeholder="Enter your password" autocomplete="current-password">
+            <button class="btn-eye" type="button" onclick="toggleEye('password','eyeIcon1')" aria-label="Show/hide password">
               <span class="material-icons-round" id="eyeIcon1">visibility_off</span>
             </button>
           </div>
         </div>
-
-        <!-- Remember Me -->
         <div class="options-row">
           <label class="remember-label" for="rememberMe">
             <input type="checkbox" id="rememberMe">
@@ -590,344 +137,106 @@
             <span class="remember-text">Remember me</span>
           </label>
         </div>
-
-        <!-- Sign In Button -->
         <button class="btn-primary" id="btnLogin" type="button">
           <span class="material-icons-round">login</span>
           <span class="btn-lbl">Sign In</span>
           <div class="spin"></div>
         </button>
-      </div><!-- /screenLogin -->
-
-      <!-- ── SCREEN 2: FORCE CHANGE PASSWORD ── -->
+      </div>
+      <!-- FORCE CHANGE PASSWORD SCREEN -->
       <div id="screenChangePass" class="screen hidden">
         <div class="card-title">Set New Password</div>
         <div class="card-sub">Required before you can continue</div>
-
-        <div class="alert alert-err" id="cpErr">
-          <span class="material-icons-round">error_outline</span>
-          <span id="cpErrMsg">Passwords do not match.</span>
-        </div>
-        <div class="alert alert-ok" id="cpOk">
-          <span class="material-icons-round">check_circle_outline</span>
-          <span>Password updated! Redirecting…</span>
-        </div>
-
-        <!-- New Password -->
+        <div class="alert alert-err" id="cpErr"><span class="material-icons-round">error_outline</span><span id="cpErrMsg">Passwords do not match.</span></div>
+        <div class="alert alert-ok" id="cpOk"><span class="material-icons-round">check_circle_outline</span><span>Password updated! Redirecting&#8230;</span></div>
         <div class="field">
           <label class="field-label" for="newPass">New Password</label>
           <div class="inp-wrap">
             <span class="material-icons-round inp-icon">lock_outline</span>
-            <input class="inp" type="password" id="newPass"
-              placeholder="Minimum 8 characters"
-              autocomplete="new-password">
-            <button class="btn-eye" type="button"
-              onclick="toggleEye('newPass','eyeIcon2')"
-              aria-label="Show/hide password">
-              <span class="material-icons-round" id="eyeIcon2">visibility_off</span>
-            </button>
+            <input class="inp" type="password" id="newPass" placeholder="Minimum 8 characters" autocomplete="new-password">
+            <button class="btn-eye" type="button" onclick="toggleEye('newPass','eyeIcon2')"><span class="material-icons-round" id="eyeIcon2">visibility_off</span></button>
           </div>
         </div>
-
-        <!-- Confirm Password -->
         <div class="field">
           <label class="field-label" for="confirmPass">Confirm Password</label>
           <div class="inp-wrap">
             <span class="material-icons-round inp-icon">lock_reset</span>
-            <input class="inp" type="password" id="confirmPass"
-              placeholder="Re-enter new password"
-              autocomplete="new-password">
-            <button class="btn-eye" type="button"
-              onclick="toggleEye('confirmPass','eyeIcon3')"
-              aria-label="Show/hide password">
-              <span class="material-icons-round" id="eyeIcon3">visibility_off</span>
-            </button>
+            <input class="inp" type="password" id="confirmPass" placeholder="Re-enter new password" autocomplete="new-password">
+            <button class="btn-eye" type="button" onclick="toggleEye('confirmPass','eyeIcon3')"><span class="material-icons-round" id="eyeIcon3">visibility_off</span></button>
           </div>
         </div>
-
         <button class="btn-primary" id="btnChangePass" type="button">
           <span class="material-icons-round">check_circle</span>
           <span class="btn-lbl">Update Password</span>
           <div class="spin"></div>
         </button>
-      </div><!-- /screenChangePass -->
-
-    </div><!-- /card -->
-
-    <!-- Footer -->
-    <div class="footer">
-      Andaman &amp; Nicobar Islands<br>
-      <strong>Electricity Department</strong>
+      </div>
     </div>
-
-  </div><!-- /wrap -->
-
+    <div class="footer">Andaman &amp; Nicobar Islands<br><strong>Electricity Department</strong></div>
+  </div>
   <div class="ver-tag">v1.0 &mdash; AN Electricity</div>
-
-  <!-- ══════════════════════════════════════════
-       JAVASCRIPT
-  ══════════════════════════════════════════ -->
-  <!-- IndexedDB wrapper (needed for offline + SW sync) -->
   <script src="./db.js"></script>
-
   <script>
     'use strict';
-
-    /* ─────────────────────────────────────────
-       CONFIG — update API_URL if redeployed
-    ───────────────────────────────────────── */
-    const CFG = {
-      API_URL: 'https://script.google.com/macros/s/AKfycbyeO7pIZrT1WKPHHuR8LKxhPKgf4uELmkSkIgUefNwT88JdCBiAoTAfgKTyCBKEMmBowQ/exec',
-      SESSION_KEY: 'an_elect_session',
-      THEME_KEY:   'an_elect_theme',
-      // Role → page map
-      ROUTES: {
-        superadmin: 'superadmin.html',
-        admin:      'index.html',
-        employee:   'index.html'
-      }
-    };
-
-    /* ─────────────────────────────────────────
-       ELEMENT REFS
-    ───────────────────────────────────────── */
-    const $ = id => document.getElementById(id);
-
-    /* ─────────────────────────────────────────
-       THEME
-    ───────────────────────────────────────── */
-    const html = document.documentElement;
-
-    function applyTheme(theme) {
-      html.setAttribute('data-theme', theme);
-      $('themeIcon').textContent = theme === 'dark' ? 'dark_mode' : 'light_mode';
-      $('themeColor').content    = theme === 'dark' ? '#0D1D36' : '#0052B4';
-      localStorage.setItem(CFG.THEME_KEY, theme);
-    }
-
-    // Init from saved preference or OS preference
-    const _savedTheme  = localStorage.getItem(CFG.THEME_KEY);
-    const _prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    applyTheme(_savedTheme || (_prefersDark ? 'dark' : 'light'));
-
-    $('themeToggle').addEventListener('click', () => {
-      applyTheme(html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
-    });
-
-    /* ─────────────────────────────────────────
-       SESSION HELPERS
-    ───────────────────────────────────────── */
-    function getSession() {
-      try {
-        const raw = localStorage.getItem(CFG.SESSION_KEY);
-        return raw ? JSON.parse(raw) : null;
-      } catch { return null; }
-    }
-
-    function saveSession(data, rememberMe) {
-      const s = {
-        token:      data.token,
-        role:       data.role,
-        userId:     data.userId,
-        username:   data.username,
-        fullName:   data.fullName,
-        officeId:   data.officeId,
-        officeName: data.officeName,
-        rememberMe: rememberMe,
-        savedAt:    Date.now()
-      };
-      // Save to localStorage (fast reads in main app)
-      localStorage.setItem(CFG.SESSION_KEY, JSON.stringify(s));
-      // Save to IndexedDB (so service worker can access during background sync)
-      AN_DB.saveSession(s);
-      AN_DB.setApiUrl(CFG.API_URL);
-    }
-
-    /* ─────────────────────────────────────────
-       SERVICE WORKER REGISTRATION
-    ───────────────────────────────────────── */
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js')
-          .then(reg => console.log('[App] SW registered:', reg.scope))
-          .catch(err => console.warn('[App] SW registration failed:', err));
-      });
-    }
-
-    /* ─────────────────────────────────────────
-       AUTO-REDIRECT: already logged in?
-    ───────────────────────────────────────── */
-    (function checkSession() {
-      const s = getSession();
-      if (s && s.token) {
-        window.location.replace(CFG.ROUTES[s.role] || 'index.html');
-      }
-    })();
-
-    /* ─────────────────────────────────────────
-       SHOW / HIDE PASSWORD
-    ───────────────────────────────────────── */
-    function toggleEye(inputId, iconId) {
-      const inp  = $(inputId);
-      const icon = $(iconId);
-      const show = inp.type === 'password';
-      inp.type       = show ? 'text' : 'password';
-      icon.textContent = show ? 'visibility' : 'visibility_off';
-    }
-    // expose globally (used in onclick attributes)
-    window.toggleEye = toggleEye;
-
-    /* ─────────────────────────────────────────
-       ALERT HELPERS
-    ───────────────────────────────────────── */
-    function showErr(alertId, msgId, msg) {
-      $(msgId).textContent = msg;
-      $(alertId).classList.add('show');
-    }
-    function hideAll(...ids) {
-      ids.forEach(id => $(id).classList.remove('show'));
-    }
-
-    /* ─────────────────────────────────────────
-       API HELPER
-       Uses text/plain to avoid CORS preflight
-       (required workaround for Apps Script)
-    ───────────────────────────────────────── */
-    async function apiCall(payload) {
-      const res = await fetch(CFG.API_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify(payload),
-        redirect: 'follow'
-      });
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      return await res.json();
-    }
-
-    /* ─────────────────────────────────────────
-       LOADING STATE
-    ───────────────────────────────────────── */
-    function setLoading(btnId, state) {
-      const btn = $(btnId);
-      btn.classList.toggle('loading', state);
-      btn.disabled = state;
-    }
-
-    /* ─────────────────────────────────────────
-       LOGIN HANDLER
-    ───────────────────────────────────────── */
-    async function handleLogin() {
-      const username   = $('username').value.trim();
-      const password   = $('password').value;
-      const rememberMe = $('rememberMe').checked;
-
-      hideAll('loginErr');
-
-      // Client-side validation
-      if (!username) { showErr('loginErr', 'loginErrMsg', 'Username is required.'); return; }
-      if (!password) { showErr('loginErr', 'loginErrMsg', 'Password is required.'); return; }
-
-      setLoading('btnLogin', true);
-
-      try {
-        const result = await apiCall({ action: 'login', username, password, rememberMe });
-
-        if (result.success) {
-          if (result.forcePasswordChange) {
-            // Store temp data for the change-password step
-            window.__tempLogin = { result, rememberMe, username, password };
-            showChangePassScreen();
-          } else {
-            saveSession(result, rememberMe);
-            window.location.replace(CFG.ROUTES[result.role] || 'index.html');
-          }
-        } else {
-          showErr('loginErr', 'loginErrMsg', result.message || 'Invalid username or password.');
+    const CFG={API_URL:'https://script.google.com/macros/s/AKfycbyeO7pIZrT1WKPHHuR8LKxhPKgf4uELmkSkIgUefNwT88JdCBiAoTAfgKTyCBKEMmBowQ/exec',SESSION_KEY:'an_elect_session',THEME_KEY:'an_elect_theme',ROUTES:{superadmin:'superadmin.html',admin:'index.html',employee:'index.html'}};
+    const $=id=>document.getElementById(id);
+    const html=document.documentElement;
+    function applyTheme(theme){html.setAttribute('data-theme',theme);$('themeIcon').textContent=theme==='dark'?'dark_mode':'light_mode';$('themeColor').content=theme==='dark'?'#0D1D36':'#0052B4';localStorage.setItem(CFG.THEME_KEY,theme);}
+    const _savedTheme=localStorage.getItem(CFG.THEME_KEY);
+    const _prefersDark=window.matchMedia('(prefers-color-scheme: dark)').matches;
+    applyTheme(_savedTheme||(_prefersDark?'dark':'light'));
+    $('themeToggle').addEventListener('click',()=>{applyTheme(html.getAttribute('data-theme')==='dark'?'light':'dark');});
+    function getSession(){try{const raw=localStorage.getItem(CFG.SESSION_KEY);return raw?JSON.parse(raw):null;}catch{return null;}}
+    function saveSession(data,rememberMe){const s={token:data.token,role:data.role,userId:data.userId,username:data.username,fullName:data.fullName,officeId:data.officeId,officeName:data.officeName,rememberMe:rememberMe,savedAt:Date.now()};localStorage.setItem(CFG.SESSION_KEY,JSON.stringify(s));AN_DB.saveSession(s);AN_DB.setApiUrl(CFG.API_URL);}
+    if('serviceWorker' in navigator){window.addEventListener('load',()=>{navigator.serviceWorker.register('./sw.js').then(reg=>console.log('[App] SW registered:',reg.scope)).catch(err=>console.warn('[App] SW failed:',err));});}
+    (function checkSession(){const s=getSession();if(s&&s.token){window.location.replace(CFG.ROUTES[s.role]||'index.html');}})();
+    function toggleEye(inputId,iconId){const inp=$(inputId),icon=$(iconId);const show=inp.type==='password';inp.type=show?'text':'password';icon.textContent=show?'visibility':'visibility_off';}
+    window.toggleEye=toggleEye;
+    function showErr(alertId,msgId,msg){$(msgId).textContent=msg;$(alertId).classList.add('show');}
+    function hideAll(...ids){ids.forEach(id=>$(id).classList.remove('show'));}
+    async function apiCall(payload){const res=await fetch(CFG.API_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(payload),redirect:'follow'});if(!res.ok)throw new Error('HTTP '+res.status);return await res.json();}
+    function setLoading(btnId,state){const btn=$(btnId);btn.classList.toggle('loading',state);btn.disabled=state;}
+    async function handleLogin(){
+      const username=$('username').value.trim(),password=$('password').value,rememberMe=$('rememberMe').checked;
+      hideAll('loginErr');$('contactHint').classList.remove('show');
+      if(!username){showErr('loginErr','loginErrMsg','Username is required.');return;}
+      if(!password){showErr('loginErr','loginErrMsg','Password is required.');return;}
+      setLoading('btnLogin',true);
+      try{
+        const result=await apiCall({action:'login',username,password,rememberMe});
+        if(result.success){
+          if(result.forcePasswordChange){window.__tempLogin={result,rememberMe,username,password};showChangePassScreen();}
+          else{saveSession(result,rememberMe);window.location.replace(CFG.ROUTES[result.role]||'index.html');}
+        }else{
+          showErr('loginErr','loginErrMsg',result.message||'Invalid username or password.');
+          // Show contact admin hint after failed login
+          $('contactHint').classList.add('show');
         }
-
-      } catch (err) {
-        console.error('[Login]', err);
-        showErr('loginErr', 'loginErrMsg',
-          'Could not connect. Check your internet and try again.');
-      } finally {
-        setLoading('btnLogin', false);
-      }
+      }catch(err){console.error('[Login]',err);showErr('loginErr','loginErrMsg','Could not connect. Check your internet and try again.');}
+      finally{setLoading('btnLogin',false);}
     }
-
-    /* ─────────────────────────────────────────
-       FORCE CHANGE PASSWORD HANDLER
-    ───────────────────────────────────────── */
-    function showChangePassScreen() {
-      $('screenLogin').classList.add('hidden');
-      $('screenChangePass').classList.remove('hidden');
-      $('newPass').focus();
+    function showChangePassScreen(){$('screenLogin').classList.add('hidden');$('screenChangePass').classList.remove('hidden');$('newPass').focus();}
+    async function handleChangePass(){
+      const newPass=$('newPass').value,confirmPass=$('confirmPass').value;
+      hideAll('cpErr','cpOk');
+      if(newPass.length<8){showErr('cpErr','cpErrMsg','Password must be at least 8 characters.');return;}
+      if(newPass!==confirmPass){showErr('cpErr','cpErrMsg','Passwords do not match.');return;}
+      setLoading('btnChangePass',true);
+      try{
+        const tmp=window.__tempLogin;
+        const result=await apiCall({action:'changePassword',username:tmp.username,currentPassword:tmp.password,newPassword:newPass});
+        if(result.success){$('cpOk').classList.add('show');saveSession(tmp.result,tmp.rememberMe);setTimeout(()=>{window.location.replace(CFG.ROUTES[tmp.result.role]||'index.html');},1500);}
+        else showErr('cpErr','cpErrMsg',result.message||'Failed to update password.');
+      }catch(err){console.error('[ChangePass]',err);showErr('cpErr','cpErrMsg','Connection failed. Try again.');}
+      finally{setLoading('btnChangePass',false);}
     }
-
-    async function handleChangePass() {
-      const newPass     = $('newPass').value;
-      const confirmPass = $('confirmPass').value;
-
-      hideAll('cpErr', 'cpOk');
-
-      // Validation
-      if (newPass.length < 8) {
-        showErr('cpErr', 'cpErrMsg', 'Password must be at least 8 characters.'); return;
-      }
-      if (newPass !== confirmPass) {
-        showErr('cpErr', 'cpErrMsg', 'Passwords do not match.'); return;
-      }
-
-      setLoading('btnChangePass', true);
-
-      try {
-        const tmp    = window.__tempLogin;
-        const result = await apiCall({
-          action:          'changePassword',
-          username:        tmp.username,
-          currentPassword: tmp.password,
-          newPassword:     newPass
-        });
-
-        if (result.success) {
-          $('cpOk').classList.add('show');
-          // Use the original login result's session data
-          saveSession(tmp.result, tmp.rememberMe);
-          setTimeout(() => {
-            window.location.replace(CFG.ROUTES[tmp.result.role] || 'index.html');
-          }, 1500);
-        } else {
-          showErr('cpErr', 'cpErrMsg', result.message || 'Failed to update password.');
-        }
-
-      } catch (err) {
-        console.error('[ChangePass]', err);
-        showErr('cpErr', 'cpErrMsg', 'Connection failed. Try again.');
-      } finally {
-        setLoading('btnChangePass', false);
-      }
-    }
-
-    /* ─────────────────────────────────────────
-       EVENT LISTENERS
-    ───────────────────────────────────────── */
-    $('btnLogin').addEventListener('click', handleLogin);
-    $('btnChangePass').addEventListener('click', handleChangePass);
-
-    // Enter key support
-    ['username', 'password'].forEach(id => {
-      $(id).addEventListener('keydown', e => { if (e.key === 'Enter') handleLogin(); });
-    });
-    ['newPass', 'confirmPass'].forEach(id => {
-      $(id).addEventListener('keydown', e => { if (e.key === 'Enter') handleChangePass(); });
-    });
-
-    // Auto-clear error on input
-    ['username', 'password'].forEach(id => {
-      $(id).addEventListener('input', () => hideAll('loginErr'));
-    });
-    ['newPass', 'confirmPass'].forEach(id => {
-      $(id).addEventListener('input', () => hideAll('cpErr'));
-    });
+    $('btnLogin').addEventListener('click',handleLogin);
+    $('btnChangePass').addEventListener('click',handleChangePass);
+    ['username','password'].forEach(id=>{$(id).addEventListener('keydown',e=>{if(e.key==='Enter')handleLogin();});});
+    ['newPass','confirmPass'].forEach(id=>{$(id).addEventListener('keydown',e=>{if(e.key==='Enter')handleChangePass();});});
+    // Hide error + contact hint on input
+    ['username','password'].forEach(id=>{$(id).addEventListener('input',()=>{hideAll('loginErr');$('contactHint').classList.remove('show');});});
+    ['newPass','confirmPass'].forEach(id=>{$(id).addEventListener('input',()=>hideAll('cpErr'));});
   </script>
 </body>
 </html>

@@ -26,6 +26,11 @@
   @keyframes bolt{from{transform:scale(.92)}to{transform:scale(1.06)}}
   .splash-name{font-family:var(--fd);font-size:20px;font-weight:700;color:#fff}
   .splash-sub{font-size:12px;color:rgba(255,255,255,.45)}
+  /* Logout overlay */
+  .logout-ov{position:fixed;inset:0;background:#060C18;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;z-index:10000;}
+  .logout-ov.hidden{display:none!important}
+  .logout-spin{width:36px;height:36px;border:3px solid rgba(255,255,255,.2);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;}
+  .logout-txt{font-family:var(--fd);font-size:14px;font-weight:500;color:rgba(255,255,255,.6);}
   .update-banner{background:var(--primary);color:#fff;padding:10px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px;font-size:13px;font-family:var(--fd);font-weight:500;}
   .upd-btn{background:rgba(255,255,255,.2);border:none;color:#fff;padding:5px 12px;border-radius:10px;font-size:12px;font-family:var(--fd);font-weight:600;cursor:pointer;}
   .backdrop{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:290;opacity:0;pointer-events:none;transition:opacity .3s var(--ease);backdrop-filter:blur(2px);-webkit-backdrop-filter:blur(2px);}
@@ -59,7 +64,7 @@
   .btn-sh.loading .bl{display:none}
   @keyframes spin{to{transform:rotate(360deg)}}
   .btn-cancel{width:100%;background:var(--inp);border:1.5px solid var(--inp-b);border-radius:var(--rb);height:44px;font-family:var(--fd);font-size:14px;font-weight:500;color:var(--t1);cursor:pointer;margin-top:8px}
-  /* Consumer form select */
+  /* Consumer form selects */
   .cf-sel-wrap{position:relative;display:flex;align-items:center;}
   .cf-sel{flex:1;background:var(--inp);border:1.5px solid var(--inp-b);border-radius:var(--ri);height:46px;padding:0 40px 0 12px;color:var(--t1);font-family:var(--fb);font-size:14px;outline:none;-webkit-appearance:none;appearance:none;cursor:pointer;transition:border-color .15s;width:100%;}
   .cf-sel:focus{border-color:var(--primary);}
@@ -70,6 +75,7 @@
   [data-theme=light] input[type=date].sinp{color-scheme:light;}
   .cf-section-hdr{font-size:10px;font-family:var(--fd);font-weight:700;color:var(--primary);text-transform:uppercase;letter-spacing:.6px;padding:14px 0 4px;border-top:1px solid var(--card-b);margin-top:4px;}
   .det-section-hdr{font-size:10px;font-family:var(--fd);font-weight:700;color:var(--primary);text-transform:uppercase;letter-spacing:.6px;padding:14px 0 4px;border-top:1px solid var(--card-b);margin-top:4px;}
+  /* About sheet */
   .ab-logo{text-align:center;font-size:48px;margin-bottom:8px}
   .ab-name{text-align:center;font-family:var(--fd);font-size:17px;font-weight:700;color:var(--t1);margin-bottom:3px}
   .ab-ver{text-align:center;font-size:12px;color:var(--t2);margin-bottom:18px}
@@ -78,6 +84,7 @@
   .ab-row .material-icons-round{color:var(--primary);font-size:18px;flex-shrink:0;margin-top:1px}
   .ab-key{font-size:10px;color:var(--t2);font-family:var(--fd);font-weight:500;text-transform:uppercase}
   .ab-val{font-size:13px;color:var(--t1);margin-top:1px}
+  /* Delete confirm */
   .del-ico{text-align:center;margin-bottom:10px}
   .del-ico .material-icons-round{font-size:44px;color:var(--danger)}
   .del-ttl{text-align:center;font-family:var(--fd);font-size:16px;font-weight:700;color:var(--t1);margin-bottom:6px}
@@ -85,6 +92,7 @@
   .del-who{font-weight:600;color:var(--danger);display:block;margin-top:4px;font-size:14px}
   .btn-del-confirm{width:100%;background:var(--danger);color:#fff;border:none;border-radius:var(--rb);height:48px;font-family:var(--fd);font-size:15px;font-weight:600;cursor:pointer;margin-bottom:10px;transition:opacity .2s}
   .btn-del-confirm:active{opacity:.8}
+  /* Detail */
   .det-name{font-family:var(--fd);font-size:17px;font-weight:700;color:var(--t1);margin-bottom:4px}
   .det-conno{font-size:12px;color:var(--t2);margin-bottom:16px}
   .det-field{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--card-b);gap:12px}
@@ -115,6 +123,7 @@
   [data-theme=dark] .det-edit{background:rgba(25,118,210,.15)}
   .det-del{background:rgba(211,47,47,.1);color:var(--danger)}
   [data-theme=dark] .det-del{background:rgba(211,47,47,.15)}
+  /* Navbar */
   .navbar{position:fixed;top:0;left:0;right:0;height:var(--nav-h);background:var(--primary);display:flex;align-items:center;justify-content:space-between;padding:0 12px;z-index:100;box-shadow:0 2px 10px rgba(0,0,0,.2);}
   .nav-left{display:flex;align-items:center;gap:10px}
   .nav-bolt{font-size:22px;line-height:1}
@@ -129,6 +138,7 @@
   .sel-cancel .material-icons-round{font-size:20px}
   .sel-cnt{flex:1;font-family:var(--fd);font-size:15px;font-weight:600;color:#fff}
   .sel-all-btn{background:rgba(255,255,255,.15);border:none;border-radius:20px;padding:6px 14px;font-family:var(--fd);font-size:12px;font-weight:500;color:#fff;cursor:pointer;white-space:nowrap}
+  /* User menu */
   .user-menu{position:fixed;top:calc(var(--nav-h) + 8px);right:12px;background:var(--card);border:1px solid var(--card-b);border-radius:20px;padding:16px;z-index:200;min-width:210px;box-shadow:var(--sh-lg);opacity:0;transform:translateY(-8px) scale(.96);pointer-events:none;transition:opacity .2s var(--ease),transform .2s var(--ease);}
   .user-menu.show{opacity:1;transform:none;pointer-events:all}
   .um-avatar{width:42px;height:42px;border-radius:50%;background:var(--primary);display:flex;align-items:center;justify-content:center;margin-bottom:8px}
@@ -144,6 +154,7 @@
   .mi.install{color:var(--success)}
   .mi.install .material-icons-round{color:var(--success)}
   .menu-ov{position:fixed;inset:0;z-index:150}
+  /* Search */
   .search-sec{position:fixed;top:var(--nav-h);left:0;right:0;background:var(--bg);padding:10px 14px 0;z-index:90;border-bottom:1px solid var(--card-b);}
   .search-wrap{display:flex;align-items:center;background:var(--inp);border:1.5px solid var(--inp-b);border-radius:var(--ri);padding:0 12px;gap:8px;height:44px}
   .search-wrap:focus-within{border-color:var(--primary)}
@@ -186,6 +197,7 @@
   .refresh-btn:active{color:var(--primary)}
   .refresh-btn .material-icons-round{font-size:18px}
   .refresh-btn.spin .material-icons-round{animation:spin .7s linear infinite}
+  /* Consumer card */
   .c-card{background:var(--card);border:1px solid var(--card-b);border-radius:var(--r);padding:13px 14px;margin-bottom:9px;box-shadow:var(--sh);position:relative;overflow:hidden;animation:fadeUp .28s var(--ease) both;cursor:pointer;transition:transform .1s,border-color .15s,background .15s;user-select:none;-webkit-user-select:none;}
   @keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
   .c-card:active{transform:scale(.985)}
@@ -251,13 +263,53 @@
   #toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
   #toast.err{background:var(--danger)}
   #toast.ok{background:var(--success)}
+  /* ─── ADMIN PANEL ─────────────────────────────── */
+  .admin-panel{padding:4px 0;}
+  .ap-hdr{display:flex;align-items:center;justify-content:space-between;padding:8px 0 16px;}
+  .ap-title{font-family:var(--fd);font-size:16px;font-weight:700;color:var(--t1);}
+  .ap-add-btn{width:42px;height:42px;border-radius:50%;background:var(--primary);color:#fff;border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 3px 12px rgba(0,82,180,.35);}
+  .ap-add-btn:active{opacity:.8}
+  .ap-add-btn .material-icons-round{font-size:22px;}
+  .u-card{background:var(--card);border:1px solid var(--card-b);border-radius:var(--r);padding:14px 16px;margin-bottom:10px;box-shadow:var(--sh);}
+  .u-top{display:flex;align-items:flex-start;gap:12px;}
+  .u-avatar{width:44px;height:44px;border-radius:50%;background:var(--primary);color:#fff;font-family:var(--fd);font-size:15px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+  .u-info{flex:1;min-width:0;}
+  .u-name{font-family:var(--fd);font-size:14px;font-weight:700;color:var(--t1);margin-bottom:3px;}
+  .u-me{font-size:10px;font-weight:500;color:var(--t2);font-family:var(--fb);}
+  .u-meta{font-size:12px;color:var(--t2);margin-bottom:4px;display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
+  .u-badge{font-size:10px;font-family:var(--fd);font-weight:700;padding:2px 7px;border-radius:7px;}
+  .role-admin{background:rgba(255,193,7,.15);color:#E65100;}
+  [data-theme=dark] .role-admin{background:rgba(255,193,7,.2);color:#FFC107;}
+  .role-emp{background:rgba(0,82,180,.1);color:var(--primary);}
+  [data-theme=dark] .role-emp{background:rgba(0,120,255,.2);color:#90CAF9;}
+  .u-status{display:flex;align-items:center;gap:5px;font-size:11.5px;color:var(--t2);}
+  .u-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+  .u-dot.on{background:#4CAF50;}
+  .u-dot.off{background:#9E9E9E;}
+  .u-actions{display:flex;gap:8px;margin-top:12px;padding-top:12px;border-top:1px solid var(--card-b);}
+  .u-btn{flex:1;height:36px;border-radius:10px;border:none;font-family:var(--fd);font-size:12px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:5px;transition:opacity .2s;}
+  .u-btn:active{opacity:.7}
+  .u-btn .material-icons-round{font-size:15px;}
+  .u-btn-pwd{background:rgba(0,82,180,.1);color:var(--primary);}
+  [data-theme=dark] .u-btn-pwd{background:rgba(25,118,210,.15);}
+  .u-btn-off{background:rgba(211,47,47,.1);color:var(--danger);}
+  [data-theme=dark] .u-btn-off{background:rgba(211,47,47,.15);}
+  .u-btn-on{background:rgba(46,125,50,.1);color:var(--success);}
+  [data-theme=dark] .u-btn-on{background:rgba(46,125,50,.15);}
+  .u-note{font-size:11px;color:var(--t2);margin-top:10px;padding-top:10px;border-top:1px solid var(--card-b);text-align:center;}
+  .ap-empty{text-align:center;padding:48px 24px;color:var(--t2);}
+  .ap-empty .material-icons-round{font-size:48px;opacity:.3;display:block;margin-bottom:12px;}
+  /* Toggle confirm sheet */
+  .ug-icon-ok .material-icons-round{color:var(--success)!important;}
   </style>
 </head>
 <body>
 <div id="splash" class="splash"><div class="splash-bolt">&#9889;</div><div class="splash-name">A&amp;N Electricity</div><div class="splash-sub">Consumer Manager</div></div>
+<!-- Logout overlay -->
+<div class="logout-ov hidden" id="logoutOv"><div class="logout-spin"></div><div class="logout-txt">Signing out...</div></div>
 <div class="update-banner hidden" id="updateBanner"><span>&#128260; New version available</span><button class="upd-btn" onclick="applyUpdate()">Update Now</button></div>
 <nav class="navbar" id="navbar">
-  <div class="nav-left"><span class="nav-bolt">&#9889;</span><div><span class="nav-app">A&amp;N Electricity</span><span class="nav-office" id="navOffice">Loading…</span></div></div>
+  <div class="nav-left"><span class="nav-bolt">&#9889;</span><div><span class="nav-app">A&amp;N Electricity</span><span class="nav-office" id="navOffice">Loading&#8230;</span></div></div>
   <div class="nav-right">
     <button class="nav-btn hidden" id="selectBtn" onclick="enterSelectMode()"><span class="material-icons-round">checklist</span></button>
     <button class="nav-btn" id="themeToggle"><span class="material-icons-round" id="themeIcon">dark_mode</span></button>
@@ -271,7 +323,7 @@
 </div>
 <div class="user-menu" id="userMenu">
   <div class="um-avatar"><span class="material-icons-round">person</span></div>
-  <div class="um-name" id="uName">—</div><div class="um-role" id="uRole">—</div>
+  <div class="um-name" id="uName">&#8212;</div><div class="um-role" id="uRole">&#8212;</div>
   <div class="menu-div"></div>
   <button class="mi install hidden" id="installBtn" onclick="installApp()"><span class="material-icons-round">install_mobile</span>Install App</button>
   <button class="mi" onclick="openChangePass()"><span class="material-icons-round">lock_reset</span>Change Password</button>
@@ -280,7 +332,7 @@
   <button class="mi danger" onclick="handleLogout()"><span class="material-icons-round">logout</span>Sign Out</button>
 </div>
 <div class="menu-ov hidden" id="menuOv" onclick="closeUserMenu()"></div>
-<!-- CHANGE PASSWORD -->
+<!-- CHANGE PASSWORD SHEET -->
 <div class="bottom-sheet" id="cpSheet">
   <div class="sheet-handle" id="cpHandle"></div><div class="sheet-title">Change Password</div>
   <div class="s-alert err" id="cpErr"><span class="material-icons-round">error_outline</span><span id="cpErrMsg"></span></div>
@@ -290,18 +342,18 @@
   <div class="sf"><label class="sl">Confirm New Password</label><div class="siw"><span class="material-icons-round">lock_outline</span><input class="sinp" type="password" id="cpCfm" placeholder="Repeat new password" autocomplete="new-password"><button class="eye" onclick="toggleEye('cpCfm','cpE3')"><span class="material-icons-round" id="cpE3">visibility_off</span></button></div></div>
   <button class="btn-sh" id="cpBtn" onclick="submitCP()"><span class="bl">Update Password</span><div class="spin"></div></button>
 </div>
-<!-- ABOUT -->
+<!-- ABOUT SHEET -->
 <div class="bottom-sheet" id="aboutSheet">
   <div class="sheet-handle" id="aboutHandle"></div>
   <div class="ab-logo">&#9889;</div><div class="ab-name">A&amp;N Electricity</div><div class="ab-ver">Consumer Manager v1.0.0</div>
   <div class="ab-row"><span class="material-icons-round">business</span><div><div class="ab-key">Department</div><div class="ab-val">A&amp;N Islands Electricity Department</div></div></div>
-  <div class="ab-row"><span class="material-icons-round">location_on</span><div><div class="ab-key">Office</div><div class="ab-val" id="aboutOffice">—</div></div></div>
-  <div class="ab-row"><span class="material-icons-round">storage</span><div><div class="ab-key">Data</div><div class="ab-val">Google Sheets · Private &amp; Secure</div></div></div>
-  <div class="ab-row"><span class="material-icons-round">offline_bolt</span><div><div class="ab-key">Platform</div><div class="ab-val">PWA · Works Offline · GitHub Pages</div></div></div>
+  <div class="ab-row"><span class="material-icons-round">location_on</span><div><div class="ab-key">Office</div><div class="ab-val" id="aboutOffice">&#8212;</div></div></div>
+  <div class="ab-row"><span class="material-icons-round">storage</span><div><div class="ab-key">Data</div><div class="ab-val">Google Sheets &#183; Private &amp; Secure</div></div></div>
+  <div class="ab-row"><span class="material-icons-round">offline_bolt</span><div><div class="ab-key">Platform</div><div class="ab-val">PWA &#183; Works Offline &#183; GitHub Pages</div></div></div>
 </div>
-<!-- DETAIL -->
-<div class="bottom-sheet" id="detailSheet"><div class="sheet-handle" id="detHandle"></div><div class="det-name" id="detName">—</div><div class="det-conno" id="detConno">—</div><div id="detFields"></div><div class="det-actions" id="detActions"></div></div>
-<!-- DELETE CONFIRM -->
+<!-- DETAIL SHEET -->
+<div class="bottom-sheet" id="detailSheet"><div class="sheet-handle" id="detHandle"></div><div class="det-name" id="detName">&#8212;</div><div class="det-conno" id="detConno">&#8212;</div><div id="detFields"></div><div class="det-actions" id="detActions"></div></div>
+<!-- DELETE CONFIRM SHEET -->
 <div class="bottom-sheet" id="delSheet">
   <div class="sheet-handle" id="delHandle"></div>
   <div class="del-ico"><span class="material-icons-round">delete_forever</span></div>
@@ -310,7 +362,16 @@
   <button class="btn-del-confirm" onclick="doDelete()">Yes, Delete Permanently</button>
   <button class="btn-cancel" onclick="closeSheet()">Cancel</button>
 </div>
-<!-- CONSUMER FORM — Add/Edit + SD fields -->
+<!-- USER TOGGLE CONFIRM SHEET -->
+<div class="bottom-sheet" id="ugSheet">
+  <div class="sheet-handle" id="ugHandle"></div>
+  <div class="del-ico" id="ugIco"><span class="material-icons-round">block</span></div>
+  <div class="del-ttl" id="ugTitle">Deactivate User?</div>
+  <div class="del-sub" id="ugSub">This user will no longer be able to login.</div>
+  <button class="btn-del-confirm" id="ugConfirmBtn" onclick="doToggleUser()">Confirm</button>
+  <button class="btn-cancel" onclick="closeSheet()">Cancel</button>
+</div>
+<!-- CONSUMER FORM SHEET — Add/Edit + SD -->
 <div class="bottom-sheet" id="cfSheet">
   <div class="sheet-handle" id="cfHandle"></div>
   <div class="sheet-title" id="cfTitle">Add Consumer</div>
@@ -320,7 +381,7 @@
   <div class="sf"><label class="sl">Address</label><div class="siw"><span class="material-icons-round">location_on</span><input class="sinp" type="text" id="cfAddr" placeholder="Full address" maxlength="200" autocomplete="off"></div></div>
   <div class="sf"><label class="sl">Lab No.</label><div class="siw"><span class="material-icons-round">science</span><input class="sinp" type="text" id="cfLabNo" placeholder="Lab number" maxlength="30" autocomplete="off"></div></div>
   <div class="sf"><label class="sl">Meter No.</label><div class="siw"><span class="material-icons-round">electric_meter</span><input class="sinp" type="text" id="cfMeter" placeholder="Meter serial number" maxlength="30" autocomplete="off"></div></div>
-  <div class="sf"><label class="sl">Area Code (TransfCode)</label><div class="cf-sel-wrap"><select class="cf-sel" id="cfTransf"><option value="">&#8212; Select Area &#8212;</option><option>AHS</option><option>OBS</option><option>SSN</option><option>SP1</option><option>PLC</option><option>SPV</option><option>RKM</option><option>RBV</option><option>SSP</option><option>MP1</option><option>CHS</option><option>RGT1</option><option>SJM</option><option>MGP1</option><option>SCT</option><option>RJM</option><option>PAO1</option></select><span class="material-icons-round cf-sel-ico">expand_more</span></div></div>
+  <div class="sf"><label class="sl">Area Code</label><div class="cf-sel-wrap"><select class="cf-sel" id="cfTransf"><option value="">&#8212; Select Area &#8212;</option><option>AHS</option><option>OBS</option><option>SSN</option><option>SP1</option><option>PLC</option><option>SPV</option><option>RKM</option><option>RBV</option><option>SSP</option><option>MP1</option><option>CHS</option><option>RGT1</option><option>SJM</option><option>MGP1</option><option>SCT</option><option>RJM</option><option>PAO1</option></select><span class="material-icons-round cf-sel-ico">expand_more</span></div></div>
   <div class="sf"><label class="sl">Phone No.</label><div class="siw"><span class="material-icons-round">phone</span><input class="sinp" type="tel" id="cfPhone" placeholder="10-digit mobile" maxlength="15" inputmode="numeric" autocomplete="off"></div></div>
   <div class="sf"><label class="sl">Status</label><div class="cf-sel-wrap"><select class="cf-sel" id="cfStatus"><option value="Active">Active</option><option value="Inactive">Inactive</option><option value="Defaulter">Defaulter</option></select><span class="material-icons-round cf-sel-ico">expand_more</span></div></div>
   <div class="cf-section-hdr">Security Deposit</div>
@@ -330,11 +391,33 @@
   <button class="btn-sh" id="cfBtn" onclick="saveConsumer()"><span class="bl" id="cfBtnLbl">Add Consumer</span><div class="spin"></div></button>
   <button class="btn-cancel" onclick="closeSheet()">Cancel</button>
 </div>
+<!-- ADD USER SHEET -->
+<div class="bottom-sheet" id="addUserSheet">
+  <div class="sheet-handle" id="addUserHandle"></div>
+  <div class="sheet-title">Add Employee</div>
+  <div class="s-alert err" id="auErr"><span class="material-icons-round">error_outline</span><span id="auErrMsg"></span></div>
+  <div class="sf"><label class="sl">Full Name <span style="color:var(--danger)">*</span></label><div class="siw"><span class="material-icons-round">badge</span><input class="sinp" type="text" id="auName" placeholder="Employee full name" maxlength="80" autocomplete="off"></div></div>
+  <div class="sf"><label class="sl">Username <span style="color:var(--danger)">*</span></label><div class="siw"><span class="material-icons-round">alternate_email</span><input class="sinp" type="text" id="auUser" placeholder="Unique username (no spaces)" maxlength="30" autocomplete="off" autocapitalize="none"></div></div>
+  <div class="sf"><label class="sl">Temporary Password <span style="color:var(--danger)">*</span></label><div class="siw"><span class="material-icons-round">lock_outline</span><input class="sinp" type="password" id="auPass" placeholder="Min 6 characters" autocomplete="new-password"><button class="eye" onclick="toggleEye('auPass','auPassIco')"><span class="material-icons-round" id="auPassIco">visibility_off</span></button></div></div>
+  <div style="font-size:11px;color:var(--t2);padding:6px 2px 14px;line-height:1.5;display:flex;align-items:flex-start;gap:6px;"><span class="material-icons-round" style="font-size:14px;flex-shrink:0;margin-top:1px;color:var(--accent)">info</span>Employee will be prompted to change this password on first login.</div>
+  <button class="btn-sh" id="auBtn" onclick="doAddUser()"><span class="bl">Add Employee</span><div class="spin"></div></button>
+  <button class="btn-cancel" onclick="closeSheet()">Cancel</button>
+</div>
+<!-- RESET PASSWORD SHEET -->
+<div class="bottom-sheet" id="rpSheet">
+  <div class="sheet-handle" id="rpHandle"></div>
+  <div class="sheet-title" id="rpTitle">Reset Password</div>
+  <div class="s-alert err" id="rpErr"><span class="material-icons-round">error_outline</span><span id="rpErrMsg"></span></div>
+  <div class="sf"><label class="sl">New Temporary Password <span style="color:var(--danger)">*</span></label><div class="siw"><span class="material-icons-round">lock_reset</span><input class="sinp" type="password" id="rpPass" placeholder="Min 6 characters" autocomplete="new-password"><button class="eye" onclick="toggleEye('rpPass','rpPassIco')"><span class="material-icons-round" id="rpPassIco">visibility_off</span></button></div></div>
+  <div style="font-size:11px;color:var(--t2);padding:6px 2px 14px;line-height:1.5;display:flex;align-items:flex-start;gap:6px;"><span class="material-icons-round" style="font-size:14px;flex-shrink:0;margin-top:1px;color:var(--accent)">info</span>User will be required to change this on next login.</div>
+  <button class="btn-sh" id="rpBtn" onclick="doResetPassword()"><span class="bl">Reset Password</span><div class="spin"></div></button>
+  <button class="btn-cancel" onclick="closeSheet()">Cancel</button>
+</div>
 <!-- BACKDROP -->
 <div class="backdrop" id="backdrop" onclick="closeSheet()"></div>
-<!-- SEARCH -->
+<!-- SEARCH SECTION -->
 <div class="search-sec" id="searchSec">
-  <div class="search-wrap"><span class="material-icons-round s-ico">search</span><input class="search-inp" type="search" id="searchInp" placeholder="Name, ConNo, meter, phone, address…" autocomplete="off" autocorrect="off" autocapitalize="none"><button class="s-clr hidden" id="sClear" onclick="clearSearch()"><span class="material-icons-round">close</span></button></div>
+  <div class="search-wrap"><span class="material-icons-round s-ico">search</span><input class="search-inp" type="search" id="searchInp" placeholder="Name, ConNo, meter, phone, address&#8230;" autocomplete="off" autocorrect="off" autocapitalize="none"><button class="s-clr hidden" id="sClear" onclick="clearSearch()"><span class="material-icons-round">close</span></button></div>
   <div class="f-row">
     <button class="f-pill active" onclick="setStatus(this,'ALL')">All Status</button>
     <button class="f-pill" onclick="setStatus(this,'Active')">&#128994; Active</button>
@@ -365,9 +448,22 @@
   </div></div>
 </div>
 <main class="main" id="main">
-  <div class="sync-row"><span class="sync-dot syncing" id="syncDot"></span><span class="sync-txt" id="syncTxt">Loading…</span><span class="cnt-txt" id="cntTxt"></span><button class="refresh-btn" id="refreshBtn" onclick="refreshData()"><span class="material-icons-round">refresh</span></button></div>
-  <div id="consumerList"></div><div id="sentinel"></div>
-  <div class="empty-state hidden" id="emptyState"><span class="material-icons-round" id="emptyIco">people_outline</span><div class="empty-title" id="emptyTtl">No consumers yet</div><div class="empty-sub" id="emptySub">Tap + to add the first consumer</div></div>
+  <!-- Consumer view -->
+  <div id="consumerView">
+    <div class="sync-row"><span class="sync-dot syncing" id="syncDot"></span><span class="sync-txt" id="syncTxt">Loading&#8230;</span><span class="cnt-txt" id="cntTxt"></span><button class="refresh-btn" id="refreshBtn" onclick="refreshData()"><span class="material-icons-round">refresh</span></button></div>
+    <div id="consumerList"></div><div id="sentinel"></div>
+    <div class="empty-state hidden" id="emptyState"><span class="material-icons-round" id="emptyIco">people_outline</span><div class="empty-title" id="emptyTtl">No consumers yet</div><div class="empty-sub" id="emptySub">Tap + to add the first consumer</div></div>
+  </div>
+  <!-- Admin panel (hidden by default) -->
+  <div id="adminPanel" class="hidden admin-panel">
+    <div class="ap-hdr">
+      <div class="ap-title">Office Employees</div>
+      <button class="ap-add-btn" onclick="openAddUserForm()"><span class="material-icons-round">person_add</span></button>
+    </div>
+    <div class="s-alert err hidden" id="apErr" style="margin-bottom:12px"><span class="material-icons-round">error_outline</span><span id="apErrMsg"></span></div>
+    <div id="userList"></div>
+    <div class="ap-empty hidden" id="userEmpty"><span class="material-icons-round">people_outline</span><div style="font-family:var(--fd);font-weight:700;margin-bottom:4px;">No employees yet</div><div style="font-size:12px;">Tap + to add the first employee</div></div>
+  </div>
 </main>
 <div class="del-bar hidden" id="delBar"><button class="del-bar-btn" onclick="bulkDeleteConfirm()"><span class="material-icons-round">delete</span>Delete Selected (<span id="delBarCnt">0</span>)</button></div>
 <button class="fab" id="fabBtn" onclick="openAddForm()"><span class="material-icons-round">add</span></button>
@@ -390,7 +486,12 @@ let selectMode=false,selectedSet=new Set();
 let delRowIdx=0,delConNo='',delName='';
 let pressTimer=null,pressPos=null,pressCard=null;
 let deferredInstall=null,swReg=null;
+let activeTab='consumers';
+// Consumer form state
 const CF={mode:'add',consumer:null};
+// User management state
+let userForReset=null,userForToggle=null;
+var _userCache={};
 const $=id=>document.getElementById(id);
 
 async function init(){
@@ -402,18 +503,14 @@ async function init(){
     navigator.serviceWorker.register('./sw.js').then(reg=>{
       swReg=reg;
       navigator.serviceWorker.addEventListener('message',onSWMsg);
-      reg.addEventListener('updatefound',()=>{
-        const nw=reg.installing;if(!nw)return;
-        nw.addEventListener('statechange',()=>{if(nw.state==='installed'&&navigator.serviceWorker.controller)$('updateBanner').classList.remove('hidden');});
-      });
+      reg.addEventListener('updatefound',()=>{const nw=reg.installing;if(!nw)return;nw.addEventListener('statechange',()=>{if(nw.state==='installed'&&navigator.serviceWorker.controller)$('updateBanner').classList.remove('hidden');});});
     }).catch(()=>{});
   }
   window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferredInstall=e;$('installBtn').classList.remove('hidden');});
-  window.addEventListener('online',onOnline);
-  window.addEventListener('offline',onOffline);
+  window.addEventListener('online',onOnline);window.addEventListener('offline',onOffline);
   history.pushState(null,'');
   window.addEventListener('popstate',()=>{
-    if(activeSheet==='cfSheet'){closeSheet();history.pushState(null,'');return;}
+    if(activeSheet==='cfSheet'||activeSheet==='addUserSheet'||activeSheet==='rpSheet'||activeSheet==='ugSheet'){closeSheet();history.pushState(null,'');return;}
     if(activeSheet){closeSheet();history.pushState(null,'');return;}
     if(selectMode){exitSelectMode();history.pushState(null,'');return;}
   });
@@ -434,13 +531,17 @@ async function init(){
   hideSplash();
 }
 
-function adjustLayout(){const navH=$('navbar').offsetHeight,searchH=$('searchSec').offsetHeight;$('main').style.paddingTop=(navH+searchH+4)+'px';}
+function adjustLayout(){
+  const navH=$('navbar').offsetHeight;
+  const searchH=$('searchSec').classList.contains('hidden')?0:$('searchSec').offsetHeight;
+  $('main').style.paddingTop=(navH+searchH+4)+'px';
+}
 function hideSplash(){const s=$('splash');s.classList.add('out');setTimeout(()=>s.style.display='none',400);}
 async function installApp(){if(!deferredInstall)return;closeUserMenu();deferredInstall.prompt();const{outcome}=await deferredInstall.userChoice;deferredInstall=null;$('installBtn').classList.add('hidden');if(outcome==='accepted')toast('App installed!','ok');}
 function applyUpdate(){if(swReg&&swReg.waiting)swReg.waiting.postMessage({type:'SKIP_WAITING'});window.location.reload();}
 
 function setupSwipeClose(){
-  ['cpHandle','aboutHandle','detHandle','delHandle','cfHandle'].forEach(id=>{
+  ['cpHandle','aboutHandle','detHandle','delHandle','cfHandle','addUserHandle','rpHandle','ugHandle'].forEach(id=>{
     const el=$(id);if(!el)return;
     let startY=0;
     el.addEventListener('touchstart',e=>{startY=e.touches[0].clientY;},{passive:true});
@@ -466,79 +567,40 @@ async function loadConsumers(showSkeleton){
       masterList=list;applyFilters();updateChipCounts();setSync('online','Synced');
     } else if(json.code==='UNAUTHORIZED'||json.error==='SESSION_EXPIRED'){
       await AN_DB.clearSession();alert('Session expired. Please log in again.');location.replace('./login.html');
-    } else {setSync('online','Loaded from cache');console.warn('[App]',json.message||json.error);}
+    } else{setSync('online','Loaded from cache');console.warn('[App]',json.message||json.error);}
   }catch(err){
     if(err.name==='AbortError'){setSync('offline','Request timed out');toast('Network timeout. Try again.','err');}
     else{if(!cached.length)showErr('Could not connect. Check your internet.');setSync('offline','Offline - showing cached data');}
   }
   setRefreshSpin(false);
 }
-
 function refreshData(){loadConsumers();}
 
 function normalize(c){
   function get(){for(var i=0;i<arguments.length;i++){var v=c[arguments[i]];if(v!==undefined&&v!==null&&String(v).trim()!==''&&String(v).trim()!=='0')return String(v).trim();}return '';}
-  var meterRaw=c['MeterNo']||c.meterNo||c['Meter No']||'';
-  return {
-    _rowIndex:c._rowIndex||0,
-    sNo:get('S.No.','sNo'),
-    conNo:get('ConNo','conNo'),
-    consumerName:get('ConsumerName','Consumer Name','consumerName'),
-    address:get('Address','address'),
-    labNo:get('LabNo','labNo','Lab No'),
-    meterNo:meterRaw?String(meterRaw).trim():'',
-    transfCode:get('TransfCode','transfCode','Transf Code','AreaCode','areaCode'),
-    phoneNo:get('PhoneNo','phoneNo','Phone','phone'),
-    status:get('Status','status')||'Active',
-    lastEditedBy:get('LastEditedBy','lastEditedBy'),
-    lastEditedAt:get('LastEditedAt','lastEditedAt'),
-    createdAt:get('CreatedAt','createdAt'),
-    sdPassbookNo:get('Passbook/SD No','sdPassbookNo'),
-    sdAmount:get('SD Amount','sdAmount'),
-    sdDate:get('SD Date','sdDate'),
-  };
+  var mr=c['MeterNo']||c.meterNo||c['Meter No']||'';
+  return {_rowIndex:c._rowIndex||0,sNo:get('S.No.','sNo'),conNo:get('ConNo','conNo'),consumerName:get('ConsumerName','Consumer Name','consumerName'),address:get('Address','address'),labNo:get('LabNo','labNo','Lab No'),meterNo:mr?String(mr).trim():'',transfCode:get('TransfCode','transfCode','Transf Code','AreaCode','areaCode'),phoneNo:get('PhoneNo','phoneNo','Phone','phone'),status:get('Status','status')||'Active',lastEditedBy:get('LastEditedBy','lastEditedBy'),lastEditedAt:get('LastEditedAt','lastEditedAt'),createdAt:get('CreatedAt','createdAt'),sdPassbookNo:get('Passbook/SD No','sdPassbookNo'),sdAmount:get('SD Amount','sdAmount'),sdDate:get('SD Date','sdDate')};
 }
 
 function updateChipCounts(){
-  var counts={};
-  masterList.forEach(function(c){if(c.transfCode)counts[c.transfCode]=(counts[c.transfCode]||0)+1;});
-  document.querySelectorAll('.chip').forEach(function(chip){
-    var area=chip.dataset.area;if(!area)return;
-    if(area==='ALL')chip.textContent='All ('+masterList.length+')';
-    else if(counts[area])chip.textContent=area+' \u00b7 '+counts[area];
-  });
+  var counts={};masterList.forEach(function(c){if(c.transfCode)counts[c.transfCode]=(counts[c.transfCode]||0)+1;});
+  document.querySelectorAll('.chip').forEach(function(chip){var a=chip.dataset.area;if(!a)return;if(a==='ALL')chip.textContent='All ('+masterList.length+')';else if(counts[a])chip.textContent=a+' \u00b7 '+counts[a];});
 }
 
 function applyFilters(){
   filtered=masterList;
   if(activeArea!=='ALL')filtered=filtered.filter(function(c){return c.transfCode===activeArea;});
   if(activeStatus!=='ALL')filtered=filtered.filter(function(c){return(c.status||'Active').toLowerCase()===activeStatus.toLowerCase();});
-  if(searchQ.trim()){
-    var q=searchQ.toLowerCase().trim();
-    filtered=filtered.filter(function(c){
-      return(c.consumerName||'').toLowerCase().indexOf(q)>=0||
-             (c.conNo||'').toLowerCase().indexOf(q)>=0||
-             (c.meterNo||'').indexOf(q)>=0||
-             (c.phoneNo||'').indexOf(q)>=0||
-             (c.address||'').toLowerCase().indexOf(q)>=0||
-             (c.sdPassbookNo||'').toLowerCase().indexOf(q)>=0;
-    });
-  }
+  if(searchQ.trim()){var q=searchQ.toLowerCase().trim();filtered=filtered.filter(function(c){return(c.consumerName||'').toLowerCase().indexOf(q)>=0||(c.conNo||'').toLowerCase().indexOf(q)>=0||(c.meterNo||'').indexOf(q)>=0||(c.phoneNo||'').indexOf(q)>=0||(c.address||'').toLowerCase().indexOf(q)>=0||(c.sdPassbookNo||'').toLowerCase().indexOf(q)>=0;});}
   if(sortOrder==='asc')filtered=filtered.slice().sort(function(a,b){return(a.consumerName||'').localeCompare(b.consumerName||'');});
   else if(sortOrder==='desc')filtered=filtered.slice().sort(function(a,b){return(b.consumerName||'').localeCompare(a.consumerName||'');});
   $('cntTxt').textContent=filtered.length?filtered.length+' consumer'+(filtered.length!==1?'s':''):'';
-  if(!filtered.length){
-    $('consumerList').innerHTML='';$('emptyState').classList.remove('hidden');
-    if(searchQ||activeArea!=='ALL'||activeStatus!=='ALL'){$('emptyIco').textContent='search_off';$('emptyTtl').textContent='No results';$('emptySub').textContent='Try different search, area, or status filter';}
-    else{$('emptyIco').textContent='people_outline';$('emptyTtl').textContent='No consumers yet';$('emptySub').textContent='Tap + to add the first consumer';}
-    return;
-  }
+  if(!filtered.length){$('consumerList').innerHTML='';$('emptyState').classList.remove('hidden');if(searchQ||activeArea!=='ALL'||activeStatus!=='ALL'){$('emptyIco').textContent='search_off';$('emptyTtl').textContent='No results';$('emptySub').textContent='Try different search, area, or status filter';}else{$('emptyIco').textContent='people_outline';$('emptyTtl').textContent='No consumers yet';$('emptySub').textContent='Tap + to add the first consumer';}return;}
   $('emptyState').classList.add('hidden');displayedN=0;$('consumerList').innerHTML='';appendCards();
 }
 
 function appendCards(){
-  var frag=document.createDocumentFragment();
-  var end=Math.min(displayedN+PAGE_SIZE,filtered.length);
+  var frag=document.createDocumentFragment();var end=Math.min(displayedN+PAGE_SIZE,filtered.length);
   for(var i=displayedN;i<end;i++){var card=makeCard(filtered[i]);card.style.animationDelay=((i-displayedN)*.03)+'s';frag.appendChild(card);}
   $('consumerList').appendChild(frag);displayedN=end;
 }
@@ -559,35 +621,24 @@ function makeCard(c){
   return div;
 }
 
-function renderSkeleton(){
-  $('emptyState').classList.add('hidden');
-  $('consumerList').innerHTML=Array(6).fill('<div class="skeleton"><div class="sk-row"><div class="sk" style="width:30%;height:11px"></div><div class="sk" style="width:18%;height:11px"></div></div><div class="sk" style="width:62%;height:14px;margin-bottom:8px"></div><div class="sk" style="width:42%;height:11px"></div></div>').join('');
-}
+function renderSkeleton(){$('emptyState').classList.add('hidden');$('consumerList').innerHTML=Array(6).fill('<div class="skeleton"><div class="sk-row"><div class="sk" style="width:30%;height:11px"></div><div class="sk" style="width:18%;height:11px"></div></div><div class="sk" style="width:62%;height:14px;margin-bottom:8px"></div><div class="sk" style="width:42%;height:11px"></div></div>').join('');}
 
 function openDetail(c){
   lastScrollY=window.scrollY;
   $('detName').textContent=c.consumerName||'\u2014';
   $('detConno').textContent='Consumer No: '+(c.conNo||'\u2014');
-  var fieldsHtml='';
-  function addField(label,value){fieldsHtml+='<div class="det-field"><span class="det-label">'+label+'</span><span class="det-value">'+value+'</span></div>';}
-  addField('Serial No',esc(c.sNo||'\u2014'));
-  addField('Meter No',esc(c.meterNo||'\u2014'));
-  addField('Area Code',esc(c.transfCode||'\u2014'));
-  addField('Address',esc(c.address||'\u2014'));
-  addField('Lab No',esc(c.labNo||'\u2014'));
-  if(c.phoneNo){
-    var clean=c.phoneNo.replace(/\D/g,'');
-    fieldsHtml+='<div class="det-field"><span class="det-label">Phone</span><div class="det-phone-row"><span class="det-phone-num">'+esc(c.phoneNo)+'</span><a href="tel:'+esc(c.phoneNo)+'" class="det-phone-btn call"><span class="material-icons-round">call</span>Call</a>'+(clean.length>=10?'<a href="https://wa.me/91'+clean.slice(-10)+'" target="_blank" rel="noopener" class="det-phone-btn wa"><span class="material-icons-round">message</span>WA</a>':'')+'</div></div>';
-  } else addField('Phone','\u2014');
-  var st=(c.status||'Active').toLowerCase();
-  fieldsHtml+='<div class="det-field"><span class="det-label">Status</span><span class="det-badge '+st+'">'+esc(c.status||'Active')+'</span></div>';
-  addField('Last Edited By',esc(c.lastEditedBy||'\u2014'));
-  addField('Created',esc(formatDate(c.createdAt)));
-  fieldsHtml+='<div class="det-section-hdr">Security Deposit</div>';
-  addField('Passbook/SD No',esc(c.sdPassbookNo||'\u2014'));
-  addField('SD Amount',c.sdAmount?'\u20b9 '+esc(c.sdAmount):'\u2014');
-  addField('SD Date',c.sdDate?esc(formatDate(c.sdDate)):'\u2014');
-  $('detFields').innerHTML=fieldsHtml;
+  var fh='';
+  function af(lbl,val){fh+='<div class="det-field"><span class="det-label">'+lbl+'</span><span class="det-value">'+val+'</span></div>';}
+  af('Serial No',esc(c.sNo||'\u2014'));af('Meter No',esc(c.meterNo||'\u2014'));af('Area Code',esc(c.transfCode||'\u2014'));af('Address',esc(c.address||'\u2014'));af('Lab No',esc(c.labNo||'\u2014'));
+  if(c.phoneNo){var cl=c.phoneNo.replace(/\D/g,'');fh+='<div class="det-field"><span class="det-label">Phone</span><div class="det-phone-row"><span class="det-phone-num">'+esc(c.phoneNo)+'</span><a href="tel:'+esc(c.phoneNo)+'" class="det-phone-btn call"><span class="material-icons-round">call</span>Call</a>'+(cl.length>=10?'<a href="https://wa.me/91'+cl.slice(-10)+'" target="_blank" rel="noopener" class="det-phone-btn wa"><span class="material-icons-round">message</span>WA</a>':'')+'</div></div>';}
+  else af('Phone','\u2014');
+  var st=(c.status||'Active').toLowerCase();fh+='<div class="det-field"><span class="det-label">Status</span><span class="det-badge '+st+'">'+esc(c.status||'Active')+'</span></div>';
+  af('Last Edited By',esc(c.lastEditedBy||'\u2014'));af('Created',esc(formatDate(c.createdAt)));
+  fh+='<div class="det-section-hdr">Security Deposit</div>';
+  af('Passbook/SD No',esc(c.sdPassbookNo||'\u2014'));
+  af('SD Amount',c.sdAmount?'\u20b9 '+esc(c.sdAmount):'\u2014');
+  af('SD Date',c.sdDate?esc(formatDate(c.sdDate)):'\u2014');
+  $('detFields').innerHTML=fh;
   var delBtn=isAdmin?'<button class="det-btn det-del" onclick="confirmDelete('+c._rowIndex+',\''+esc(c.conNo)+'\',\''+esc(c.consumerName)+'\')"><span class="material-icons-round">delete</span>Delete</button>':'';
   $('detActions').innerHTML='<button class="det-btn det-edit" onclick="openEditForm(\''+esc(c.conNo)+'\')"><span class="material-icons-round">edit</span>Edit</button>'+delBtn;
   openSheet('detailSheet');
@@ -596,21 +647,8 @@ function openDetail(c){
 $('searchInp').addEventListener('input',function(e){searchQ=e.target.value;$('sClear').classList.toggle('hidden',!searchQ);clearTimeout(searchT);searchT=setTimeout(applyFilters,280);});
 function clearSearch(){$('searchInp').value='';searchQ='';$('sClear').classList.add('hidden');applyFilters();}
 function setArea(el,code){activeArea=code;document.querySelectorAll('.chip').forEach(function(c){c.classList.remove('active');});el.classList.add('active');applyFilters();}
-function setStatus(el,status){
-  activeStatus=status;
-  document.querySelectorAll('.f-pill').forEach(function(p){p.classList.remove('active','active-s','inactive-s','defaulter-s');});
-  if(status==='ALL')el.classList.add('active');
-  else if(status==='Active')el.classList.add('active-s');
-  else if(status==='Inactive')el.classList.add('inactive-s');
-  else if(status==='Defaulter')el.classList.add('defaulter-s');
-  applyFilters();
-}
-function cycleSort(){
-  var orders=['default','asc','desc'],labels=['Default','A \u2192 Z','Z \u2192 A'];
-  var cur=orders.indexOf(sortOrder);sortOrder=orders[(cur+1)%3];
-  $('sortLbl').textContent=labels[orders.indexOf(sortOrder)];
-  $('sortBtn').classList.toggle('active',sortOrder!=='default');applyFilters();
-}
+function setStatus(el,status){activeStatus=status;document.querySelectorAll('.f-pill').forEach(function(p){p.classList.remove('active','active-s','inactive-s','defaulter-s');});if(status==='ALL')el.classList.add('active');else if(status==='Active')el.classList.add('active-s');else if(status==='Inactive')el.classList.add('inactive-s');else if(status==='Defaulter')el.classList.add('defaulter-s');applyFilters();}
+function cycleSort(){var orders=['default','asc','desc'],labels=['Default','A \u2192 Z','Z \u2192 A'];var cur=orders.indexOf(sortOrder);sortOrder=orders[(cur+1)%3];$('sortLbl').textContent=labels[orders.indexOf(sortOrder)];$('sortBtn').classList.toggle('active',sortOrder!=='default');applyFilters();}
 
 function applyTheme(t){document.documentElement.setAttribute('data-theme',t);$('themeIcon').textContent=t==='dark'?'dark_mode':'light_mode';$('themeColorMeta').content=t==='dark'?'#0F1F3C':'#0052B4';localStorage.setItem('an_elect_theme',t);}
 $('themeToggle').addEventListener('click',function(){applyTheme(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark');});
@@ -623,9 +661,7 @@ function chkStrength(v){var fi=$('sfi'),tx=$('stxt');if(!v){fi.style.width='0%';
 async function submitCP(){
   var cur=$('cpCur').value.trim(),nw=$('cpNew').value.trim(),cfm=$('cpCfm').value.trim();
   $('cpErr').classList.remove('show');$('cpOk').classList.remove('show');
-  if(!cur||!nw||!cfm){showCpErr('All fields required.');return;}
-  if(nw.length<8){showCpErr('Min 8 characters.');return;}
-  if(nw!==cfm){showCpErr('Passwords do not match.');return;}
+  if(!cur||!nw||!cfm){showCpErr('All fields required.');return;}if(nw.length<8){showCpErr('Min 8 characters.');return;}if(nw!==cfm){showCpErr('Passwords do not match.');return;}
   var btn=$('cpBtn');btn.classList.add('loading');
   try{var res=await fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({action:'changePassword',username:session.username,currentPassword:cur,newPassword:nw})});var json=await res.json();if(json.success){$('cpOk').classList.add('show');setTimeout(closeSheet,2000);}else showCpErr(json.message||'Failed.');}catch(e){showCpErr('Network error.');}
   btn.classList.remove('loading');
@@ -633,10 +669,16 @@ async function submitCP(){
 function showCpErr(msg){$('cpErrMsg').textContent=msg;$('cpErr').classList.add('show');}
 function openAbout(){closeUserMenu();openSheet('aboutSheet');}
 
-async function handleLogout(){closeUserMenu();try{await fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({action:'logout',token:session.token})});}catch(e){}await AN_DB.clearAllData();await AN_DB.clearSession();location.replace('./login.html');}
+async function handleLogout(){
+  closeUserMenu();
+  $('logoutOv').classList.remove('hidden');
+  try{await fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({action:'logout',token:session.token})});}catch(e){}
+  await AN_DB.clearAllData();await AN_DB.clearSession();
+  location.replace('./login.html');
+}
 
 function enterSelectMode(){if(!isAdmin)return;selectMode=true;selectedSet.clear();$('selBar').classList.remove('hidden');$('navbar').classList.add('hidden');$('fabBtn').classList.add('hidden');$('bottomNav').classList.add('hide');updateSelUI();applyFilters();}
-function exitSelectMode(){selectMode=false;selectedSet.clear();$('selBar').classList.add('hidden');$('navbar').classList.remove('hidden');$('fabBtn').classList.remove('hidden');$('bottomNav').classList.remove('hide');$('delBar').classList.add('hidden');applyFilters();}
+function exitSelectMode(){selectMode=false;selectedSet.clear();$('selBar').classList.add('hidden');$('navbar').classList.remove('hidden');if(activeTab==='consumers')$('fabBtn').classList.remove('hidden');$('bottomNav').classList.remove('hide');$('delBar').classList.add('hidden');applyFilters();}
 function toggleCard(conNo,el){if(selectedSet.has(conNo)){selectedSet.delete(conNo);el.classList.remove('selected');}else{selectedSet.add(conNo);el.classList.add('selected');}updateSelUI();}
 function toggleSelectAll(){var allSel=selectedSet.size===filtered.length;selectedSet.clear();if(!allSel)filtered.forEach(function(c){selectedSet.add(c.conNo);});document.querySelectorAll('.c-card').forEach(function(card){card.classList.toggle('selected',!allSel);});updateSelUI();}
 function updateSelUI(){var n=selectedSet.size;$('selCnt').textContent=n===0?'Tap cards to select':n+' selected';$('delBarCnt').textContent=n;$('delBar').classList.toggle('hidden',n===0);$('selAllBtn').textContent=n===filtered.length?'Deselect All':'Select All';}
@@ -645,47 +687,33 @@ function bulkDeleteConfirm(){var n=selectedSet.size;if(!n)return;$('delWho').tex
 async function doDelete(){closeSheet();if(window._bulkDelete){window._bulkDelete=false;await executeBulkDelete();}else await executeSingleDelete();}
 async function executeBulkDelete(){
   var conNos=Array.from(selectedSet);if(!conNos.length)return;toast('Deleting '+conNos.length+' consumers...');
-  var toDelete=conNos.map(function(conNo){return masterList.find(function(c){return c.conNo===conNo;});}).filter(Boolean).sort(function(a,b){return b._rowIndex-a._rowIndex;});
+  var toDelete=conNos.map(function(cn){return masterList.find(function(c){return c.conNo===cn;});}).filter(Boolean).sort(function(a,b){return b._rowIndex-a._rowIndex;});
   var deleted=0,failed=0;
   for(var i=0;i<toDelete.length;i++){
     var c=toDelete[i];
-    try{
-      if(navigator.onLine){var res=await fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({action:'deleteConsumer',token:session.token,officeId:session.officeId,sheetName:'CONSUMER DATA ALL',rowIndex:c._rowIndex,conNo:c.conNo,consumerName:c.consumerName})});var json=await res.json();if(json.success){await AN_DB.deleteConsumer(c.conNo);masterList=masterList.filter(function(x){return x.conNo!==c.conNo;});deleted++;}else failed++;}
-      else{await AN_DB.deleteConsumer(c.conNo);await AN_DB.addPendingChange('deleteConsumer',{rowIndex:c._rowIndex,conNo:c.conNo},session.officeId);masterList=masterList.filter(function(x){return x.conNo!==c.conNo;});deleted++;}
-    }catch(e){failed++;}
+    try{if(navigator.onLine){var res=await fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({action:'deleteConsumer',token:session.token,officeId:session.officeId,sheetName:'CONSUMER DATA ALL',rowIndex:c._rowIndex,conNo:c.conNo,consumerName:c.consumerName})});var json=await res.json();if(json.success){await AN_DB.deleteConsumer(c.conNo);masterList=masterList.filter(function(x){return x.conNo!==c.conNo;});deleted++;}else failed++;}
+    else{await AN_DB.deleteConsumer(c.conNo);await AN_DB.addPendingChange('deleteConsumer',{rowIndex:c._rowIndex,conNo:c.conNo},session.officeId);masterList=masterList.filter(function(x){return x.conNo!==c.conNo;});deleted++;}}catch(e){failed++;}
   }
   exitSelectMode();toast('Deleted '+deleted+(failed?' \u00b7 '+failed+' failed':''),deleted>0?'ok':'err');
   if(navigator.onLine)setTimeout(function(){loadConsumers(false);},800);else AN_DB.requestSync();
 }
 function confirmDelete(rowIdx,conNo,name){closeSheet();delRowIdx=rowIdx;delConNo=conNo;delName=name;window._bulkDelete=false;$('delWho').textContent=name;setTimeout(function(){openSheet('delSheet');},150);}
 async function executeSingleDelete(){
-  try{
-    if(navigator.onLine){var res=await fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({action:'deleteConsumer',token:session.token,officeId:session.officeId,sheetName:'CONSUMER DATA ALL',rowIndex:delRowIdx,conNo:delConNo,consumerName:delName})});var json=await res.json();if(json.success){await AN_DB.deleteConsumer(delConNo);masterList=masterList.filter(function(c){return c.conNo!==delConNo;});applyFilters();toast('Consumer deleted','ok');if(navigator.onLine)setTimeout(function(){loadConsumers(false);},800);}else toast(json.error||json.message||'Delete failed','err');}
-    else{await AN_DB.deleteConsumer(delConNo);await AN_DB.addPendingChange('deleteConsumer',{rowIndex:delRowIdx,conNo:delConNo},session.officeId);masterList=masterList.filter(function(c){return c.conNo!==delConNo;});applyFilters();toast('Deleted offline - will sync when online');AN_DB.requestSync();}
-  }catch(e){toast('Error deleting','err');}
+  try{if(navigator.onLine){var res=await fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({action:'deleteConsumer',token:session.token,officeId:session.officeId,sheetName:'CONSUMER DATA ALL',rowIndex:delRowIdx,conNo:delConNo,consumerName:delName})});var json=await res.json();if(json.success){await AN_DB.deleteConsumer(delConNo);masterList=masterList.filter(function(c){return c.conNo!==delConNo;});applyFilters();toast('Consumer deleted','ok');if(navigator.onLine)setTimeout(function(){loadConsumers(false);},800);}else toast(json.error||json.message||'Delete failed','err');}
+  else{await AN_DB.deleteConsumer(delConNo);await AN_DB.addPendingChange('deleteConsumer',{rowIndex:delRowIdx,conNo:delConNo},session.officeId);masterList=masterList.filter(function(c){return c.conNo!==delConNo;});applyFilters();toast('Deleted offline - will sync when online');AN_DB.requestSync();}}catch(e){toast('Error deleting','err');}
 }
 
-/* ADD / EDIT — Step 6 */
-function toDateInput(v){
-  if(!v)return '';
-  try{var d=new Date(v);return isNaN(d)?'':d.toISOString().split('T')[0];}
-  catch(e){return '';}
-}
+/* ADD/EDIT CONSUMER — Step 6 */
+function toDateInput(v){if(!v)return '';try{var d=new Date(v);return isNaN(d)?'':d.toISOString().split('T')[0];}catch(e){return '';}}
 
 function openAddForm(){
   CF.mode='add';CF.consumer=null;
   $('cfTitle').textContent='Add Consumer';$('cfBtnLbl').textContent='Add Consumer';
-  $('cfConNo').value='';$('cfConNo').disabled=false;
-  $('cfCName').value='';$('cfAddr').value='';$('cfLabNo').value='';
-  $('cfMeter').value='';$('cfTransf').value='';$('cfPhone').value='';
-  $('cfStatus').value='Active';
+  $('cfConNo').value='';$('cfConNo').disabled=false;$('cfCName').value='';$('cfAddr').value='';$('cfLabNo').value='';$('cfMeter').value='';$('cfTransf').value='';$('cfPhone').value='';$('cfStatus').value='Active';
   $('cfSdNo').value='';$('cfSdAmt').value='';$('cfSdDate').value='';
-  $('cfErr').classList.remove('show');$('cfErrMsg').textContent='';
-  $('cfBtn').classList.remove('loading');
-  openSheet('cfSheet');
-  setTimeout(function(){$('cfConNo').focus();},380);
+  $('cfErr').classList.remove('show');$('cfErrMsg').textContent='';$('cfBtn').classList.remove('loading');
+  openSheet('cfSheet');setTimeout(function(){$('cfConNo').focus();},380);
 }
-
 function openEditForm(conNo){
   var c=masterList.find(function(x){return x.conNo===conNo;});
   if(!c){toast('Consumer not found. Please reload.','err');return;}
@@ -693,34 +721,13 @@ function openEditForm(conNo){
   CF.mode='edit';CF.consumer=c;
   $('cfTitle').textContent='Edit Consumer';$('cfBtnLbl').textContent='Save Changes';
   $('cfConNo').value=c.conNo||'';$('cfConNo').disabled=true;
-  $('cfCName').value=c.consumerName||'';
-  $('cfAddr').value=c.address||'';
-  $('cfLabNo').value=c.labNo||'';
-  $('cfMeter').value=c.meterNo||'';
-  $('cfTransf').value=c.transfCode||'';
-  $('cfPhone').value=c.phoneNo||'';
-  $('cfStatus').value=c.status||'Active';
-  $('cfSdNo').value=c.sdPassbookNo||'';
-  $('cfSdAmt').value=c.sdAmount||'';
-  $('cfSdDate').value=toDateInput(c.sdDate);
-  $('cfErr').classList.remove('show');$('cfErrMsg').textContent='';
-  $('cfBtn').classList.remove('loading');
-  closeSheet();
-  setTimeout(function(){openSheet('cfSheet');},200);
+  $('cfCName').value=c.consumerName||'';$('cfAddr').value=c.address||'';$('cfLabNo').value=c.labNo||'';$('cfMeter').value=c.meterNo||'';$('cfTransf').value=c.transfCode||'';$('cfPhone').value=c.phoneNo||'';$('cfStatus').value=c.status||'Active';
+  $('cfSdNo').value=c.sdPassbookNo||'';$('cfSdAmt').value=c.sdAmount||'';$('cfSdDate').value=toDateInput(c.sdDate);
+  $('cfErr').classList.remove('show');$('cfErrMsg').textContent='';$('cfBtn').classList.remove('loading');
+  closeSheet();setTimeout(function(){openSheet('cfSheet');},200);
 }
-
 async function saveConsumer(){
-  var conNo=$('cfConNo').value.trim();
-  var cName=$('cfCName').value.trim();
-  var addr=$('cfAddr').value.trim();
-  var labNo=$('cfLabNo').value.trim();
-  var meter=$('cfMeter').value.trim();
-  var transf=$('cfTransf').value;
-  var phone=$('cfPhone').value.trim();
-  var status=$('cfStatus').value;
-  var sdNo=$('cfSdNo').value.trim();
-  var sdAmt=$('cfSdAmt').value.trim();
-  var sdDate=$('cfSdDate').value;
+  var conNo=$('cfConNo').value.trim(),cName=$('cfCName').value.trim(),addr=$('cfAddr').value.trim(),labNo=$('cfLabNo').value.trim(),meter=$('cfMeter').value.trim(),transf=$('cfTransf').value,phone=$('cfPhone').value.trim(),status=$('cfStatus').value,sdNo=$('cfSdNo').value.trim(),sdAmt=$('cfSdAmt').value.trim(),sdDate=$('cfSdDate').value;
   $('cfErr').classList.remove('show');
   if(!conNo){showCfErr('Consumer No. is required.');$('cfConNo').focus();return;}
   if(!cName){showCfErr('Consumer Name is required.');$('cfCName').focus();return;}
@@ -728,52 +735,182 @@ async function saveConsumer(){
   var btn=$('cfBtn');btn.classList.add('loading');
   var consumerData={ConNo:conNo,ConsumerName:cName,Address:addr,LabNo:labNo,MeterNo:meter,TransfCode:transf,PhoneNo:phone,Status:status,'Passbook/SD No':sdNo,'SD Amount':sdAmt,'SD Date':sdDate};
   if(!navigator.onLine){
-    try{
-      if(CF.mode==='add'){await AN_DB.addPendingChange('addConsumer',consumerData,session.officeId);var tmp=normalize(Object.assign({},consumerData,{_rowIndex:-1}));await AN_DB.upsertConsumer(tmp);masterList.unshift(tmp);}
-      else{await AN_DB.addPendingChange('updateConsumer',{rowIndex:CF.consumer._rowIndex,consumer:consumerData},session.officeId);var upd=normalize(Object.assign({},consumerData,{_rowIndex:CF.consumer._rowIndex}));await AN_DB.upsertConsumer(upd);var idx=masterList.findIndex(function(c){return c.conNo===CF.consumer.conNo;});if(idx!==-1)masterList[idx]=upd;}
-    }catch(e){console.warn('CF offline:',e);}
-    closeSheet();applyFilters();updateChipCounts();
-    toast(CF.mode==='add'?'Saved offline - will sync when connected':'Updated offline - will sync','');
-    AN_DB.requestSync();btn.classList.remove('loading');return;
+    try{if(CF.mode==='add'){await AN_DB.addPendingChange('addConsumer',consumerData,session.officeId);var tmp=normalize(Object.assign({},consumerData,{_rowIndex:-1}));await AN_DB.upsertConsumer(tmp);masterList.unshift(tmp);}
+    else{await AN_DB.addPendingChange('updateConsumer',{rowIndex:CF.consumer._rowIndex,consumer:consumerData},session.officeId);var upd=normalize(Object.assign({},consumerData,{_rowIndex:CF.consumer._rowIndex}));await AN_DB.upsertConsumer(upd);var idx=masterList.findIndex(function(c){return c.conNo===CF.consumer.conNo;});if(idx!==-1)masterList[idx]=upd;}}catch(e){console.warn('CF offline:',e);}
+    closeSheet();applyFilters();updateChipCounts();toast(CF.mode==='add'?'Saved offline - will sync when connected':'Updated offline - will sync','');AN_DB.requestSync();btn.classList.remove('loading');return;
   }
   try{
-    var controller=new AbortController();
-    var tid=setTimeout(function(){controller.abort();},TIMEOUT);
-    var payload=CF.mode==='add'
-      ?{action:'addConsumer',token:session.token,officeId:session.officeId,sheetName:'CONSUMER DATA ALL',consumer:consumerData}
-      :{action:'updateConsumer',token:session.token,officeId:session.officeId,sheetName:'CONSUMER DATA ALL',rowIndex:CF.consumer._rowIndex,consumer:consumerData};
-    var res=await fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify(payload),redirect:'follow',signal:controller.signal});
-    clearTimeout(tid);
+    var controller=new AbortController();var tid=setTimeout(function(){controller.abort();},TIMEOUT);
+    var payload=CF.mode==='add'?{action:'addConsumer',token:session.token,officeId:session.officeId,sheetName:'CONSUMER DATA ALL',consumer:consumerData}:{action:'updateConsumer',token:session.token,officeId:session.officeId,sheetName:'CONSUMER DATA ALL',rowIndex:CF.consumer._rowIndex,consumer:consumerData};
+    var res=await fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify(payload),redirect:'follow',signal:controller.signal});clearTimeout(tid);
     var json=await res.json();
     if(json.success){
-      if(CF.mode==='add'){
-        var saved=normalize(json.consumer||Object.assign({},consumerData,{_rowIndex:json.rowIndex||0,'S.No.':json.sNo||''}));
-        try{await AN_DB.upsertConsumer(saved);}catch(e){}
-        masterList.unshift(saved);
-      } else {
-        var updated=normalize(Object.assign({},consumerData,{_rowIndex:CF.consumer._rowIndex,'S.No.':CF.consumer.sNo,CreatedAt:CF.consumer.createdAt}));
-        try{await AN_DB.upsertConsumer(updated);}catch(e){}
-        var ix=masterList.findIndex(function(c){return c.conNo===CF.consumer.conNo;});
-        if(ix!==-1)masterList[ix]=updated;
-      }
-      closeSheet();applyFilters();updateChipCounts();
-      toast(CF.mode==='add'?'Consumer added successfully':'Consumer updated successfully','ok');
-    } else {
-      showCfErr(json.message||json.error||'Failed to save. Please try again.');
-    }
-  }catch(err){
-    showCfErr(err.name==='AbortError'?'Request timed out (30s). Check connection.':'Network error. Please retry.');
-  }
+      if(CF.mode==='add'){var saved=normalize(json.consumer||Object.assign({},consumerData,{_rowIndex:json.rowIndex||0,'S.No.':json.sNo||''}));try{await AN_DB.upsertConsumer(saved);}catch(e){}masterList.unshift(saved);}
+      else{var updated=normalize(Object.assign({},consumerData,{_rowIndex:CF.consumer._rowIndex,'S.No.':CF.consumer.sNo,CreatedAt:CF.consumer.createdAt}));try{await AN_DB.upsertConsumer(updated);}catch(e){}var ix=masterList.findIndex(function(c){return c.conNo===CF.consumer.conNo;});if(ix!==-1)masterList[ix]=updated;}
+      closeSheet();applyFilters();updateChipCounts();toast(CF.mode==='add'?'Consumer added successfully':'Consumer updated successfully','ok');
+    }else{showCfErr(json.message||json.error||'Failed to save. Please try again.');}
+  }catch(err){showCfErr(err.name==='AbortError'?'Request timed out (30s). Check connection.':'Network error. Please retry.');}
   btn.classList.remove('loading');
 }
 function showCfErr(msg){$('cfErrMsg').textContent=msg;$('cfErr').classList.add('show');}
 
-function switchTab(tab){document.querySelectorAll('.bnav').forEach(function(b){b.classList.remove('active');});var el=document.getElementById('bnav-'+tab);if(el)el.classList.add('active');if(tab==='activity')toast('Activity Log - coming soon!');if(tab==='admin')toast('Admin Panel - coming soon!');}
+/* ADMIN PANEL — Step 7 */
+async function loadUsers(){
+  $('userList').innerHTML=Array(3).fill('<div class="skeleton u-skel" style="height:100px;margin-bottom:10px"></div>').join('');
+  $('userEmpty').classList.add('hidden');
+  var apErr=$('apErr');apErr.classList.add('hidden');
+  if(!navigator.onLine){$('userList').innerHTML='<div class="err-bar"><span class="material-icons-round">wifi_off</span>Cannot load users while offline.</div>';return;}
+  try{
+    var controller=new AbortController();var tid=setTimeout(function(){controller.abort();},TIMEOUT);
+    var res=await fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({action:'getUsers',token:session.token}),redirect:'follow',signal:controller.signal});clearTimeout(tid);
+    var json=await res.json();
+    if(json.success){renderUserList(json.data||[]);}
+    else{$('userList').innerHTML='<div class="err-bar"><span class="material-icons-round">warning_amber</span>'+esc(json.error||'Failed to load users.')+'</div>';}
+  }catch(err){$('userList').innerHTML='<div class="err-bar"><span class="material-icons-round">warning_amber</span>'+(err.name==='AbortError'?'Request timed out.':'Network error.')+'</div>';}
+}
 
-function openSheet(id){if(activeSheet)document.getElementById(activeSheet).classList.remove('open');activeSheet=id;document.getElementById(id).classList.add('open');$('backdrop').classList.add('show');$('backdrop').onclick=id==='delSheet'?null:closeSheet;}
+function renderUserList(users){
+  _userCache={};
+  users.forEach(function(u){_userCache[u['UserID']]=u;});
+  $('userList').innerHTML='';
+  if(!users.length){$('userEmpty').classList.remove('hidden');return;}
+  $('userEmpty').classList.add('hidden');
+  var frag=document.createDocumentFragment();
+  users.forEach(function(u){frag.appendChild(makeUserCard(u));});
+  $('userList').appendChild(frag);
+}
+
+function makeUserCard(u){
+  var div=document.createElement('div');div.className='u-card';
+  var isMe=u['UserID']===session.userId;
+  var active=u['IsActive']==='TRUE'||u['IsActive']===true;
+  var role=u['Role']||'Employee';
+  var name=u['FullName']||'Unknown';
+  var username=u['Username']||'';
+  var lastLogin=u['LastLogin']?formatDate(u['LastLogin']):'Never';
+  var words=name.trim().split(' ');
+  var initials=words.length>=2?(words[0][0]+words[words.length-1][0]).toUpperCase():name.substring(0,2).toUpperCase();
+  var roleClass=role==='Admin'?'role-admin':'role-emp';
+  var dotClass=active?'on':'off';
+  var statusTxt=active?'Active':'Inactive';
+  var meName=isMe?' <span class="u-me">(You)</span>':'';
+  var actionsHtml='';
+  if(isMe){actionsHtml='<div class="u-note">Cannot modify your own account.</div>';}
+  else{
+    var toggleClass=active?'u-btn-off':'u-btn-on';
+    var toggleIco=active?'block':'check_circle';
+    var toggleTxt=active?'Deactivate':'Activate';
+    actionsHtml='<div class="u-actions"><button class="u-btn u-btn-pwd js-rpwd"><span class="material-icons-round">lock_reset</span>Reset PWD</button><button class="u-btn '+toggleClass+' js-toggle"><span class="material-icons-round">'+toggleIco+'</span>'+toggleTxt+'</button></div>';
+  }
+  div.innerHTML='<div class="u-top"><div class="u-avatar">'+esc(initials)+'</div><div class="u-info"><div class="u-name">'+esc(name)+meName+'</div><div class="u-meta">@'+esc(username)+' <span class="u-badge '+roleClass+'">'+esc(role)+'</span></div><div class="u-status"><span class="u-dot '+dotClass+'"></span>'+statusTxt+' · '+esc(lastLogin)+'</div></div></div>'+actionsHtml;
+  if(!isMe){
+    var rpBtn=div.querySelector('.js-rpwd');
+    var tgBtn=div.querySelector('.js-toggle');
+    var uid=u['UserID'];
+    var isAct=active;
+    if(rpBtn)rpBtn.addEventListener('click',function(){openResetPwdForm(uid);});
+    if(tgBtn)tgBtn.addEventListener('click',function(){promptToggleUser(uid,isAct);});
+  }
+  return div;
+}
+
+function openAddUserForm(){
+  $('auName').value='';$('auUser').value='';$('auPass').value='';
+  $('auErr').classList.remove('show');$('auErrMsg').textContent='';$('auBtn').classList.remove('loading');
+  openSheet('addUserSheet');
+  setTimeout(function(){$('auName').focus();},380);
+}
+
+async function doAddUser(){
+  var name=$('auName').value.trim(),username=$('auUser').value.trim().toLowerCase(),password=$('auPass').value;
+  $('auErr').classList.remove('show');
+  if(!name){$('auErrMsg').textContent='Full name is required.';$('auErr').classList.add('show');$('auName').focus();return;}
+  if(!username){$('auErrMsg').textContent='Username is required.';$('auErr').classList.add('show');$('auUser').focus();return;}
+  if(/\s/.test(username)){$('auErrMsg').textContent='Username cannot have spaces.';$('auErr').classList.add('show');$('auUser').focus();return;}
+  if(!password||password.length<6){$('auErrMsg').textContent='Password must be at least 6 characters.';$('auErr').classList.add('show');$('auPass').focus();return;}
+  if(!session||!session.token){location.replace('./login.html');return;}
+  var btn=$('auBtn');btn.classList.add('loading');
+  try{
+    var controller=new AbortController();var tid=setTimeout(function(){controller.abort();},TIMEOUT);
+    var res=await fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({action:'addUser',token:session.token,username:username,password:password,fullName:name,role:'Employee'}),redirect:'follow',signal:controller.signal});clearTimeout(tid);
+    var json=await res.json();
+    if(json.success){closeSheet();toast('Employee added successfully','ok');setTimeout(loadUsers,500);}
+    else{$('auErrMsg').textContent=json.error||json.message||'Failed to add user.';$('auErr').classList.add('show');}
+  }catch(err){$('auErrMsg').textContent=err.name==='AbortError'?'Request timed out.':'Network error. Please retry.';$('auErr').classList.add('show');}
+  btn.classList.remove('loading');
+}
+
+function openResetPwdForm(userId){
+  var u=_userCache[userId]||{};
+  var name=u['FullName']||'User';
+  userForReset={userId:userId,name:name};
+  $('rpTitle').textContent='Reset Password: '+name;
+  $('rpPass').value='';$('rpErr').classList.remove('show');$('rpErrMsg').textContent='';$('rpBtn').classList.remove('loading');
+  openSheet('rpSheet');
+  setTimeout(function(){$('rpPass').focus();},380);
+}
+
+async function doResetPassword(){
+  if(!userForReset)return;
+  var password=$('rpPass').value;
+  $('rpErr').classList.remove('show');
+  if(!password||password.length<6){$('rpErrMsg').textContent='Password must be at least 6 characters.';$('rpErr').classList.add('show');return;}
+  var btn=$('rpBtn');btn.classList.add('loading');
+  try{
+    var controller=new AbortController();var tid=setTimeout(function(){controller.abort();},TIMEOUT);
+    var res=await fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({action:'resetUserPassword',token:session.token,targetUserId:userForReset.userId,newPassword:password}),redirect:'follow',signal:controller.signal});clearTimeout(tid);
+    var json=await res.json();
+    if(json.success){closeSheet();toast('Password reset. User must change on next login.','ok');}
+    else{$('rpErrMsg').textContent=json.error||json.message||'Failed to reset password.';$('rpErr').classList.add('show');}
+  }catch(err){$('rpErrMsg').textContent=err.name==='AbortError'?'Request timed out.':'Network error. Please retry.';$('rpErr').classList.add('show');}
+  btn.classList.remove('loading');
+}
+
+function promptToggleUser(userId,isActive){
+  var u=_userCache[userId]||{};
+  var name=u['FullName']||'User';
+  userForToggle={userId:userId,name:name,isActive:isActive};
+  var ico=$('ugIco').querySelector('.material-icons-round');
+  if(isActive){ico.textContent='block';ico.style.color='var(--danger)';$('ugTitle').textContent='Deactivate '+name+'?';$('ugSub').textContent='This user will no longer be able to login.';$('ugConfirmBtn').style.background='var(--danger)';}
+  else{ico.textContent='check_circle';ico.style.color='var(--success)';$('ugTitle').textContent='Activate '+name+'?';$('ugSub').textContent='This user will be able to login again.';$('ugConfirmBtn').style.background='var(--success)';}
+  openSheet('ugSheet');
+}
+
+async function doToggleUser(){
+  if(!userForToggle)return;
+  closeSheet();
+  try{
+    var controller=new AbortController();var tid=setTimeout(function(){controller.abort();},TIMEOUT);
+    var res=await fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({action:'updateUser',token:session.token,targetUserId:userForToggle.userId,isActive:!userForToggle.isActive}),redirect:'follow',signal:controller.signal});clearTimeout(tid);
+    var json=await res.json();
+    if(json.success){toast(userForToggle.isActive?'User deactivated':'User activated','ok');setTimeout(loadUsers,500);}
+    else toast(json.error||json.message||'Failed.','err');
+  }catch(err){toast(err.name==='AbortError'?'Request timed out.':'Network error.','err');}
+  userForToggle=null;
+}
+
+/* TABS */
+function switchTab(tab){
+  if(selectMode)exitSelectMode();
+  activeTab=tab;
+  document.querySelectorAll('.bnav').forEach(function(b){b.classList.remove('active');});
+  var el=document.getElementById('bnav-'+tab);if(el)el.classList.add('active');
+  var isConsumers=tab==='consumers';var isAdminTab=tab==='admin';
+  $('searchSec').classList.toggle('hidden',!isConsumers);
+  $('consumerView').classList.toggle('hidden',!isConsumers);
+  $('adminPanel').classList.toggle('hidden',!isAdminTab);
+  $('fabBtn').classList.toggle('hidden',!isConsumers||selectMode);
+  if(isAdminTab)loadUsers();
+  if(tab==='activity')toast('Activity Log - coming soon!');
+  adjustLayout();
+}
+
+/* SHEETS */
+function openSheet(id){if(activeSheet)document.getElementById(activeSheet).classList.remove('open');activeSheet=id;document.getElementById(id).classList.add('open');$('backdrop').classList.add('show');$('backdrop').onclick=id==='delSheet'||id==='ugSheet'?null:closeSheet;}
 function closeSheet(){if(activeSheet){document.getElementById(activeSheet).classList.remove('open');activeSheet=null;}$('backdrop').classList.remove('show');$('backdrop').onclick=closeSheet;window._bulkDelete=false;requestAnimationFrame(function(){window.scrollTo(0,lastScrollY);});}
 function toggleEye(inputId,iconId){var inp=document.getElementById(inputId),icon=document.getElementById(iconId);inp.type=inp.type==='password'?'text':'password';icon.textContent=inp.type==='text'?'visibility':'visibility_off';}
 
+/* LONG PRESS */
 function attachLongPress(el,consumer){
   el.addEventListener('pointerdown',function(e){if(!isAdmin)return;pressPos={x:e.clientX,y:e.clientY};pressCard=el;el.classList.add('pressing');pressTimer=setTimeout(function(){if(navigator.vibrate)navigator.vibrate(50);el.classList.remove('pressing');pressTimer=null;enterSelectMode();toggleCard(consumer.conNo,el);},500);});
   el.addEventListener('pointermove',function(e){if(!pressPos)return;if(Math.abs(e.clientX-pressPos.x)>12||Math.abs(e.clientY-pressPos.y)>12)clearPressTimer();});
@@ -781,12 +918,14 @@ function attachLongPress(el,consumer){
 }
 function clearPressTimer(){clearTimeout(pressTimer);pressTimer=null;pressPos=null;if(pressCard){pressCard.classList.remove('pressing');pressCard=null;}}
 
+/* SYNC */
 function setSync(type,txt){$('syncDot').className='sync-dot '+type;$('syncTxt').textContent=txt;}
 function setRefreshSpin(on){$('refreshBtn').classList.toggle('spin',on);}
 function onOnline(){setSync('syncing','Back online - syncing...');AN_DB.requestSync();setTimeout(loadConsumers,600);}
 function onOffline(){setSync('offline','Offline - edits save locally');}
 function onSWMsg(e){var data=e.data;if(!data)return;if(data.type==='SYNC_COMPLETE'){setSync('online',data.synced+' change'+(data.synced!==1?'s':'')+' synced');loadConsumers(false);}if(data.type==='SYNC_FAILED')setSync('pending','Sync failed - will retry');}
 
+/* UTILS */
 function showErr(msg){$('consumerList').innerHTML='<div class="err-bar"><span class="material-icons-round">warning_amber</span>'+esc(msg)+'</div>';}
 function addRipple(el,e){var r=el.getBoundingClientRect(),sz=Math.max(r.width,r.height)*1.4;var rip=document.createElement('span');rip.className='ripple';rip.style.cssText='width:'+sz+'px;height:'+sz+'px;left:'+(e.clientX-r.left-sz/2)+'px;top:'+(e.clientY-r.top-sz/2)+'px;';el.appendChild(rip);setTimeout(function(){rip.remove();},600);}
 function toast(msg,type){var el=$('toast');el.textContent=msg;el.className='show '+(type||'');clearTimeout(toastT);toastT=setTimeout(function(){el.className=type||'';},2800);}
