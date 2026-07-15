@@ -674,7 +674,6 @@ function openAbout(){closeUserMenu();openSheet('aboutSheet');}
 async function handleLogout(){
   closeUserMenu();
   $('logoutOv').classList.remove('hidden');
-  try{await fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({action:'logout',token:session.token})});}catch(e){}
   await AN_DB.clearAllData();await AN_DB.clearSession();
   location.replace('./login.html');
 }
