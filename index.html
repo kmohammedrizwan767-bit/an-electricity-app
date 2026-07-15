@@ -26,7 +26,6 @@
   @keyframes bolt{from{transform:scale(.92)}to{transform:scale(1.06)}}
   .splash-name{font-family:var(--fd);font-size:20px;font-weight:700;color:#fff}
   .splash-sub{font-size:12px;color:rgba(255,255,255,.45)}
-  /* Logout overlay */
   .logout-ov{position:fixed;inset:0;background:#060C18;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;z-index:10000;}
   .logout-ov.hidden{display:none!important}
   .logout-spin{width:36px;height:36px;border:3px solid rgba(255,255,255,.2);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;}
@@ -64,7 +63,6 @@
   .btn-sh.loading .bl{display:none}
   @keyframes spin{to{transform:rotate(360deg)}}
   .btn-cancel{width:100%;background:var(--inp);border:1.5px solid var(--inp-b);border-radius:var(--rb);height:44px;font-family:var(--fd);font-size:14px;font-weight:500;color:var(--t1);cursor:pointer;margin-top:8px}
-  /* Consumer form selects */
   .cf-sel-wrap{position:relative;display:flex;align-items:center;}
   .cf-sel{flex:1;background:var(--inp);border:1.5px solid var(--inp-b);border-radius:var(--ri);height:46px;padding:0 40px 0 12px;color:var(--t1);font-family:var(--fb);font-size:14px;outline:none;-webkit-appearance:none;appearance:none;cursor:pointer;transition:border-color .15s;width:100%;}
   .cf-sel:focus{border-color:var(--primary);}
@@ -75,7 +73,6 @@
   [data-theme=light] input[type=date].sinp{color-scheme:light;}
   .cf-section-hdr{font-size:10px;font-family:var(--fd);font-weight:700;color:var(--primary);text-transform:uppercase;letter-spacing:.6px;padding:14px 0 4px;border-top:1px solid var(--card-b);margin-top:4px;}
   .det-section-hdr{font-size:10px;font-family:var(--fd);font-weight:700;color:var(--primary);text-transform:uppercase;letter-spacing:.6px;padding:14px 0 4px;border-top:1px solid var(--card-b);margin-top:4px;}
-  /* About sheet */
   .ab-logo{text-align:center;font-size:48px;margin-bottom:8px}
   .ab-name{text-align:center;font-family:var(--fd);font-size:17px;font-weight:700;color:var(--t1);margin-bottom:3px}
   .ab-ver{text-align:center;font-size:12px;color:var(--t2);margin-bottom:18px}
@@ -84,7 +81,6 @@
   .ab-row .material-icons-round{color:var(--primary);font-size:18px;flex-shrink:0;margin-top:1px}
   .ab-key{font-size:10px;color:var(--t2);font-family:var(--fd);font-weight:500;text-transform:uppercase}
   .ab-val{font-size:13px;color:var(--t1);margin-top:1px}
-  /* Delete confirm */
   .del-ico{text-align:center;margin-bottom:10px}
   .del-ico .material-icons-round{font-size:44px;color:var(--danger)}
   .del-ttl{text-align:center;font-family:var(--fd);font-size:16px;font-weight:700;color:var(--t1);margin-bottom:6px}
@@ -92,7 +88,6 @@
   .del-who{font-weight:600;color:var(--danger);display:block;margin-top:4px;font-size:14px}
   .btn-del-confirm{width:100%;background:var(--danger);color:#fff;border:none;border-radius:var(--rb);height:48px;font-family:var(--fd);font-size:15px;font-weight:600;cursor:pointer;margin-bottom:10px;transition:opacity .2s}
   .btn-del-confirm:active{opacity:.8}
-  /* Detail */
   .det-name{font-family:var(--fd);font-size:17px;font-weight:700;color:var(--t1);margin-bottom:4px}
   .det-conno{font-size:12px;color:var(--t2);margin-bottom:16px}
   .det-field{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--card-b);gap:12px}
@@ -123,7 +118,6 @@
   [data-theme=dark] .det-edit{background:rgba(25,118,210,.15)}
   .det-del{background:rgba(211,47,47,.1);color:var(--danger)}
   [data-theme=dark] .det-del{background:rgba(211,47,47,.15)}
-  /* Navbar */
   .navbar{position:fixed;top:0;left:0;right:0;height:var(--nav-h);background:var(--primary);display:flex;align-items:center;justify-content:space-between;padding:0 12px;z-index:100;box-shadow:0 2px 10px rgba(0,0,0,.2);}
   .nav-left{display:flex;align-items:center;gap:10px}
   .nav-bolt{font-size:22px;line-height:1}
@@ -138,7 +132,6 @@
   .sel-cancel .material-icons-round{font-size:20px}
   .sel-cnt{flex:1;font-family:var(--fd);font-size:15px;font-weight:600;color:#fff}
   .sel-all-btn{background:rgba(255,255,255,.15);border:none;border-radius:20px;padding:6px 14px;font-family:var(--fd);font-size:12px;font-weight:500;color:#fff;cursor:pointer;white-space:nowrap}
-  /* User menu */
   .user-menu{position:fixed;top:calc(var(--nav-h) + 8px);right:12px;background:var(--card);border:1px solid var(--card-b);border-radius:20px;padding:16px;z-index:200;min-width:210px;box-shadow:var(--sh-lg);opacity:0;transform:translateY(-8px) scale(.96);pointer-events:none;transition:opacity .2s var(--ease),transform .2s var(--ease);}
   .user-menu.show{opacity:1;transform:none;pointer-events:all}
   .um-avatar{width:42px;height:42px;border-radius:50%;background:var(--primary);display:flex;align-items:center;justify-content:center;margin-bottom:8px}
@@ -154,7 +147,6 @@
   .mi.install{color:var(--success)}
   .mi.install .material-icons-round{color:var(--success)}
   .menu-ov{position:fixed;inset:0;z-index:150}
-  /* Search */
   .search-sec{position:fixed;top:var(--nav-h);left:0;right:0;background:var(--bg);padding:10px 14px 0;z-index:90;border-bottom:1px solid var(--card-b);}
   .search-wrap{display:flex;align-items:center;background:var(--inp);border:1.5px solid var(--inp-b);border-radius:var(--ri);padding:0 12px;gap:8px;height:44px}
   .search-wrap:focus-within{border-color:var(--primary)}
@@ -197,7 +189,6 @@
   .refresh-btn:active{color:var(--primary)}
   .refresh-btn .material-icons-round{font-size:18px}
   .refresh-btn.spin .material-icons-round{animation:spin .7s linear infinite}
-  /* Consumer card */
   .c-card{background:var(--card);border:1px solid var(--card-b);border-radius:var(--r);padding:13px 14px;margin-bottom:9px;box-shadow:var(--sh);position:relative;overflow:hidden;animation:fadeUp .28s var(--ease) both;cursor:pointer;transition:transform .1s,border-color .15s,background .15s;user-select:none;-webkit-user-select:none;}
   @keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
   .c-card:active{transform:scale(.985)}
@@ -263,7 +254,7 @@
   #toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
   #toast.err{background:var(--danger)}
   #toast.ok{background:var(--success)}
-  /* ─── ADMIN PANEL ─────────────────────────────── */
+  /* ADMIN PANEL */
   .admin-panel{padding:4px 0;}
   .ap-hdr{display:flex;align-items:center;justify-content:space-between;padding:8px 0 16px;}
   .ap-title{font-family:var(--fd);font-size:16px;font-weight:700;color:var(--t1);}
@@ -299,13 +290,28 @@
   .u-note{font-size:11px;color:var(--t2);margin-top:10px;padding-top:10px;border-top:1px solid var(--card-b);text-align:center;}
   .ap-empty{text-align:center;padding:48px 24px;color:var(--t2);}
   .ap-empty .material-icons-round{font-size:48px;opacity:.3;display:block;margin-bottom:12px;}
-  /* Toggle confirm sheet */
   .ug-icon-ok .material-icons-round{color:var(--success)!important;}
+  /* ACTIVITY PANEL */
+  .activity-panel{padding:4px 0;}
+  .act-hdr{display:flex;align-items:center;justify-content:space-between;padding:8px 0 16px;}
+  .act-hdr-title{font-family:var(--fd);font-size:16px;font-weight:700;color:var(--t1);}
+  .act-card{background:var(--card);border:1px solid var(--card-b);border-radius:var(--r);padding:13px 14px;margin-bottom:9px;box-shadow:var(--sh);animation:fadeUp .28s var(--ease) both;}
+  .act-inner{display:flex;gap:12px;align-items:flex-start;}
+  .act-ico-wrap{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+  .act-ico{font-size:18px;}
+  .act-body{flex:1;min-width:0;}
+  .act-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:4px;}
+  .act-action{font-family:var(--fd);font-size:13px;font-weight:600;color:var(--t1);line-height:1.3;}
+  .act-time{font-size:11px;color:var(--t2);flex-shrink:0;white-space:nowrap;}
+  .act-conno{font-size:11.5px;font-family:var(--fd);font-weight:600;color:var(--primary);background:rgba(0,82,180,.1);padding:2px 8px;border-radius:7px;display:inline-block;margin-bottom:5px;}
+  [data-theme=dark] .act-conno{background:rgba(0,120,255,.2);color:#90CAF9;}
+  .act-meta{font-size:12px;color:var(--t2);display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
+  .act-role{font-size:10px;font-family:var(--fd);font-weight:600;padding:2px 7px;border-radius:7px;}
+  .act-details{font-size:11.5px;color:var(--t2);margin-top:5px;line-height:1.4;}
   </style>
 </head>
 <body>
 <div id="splash" class="splash"><div class="splash-bolt">&#9889;</div><div class="splash-name">A&amp;N Electricity</div><div class="splash-sub">Consumer Manager</div></div>
-<!-- Logout overlay -->
 <div class="logout-ov hidden" id="logoutOv"><div class="logout-spin"></div><div class="logout-txt">Signing out...</div></div>
 <div class="update-banner hidden" id="updateBanner"><span>&#128260; New version available</span><button class="upd-btn" onclick="applyUpdate()">Update Now</button></div>
 <nav class="navbar" id="navbar">
@@ -332,7 +338,6 @@
   <button class="mi danger" onclick="handleLogout()"><span class="material-icons-round">logout</span>Sign Out</button>
 </div>
 <div class="menu-ov hidden" id="menuOv" onclick="closeUserMenu()"></div>
-<!-- CHANGE PASSWORD SHEET -->
 <div class="bottom-sheet" id="cpSheet">
   <div class="sheet-handle" id="cpHandle"></div><div class="sheet-title">Change Password</div>
   <div class="s-alert err" id="cpErr"><span class="material-icons-round">error_outline</span><span id="cpErrMsg"></span></div>
@@ -342,7 +347,6 @@
   <div class="sf"><label class="sl">Confirm New Password</label><div class="siw"><span class="material-icons-round">lock_outline</span><input class="sinp" type="password" id="cpCfm" placeholder="Repeat new password" autocomplete="new-password"><button class="eye" onclick="toggleEye('cpCfm','cpE3')"><span class="material-icons-round" id="cpE3">visibility_off</span></button></div></div>
   <button class="btn-sh" id="cpBtn" onclick="submitCP()"><span class="bl">Update Password</span><div class="spin"></div></button>
 </div>
-<!-- ABOUT SHEET -->
 <div class="bottom-sheet" id="aboutSheet">
   <div class="sheet-handle" id="aboutHandle"></div>
   <div class="ab-logo">&#9889;</div><div class="ab-name">A&amp;N Electricity</div><div class="ab-ver">Consumer Manager v1.0.0</div>
@@ -351,9 +355,7 @@
   <div class="ab-row"><span class="material-icons-round">storage</span><div><div class="ab-key">Data</div><div class="ab-val">Google Sheets &#183; Private &amp; Secure</div></div></div>
   <div class="ab-row"><span class="material-icons-round">offline_bolt</span><div><div class="ab-key">Platform</div><div class="ab-val">PWA &#183; Works Offline &#183; GitHub Pages</div></div></div>
 </div>
-<!-- DETAIL SHEET -->
 <div class="bottom-sheet" id="detailSheet"><div class="sheet-handle" id="detHandle"></div><div class="det-name" id="detName">&#8212;</div><div class="det-conno" id="detConno">&#8212;</div><div id="detFields"></div><div class="det-actions" id="detActions"></div></div>
-<!-- DELETE CONFIRM SHEET -->
 <div class="bottom-sheet" id="delSheet">
   <div class="sheet-handle" id="delHandle"></div>
   <div class="del-ico"><span class="material-icons-round">delete_forever</span></div>
@@ -362,7 +364,6 @@
   <button class="btn-del-confirm" onclick="doDelete()">Yes, Delete Permanently</button>
   <button class="btn-cancel" onclick="closeSheet()">Cancel</button>
 </div>
-<!-- USER TOGGLE CONFIRM SHEET -->
 <div class="bottom-sheet" id="ugSheet">
   <div class="sheet-handle" id="ugHandle"></div>
   <div class="del-ico" id="ugIco"><span class="material-icons-round">block</span></div>
@@ -371,7 +372,6 @@
   <button class="btn-del-confirm" id="ugConfirmBtn" onclick="doToggleUser()">Confirm</button>
   <button class="btn-cancel" onclick="closeSheet()">Cancel</button>
 </div>
-<!-- CONSUMER FORM SHEET — Add/Edit + SD -->
 <div class="bottom-sheet" id="cfSheet">
   <div class="sheet-handle" id="cfHandle"></div>
   <div class="sheet-title" id="cfTitle">Add Consumer</div>
@@ -391,7 +391,6 @@
   <button class="btn-sh" id="cfBtn" onclick="saveConsumer()"><span class="bl" id="cfBtnLbl">Add Consumer</span><div class="spin"></div></button>
   <button class="btn-cancel" onclick="closeSheet()">Cancel</button>
 </div>
-<!-- ADD USER SHEET -->
 <div class="bottom-sheet" id="addUserSheet">
   <div class="sheet-handle" id="addUserHandle"></div>
   <div class="sheet-title">Add Employee</div>
@@ -403,7 +402,6 @@
   <button class="btn-sh" id="auBtn" onclick="doAddUser()"><span class="bl">Add Employee</span><div class="spin"></div></button>
   <button class="btn-cancel" onclick="closeSheet()">Cancel</button>
 </div>
-<!-- RESET PASSWORD SHEET -->
 <div class="bottom-sheet" id="rpSheet">
   <div class="sheet-handle" id="rpHandle"></div>
   <div class="sheet-title" id="rpTitle">Reset Password</div>
@@ -413,9 +411,7 @@
   <button class="btn-sh" id="rpBtn" onclick="doResetPassword()"><span class="bl">Reset Password</span><div class="spin"></div></button>
   <button class="btn-cancel" onclick="closeSheet()">Cancel</button>
 </div>
-<!-- BACKDROP -->
 <div class="backdrop" id="backdrop" onclick="closeSheet()"></div>
-<!-- SEARCH SECTION -->
 <div class="search-sec" id="searchSec">
   <div class="search-wrap"><span class="material-icons-round s-ico">search</span><input class="search-inp" type="search" id="searchInp" placeholder="Name, ConNo, meter, phone, address&#8230;" autocomplete="off" autocorrect="off" autocapitalize="none"><button class="s-clr hidden" id="sClear" onclick="clearSearch()"><span class="material-icons-round">close</span></button></div>
   <div class="f-row">
@@ -448,13 +444,11 @@
   </div></div>
 </div>
 <main class="main" id="main">
-  <!-- Consumer view -->
   <div id="consumerView">
     <div class="sync-row"><span class="sync-dot syncing" id="syncDot"></span><span class="sync-txt" id="syncTxt">Loading&#8230;</span><span class="cnt-txt" id="cntTxt"></span><button class="refresh-btn" id="refreshBtn" onclick="refreshData()"><span class="material-icons-round">refresh</span></button></div>
     <div id="consumerList"></div><div id="sentinel"></div>
     <div class="empty-state hidden" id="emptyState"><span class="material-icons-round" id="emptyIco">people_outline</span><div class="empty-title" id="emptyTtl">No consumers yet</div><div class="empty-sub" id="emptySub">Tap + to add the first consumer</div></div>
   </div>
-  <!-- Admin panel (hidden by default) -->
   <div id="adminPanel" class="hidden admin-panel">
     <div class="ap-hdr">
       <div class="ap-title">Office Employees</div>
@@ -463,6 +457,15 @@
     <div class="s-alert err hidden" id="apErr" style="margin-bottom:12px"><span class="material-icons-round">error_outline</span><span id="apErrMsg"></span></div>
     <div id="userList"></div>
     <div class="ap-empty hidden" id="userEmpty"><span class="material-icons-round">people_outline</span><div style="font-family:var(--fd);font-weight:700;margin-bottom:4px;">No employees yet</div><div style="font-size:12px;">Tap + to add the first employee</div></div>
+  </div>
+  <!-- ACTIVITY PANEL -->
+  <div id="activityPanel" class="hidden activity-panel">
+    <div class="act-hdr">
+      <div class="act-hdr-title">Activity Log</div>
+      <button class="refresh-btn" id="actRefreshBtn" onclick="loadActivity()"><span class="material-icons-round">refresh</span></button>
+    </div>
+    <div id="activityList"></div>
+    <div class="ap-empty hidden" id="activityEmpty"><span class="material-icons-round">history</span><div style="font-family:var(--fd);font-weight:700;margin-bottom:4px;">No activity yet</div><div style="font-size:12px;">Actions will appear here</div></div>
   </div>
 </main>
 <div class="del-bar hidden" id="delBar"><button class="del-bar-btn" onclick="bulkDeleteConfirm()"><span class="material-icons-round">delete</span>Delete Selected (<span id="delBarCnt">0</span>)</button></div>
@@ -487,9 +490,7 @@ let delRowIdx=0,delConNo='',delName='';
 let pressTimer=null,pressPos=null,pressCard=null;
 let deferredInstall=null,swReg=null;
 let activeTab='consumers';
-// Consumer form state
 const CF={mode:'add',consumer:null};
-// User management state
 let userForReset=null,userForToggle=null;
 var _userCache={};
 const $=id=>document.getElementById(id);
@@ -584,7 +585,7 @@ function normalize(c){
 
 function updateChipCounts(){
   var counts={};masterList.forEach(function(c){if(c.transfCode)counts[c.transfCode]=(counts[c.transfCode]||0)+1;});
-  document.querySelectorAll('.chip').forEach(function(chip){var a=chip.dataset.area;if(!a)return;if(a==='ALL')chip.textContent='All ('+masterList.length+')';else if(counts[a])chip.textContent=a+' \u00b7 '+counts[a];});
+  document.querySelectorAll('.chip').forEach(function(chip){var a=chip.dataset.area;if(!a)return;if(a==='ALL')chip.textContent='All ('+masterList.length+')';else if(counts[a])chip.textContent=a+' · '+counts[a];});
 }
 
 function applyFilters(){
@@ -615,7 +616,7 @@ function makeCard(c){
   var addr=c.address?'<div class="c-mi addr"><span class="material-icons-round">location_on</span>'+esc(c.address).substring(0,28)+'</div>':'';
   var check=selectMode?'<div class="c-check"><span class="material-icons-round">check</span></div>':'';
   var arrow=selectMode?'':'<span class="c-arrow material-icons-round">chevron_right</span>';
-  div.innerHTML='<div class="c-inner">'+check+'<div class="c-body"><div class="c-row1"><span class="c-conno">'+esc(c.conNo||'\u2014')+'</span><div class="badges">'+area+'<span class="status-badge '+status+'">'+esc(c.status||'Active')+'</span></div></div><div class="c-name">'+esc(c.consumerName||'\u2014')+'</div><div class="c-meta">'+meter+phone+addr+'</div></div>'+arrow+'</div>';
+  div.innerHTML='<div class="c-inner">'+check+'<div class="c-body"><div class="c-row1"><span class="c-conno">'+esc(c.conNo||'—')+'</span><div class="badges">'+area+'<span class="status-badge '+status+'">'+esc(c.status||'Active')+'</span></div></div><div class="c-name">'+esc(c.consumerName||'—')+'</div><div class="c-meta">'+meter+phone+addr+'</div></div>'+arrow+'</div>';
   if(selectMode){div.addEventListener('click',function(){toggleCard(c.conNo,div);});}
   else{div.addEventListener('click',function(){openDetail(c);});attachLongPress(div,c);div.addEventListener('pointerdown',function(e){addRipple(div,e);});}
   return div;
@@ -625,19 +626,19 @@ function renderSkeleton(){$('emptyState').classList.add('hidden');$('consumerLis
 
 function openDetail(c){
   lastScrollY=window.scrollY;
-  $('detName').textContent=c.consumerName||'\u2014';
-  $('detConno').textContent='Consumer No: '+(c.conNo||'\u2014');
+  $('detName').textContent=c.consumerName||'—';
+  $('detConno').textContent='Consumer No: '+(c.conNo||'—');
   var fh='';
   function af(lbl,val){fh+='<div class="det-field"><span class="det-label">'+lbl+'</span><span class="det-value">'+val+'</span></div>';}
-  af('Serial No',esc(c.sNo||'\u2014'));af('Meter No',esc(c.meterNo||'\u2014'));af('Area Code',esc(c.transfCode||'\u2014'));af('Address',esc(c.address||'\u2014'));af('Lab No',esc(c.labNo||'\u2014'));
-  if(c.phoneNo){var cl=c.phoneNo.replace(/\D/g,'');fh+='<div class="det-field"><span class="det-label">Phone</span><div class="det-phone-row"><span class="det-phone-num">'+esc(c.phoneNo)+'</span><a href="tel:'+esc(c.phoneNo)+'" class="det-phone-btn call"><span class="material-icons-round">call</span>Call</a>'+(cl.length>=10?'<a href="https://wa.me/91'+cl.slice(-10)+'" target="_blank" rel="noopener" class="det-phone-btn wa"><span class="material-icons-round">message</span>WA</a>':'')+'</div></div>';}
-  else af('Phone','\u2014');
+  af('Serial No',esc(c.sNo||'—'));af('Meter No',esc(c.meterNo||'—'));af('Area Code',esc(c.transfCode||'—'));af('Address',esc(c.address||'—'));af('Lab No',esc(c.labNo||'—'));
+  if(c.phoneNo){var cl=c.phoneNo.replace(/[^0-9]/g,'');fh+='<div class="det-field"><span class="det-label">Phone</span><div class="det-phone-row"><span class="det-phone-num">'+esc(c.phoneNo)+'</span><a href="tel:'+esc(c.phoneNo)+'" class="det-phone-btn call"><span class="material-icons-round">call</span>Call</a>'+(cl.length>=10?'<a href="https://wa.me/91'+cl.slice(-10)+'" target="_blank" rel="noopener" class="det-phone-btn wa"><span class="material-icons-round">message</span>WA</a>':'')+'</div></div>';}
+  else af('Phone','—');
   var st=(c.status||'Active').toLowerCase();fh+='<div class="det-field"><span class="det-label">Status</span><span class="det-badge '+st+'">'+esc(c.status||'Active')+'</span></div>';
-  af('Last Edited By',esc(c.lastEditedBy||'\u2014'));af('Created',esc(formatDate(c.createdAt)));
+  af('Last Edited By',esc(c.lastEditedBy||'—'));af('Created',esc(formatDate(c.createdAt)));
   fh+='<div class="det-section-hdr">Security Deposit</div>';
-  af('Passbook/SD No',esc(c.sdPassbookNo||'\u2014'));
-  af('SD Amount',c.sdAmount?'\u20b9 '+esc(c.sdAmount):'\u2014');
-  af('SD Date',c.sdDate?esc(formatDate(c.sdDate)):'\u2014');
+  af('Passbook/SD No',esc(c.sdPassbookNo||'—'));
+  af('SD Amount',c.sdAmount?'&#8377; '+esc(c.sdAmount):'—');
+  af('SD Date',c.sdDate?esc(formatDate(c.sdDate)):'—');
   $('detFields').innerHTML=fh;
   var delBtn=isAdmin?'<button class="det-btn det-del" onclick="confirmDelete('+c._rowIndex+',\''+esc(c.conNo)+'\',\''+esc(c.consumerName)+'\')"><span class="material-icons-round">delete</span>Delete</button>':'';
   $('detActions').innerHTML='<button class="det-btn det-edit" onclick="openEditForm(\''+esc(c.conNo)+'\')"><span class="material-icons-round">edit</span>Edit</button>'+delBtn;
@@ -648,7 +649,7 @@ $('searchInp').addEventListener('input',function(e){searchQ=e.target.value;$('sC
 function clearSearch(){$('searchInp').value='';searchQ='';$('sClear').classList.add('hidden');applyFilters();}
 function setArea(el,code){activeArea=code;document.querySelectorAll('.chip').forEach(function(c){c.classList.remove('active');});el.classList.add('active');applyFilters();}
 function setStatus(el,status){activeStatus=status;document.querySelectorAll('.f-pill').forEach(function(p){p.classList.remove('active','active-s','inactive-s','defaulter-s');});if(status==='ALL')el.classList.add('active');else if(status==='Active')el.classList.add('active-s');else if(status==='Inactive')el.classList.add('inactive-s');else if(status==='Defaulter')el.classList.add('defaulter-s');applyFilters();}
-function cycleSort(){var orders=['default','asc','desc'],labels=['Default','A \u2192 Z','Z \u2192 A'];var cur=orders.indexOf(sortOrder);sortOrder=orders[(cur+1)%3];$('sortLbl').textContent=labels[orders.indexOf(sortOrder)];$('sortBtn').classList.toggle('active',sortOrder!=='default');applyFilters();}
+function cycleSort(){var orders=['default','asc','desc'],labels=['Default','A → Z','Z → A'];var cur=orders.indexOf(sortOrder);sortOrder=orders[(cur+1)%3];$('sortLbl').textContent=labels[orders.indexOf(sortOrder)];$('sortBtn').classList.toggle('active',sortOrder!=='default');applyFilters();}
 
 function applyTheme(t){document.documentElement.setAttribute('data-theme',t);$('themeIcon').textContent=t==='dark'?'dark_mode':'light_mode';$('themeColorMeta').content=t==='dark'?'#0F1F3C':'#0052B4';localStorage.setItem('an_elect_theme',t);}
 $('themeToggle').addEventListener('click',function(){applyTheme(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark');});
@@ -694,7 +695,7 @@ async function executeBulkDelete(){
     try{if(navigator.onLine){var res=await fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({action:'deleteConsumer',token:session.token,officeId:session.officeId,sheetName:'CONSUMER DATA ALL',rowIndex:c._rowIndex,conNo:c.conNo,consumerName:c.consumerName})});var json=await res.json();if(json.success){await AN_DB.deleteConsumer(c.conNo);masterList=masterList.filter(function(x){return x.conNo!==c.conNo;});deleted++;}else failed++;}
     else{await AN_DB.deleteConsumer(c.conNo);await AN_DB.addPendingChange('deleteConsumer',{rowIndex:c._rowIndex,conNo:c.conNo},session.officeId);masterList=masterList.filter(function(x){return x.conNo!==c.conNo;});deleted++;}}catch(e){failed++;}
   }
-  exitSelectMode();toast('Deleted '+deleted+(failed?' \u00b7 '+failed+' failed':''),deleted>0?'ok':'err');
+  exitSelectMode();toast('Deleted '+deleted+(failed?' · '+failed+' failed':''),deleted>0?'ok':'err');
   if(navigator.onLine)setTimeout(function(){loadConsumers(false);},800);else AN_DB.requestSync();
 }
 function confirmDelete(rowIdx,conNo,name){closeSheet();delRowIdx=rowIdx;delConNo=conNo;delName=name;window._bulkDelete=false;$('delWho').textContent=name;setTimeout(function(){openSheet('delSheet');},150);}
@@ -703,7 +704,7 @@ async function executeSingleDelete(){
   else{await AN_DB.deleteConsumer(delConNo);await AN_DB.addPendingChange('deleteConsumer',{rowIndex:delRowIdx,conNo:delConNo},session.officeId);masterList=masterList.filter(function(c){return c.conNo!==delConNo;});applyFilters();toast('Deleted offline - will sync when online');AN_DB.requestSync();}}catch(e){toast('Error deleting','err');}
 }
 
-/* ADD/EDIT CONSUMER — Step 6 */
+/* ADD/EDIT CONSUMER */
 function toDateInput(v){if(!v)return '';try{var d=new Date(v);return isNaN(d)?'':d.toISOString().split('T')[0];}catch(e){return '';}}
 
 function openAddForm(){
@@ -754,7 +755,7 @@ async function saveConsumer(){
 }
 function showCfErr(msg){$('cfErrMsg').textContent=msg;$('cfErr').classList.add('show');}
 
-/* ADMIN PANEL — Step 7 */
+/* ADMIN PANEL */
 async function loadUsers(){
   $('userList').innerHTML=Array(3).fill('<div class="skeleton u-skel" style="height:100px;margin-bottom:10px"></div>').join('');
   $('userEmpty').classList.add('hidden');
@@ -826,7 +827,7 @@ async function doAddUser(){
   $('auErr').classList.remove('show');
   if(!name){$('auErrMsg').textContent='Full name is required.';$('auErr').classList.add('show');$('auName').focus();return;}
   if(!username){$('auErrMsg').textContent='Username is required.';$('auErr').classList.add('show');$('auUser').focus();return;}
-  if(/\s/.test(username)){$('auErrMsg').textContent='Username cannot have spaces.';$('auErr').classList.add('show');$('auUser').focus();return;}
+  if(username.indexOf(' ')>=0){$('auErrMsg').textContent='Username cannot have spaces.';$('auErr').classList.add('show');$('auUser').focus();return;}
   if(!password||password.length<6){$('auErrMsg').textContent='Password must be at least 6 characters.';$('auErr').classList.add('show');$('auPass').focus();return;}
   if(!session||!session.token){location.replace('./login.html');return;}
   var btn=$('auBtn');btn.classList.add('loading');
@@ -889,19 +890,84 @@ async function doToggleUser(){
   userForToggle=null;
 }
 
+/* ACTIVITY LOG - Step 8 */
+function getActionMeta(action){
+  var a=(action||'').toUpperCase();
+  var map=[
+    {keys:['ADD_CONSUMER','ADD'],icon:'add_circle',color:'#2E7D32',bg:'rgba(46,125,50,.12)',label:'Added Consumer'},
+    {keys:['UPDATE_CONSUMER','EDIT','UPDATE'],icon:'edit',color:'#0052B4',bg:'rgba(0,82,180,.1)',label:'Edited Consumer'},
+    {keys:['DELETE_CONSUMER','DELETE'],icon:'delete',color:'#D32F2F',bg:'rgba(211,47,47,.12)',label:'Deleted Consumer'},
+    {keys:['BULK_DELETE'],icon:'delete_sweep',color:'#D32F2F',bg:'rgba(211,47,47,.12)',label:'Bulk Delete'},
+    {keys:['IMPORT'],icon:'upload_file',color:'#7B1FA2',bg:'rgba(123,31,162,.1)',label:'Import'},
+    {keys:['LOGIN'],icon:'login',color:'#F57C00',bg:'rgba(245,124,0,.1)',label:'Login'},
+    {keys:['LOGOUT'],icon:'logout',color:'#757575',bg:'rgba(120,120,120,.1)',label:'Logout'},
+    {keys:['CHANGE_PASSWORD','PASSWORD_CHANGE'],icon:'lock_reset',color:'#0288D1',bg:'rgba(2,136,209,.1)',label:'Password Changed'},
+    {keys:['ADD_USER'],icon:'person_add',color:'#00838F',bg:'rgba(0,131,143,.1)',label:'Added User'},
+    {keys:['RESET_PASSWORD'],icon:'lock_reset',color:'#E64A19',bg:'rgba(230,74,25,.1)',label:'Reset Password'},
+    {keys:['TOGGLE_USER','UPDATEUSER','UPDATE_USER'],icon:'manage_accounts',color:'#455A64',bg:'rgba(69,90,100,.1)',label:'User Updated'},
+  ];
+  for(var i=0;i<map.length;i++){if(map[i].keys.some(function(k){return a.indexOf(k)>=0;}))return map[i];}
+  return {icon:'history',color:'#5A6A85',bg:'rgba(90,106,133,.1)',label:action||'Activity'};
+}
+
+async function loadActivity(){
+  $('activityList').innerHTML=Array(5).fill('<div class="skeleton" style="height:72px;margin-bottom:9px"></div>').join('');
+  $('activityEmpty').classList.add('hidden');
+  var actRefreshBtn=$('actRefreshBtn');if(actRefreshBtn)actRefreshBtn.classList.add('spin');
+  if(!navigator.onLine){$('activityList').innerHTML='<div class="err-bar"><span class="material-icons-round">wifi_off</span>Cannot load activity while offline.</div>';if(actRefreshBtn)actRefreshBtn.classList.remove('spin');return;}
+  try{
+    var controller=new AbortController();var tid=setTimeout(function(){controller.abort();},TIMEOUT);
+    var res=await fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({action:'getActivityLog',token:session.token,limit:200}),redirect:'follow',signal:controller.signal});clearTimeout(tid);
+    var json=await res.json();
+    if(json.success){renderActivityList(json.data||[]);}
+    else if(json.code==='UNAUTHORIZED'||json.error==='SESSION_EXPIRED'){await AN_DB.clearSession();location.replace('./login.html');}
+    else{$('activityList').innerHTML='<div class="err-bar"><span class="material-icons-round">warning_amber</span>'+esc(json.error||'Failed to load activity.')+'</div>';}
+  }catch(err){$('activityList').innerHTML='<div class="err-bar"><span class="material-icons-round">warning_amber</span>'+(err.name==='AbortError'?'Request timed out.':'Network error.')+'</div>';}
+  if(actRefreshBtn)actRefreshBtn.classList.remove('spin');
+}
+
+function renderActivityList(entries){
+  $('activityList').innerHTML='';
+  if(!entries.length){$('activityEmpty').classList.remove('hidden');return;}
+  $('activityEmpty').classList.add('hidden');
+  var frag=document.createDocumentFragment();
+  entries.forEach(function(e){frag.appendChild(makeActivityCard(e));});
+  $('activityList').appendChild(frag);
+}
+
+function makeActivityCard(entry){
+  var div=document.createElement('div');div.className='act-card';
+  var action=entry.Action||entry.action||'';
+  var meta=getActionMeta(action);
+  var fullName=esc(entry.FullName||entry.fullName||'Unknown');
+  var role=entry.Role||entry.role||'';
+  var conNo=entry.ConNo||entry.conNo||'';
+  var details=esc(entry.Details||entry.details||'');
+  var ts=entry.Timestamp||entry.timestamp||'';
+  var timeStr=ts?formatDate(ts):'';
+  var roleClass=role==='Admin'?'role-admin':'role-emp';
+  var conNoHtml=conNo?'<div class="act-conno">'+esc(conNo)+'</div>':'';
+  var detailsHtml=details?'<div class="act-details">'+details+'</div>':'';
+  div.innerHTML='<div class="act-inner"><div class="act-ico-wrap" style="background:'+meta.bg+'"><span class="material-icons-round act-ico" style="color:'+meta.color+'">'+meta.icon+'</span></div><div class="act-body"><div class="act-top"><span class="act-action">'+meta.label+'</span><span class="act-time">'+esc(timeStr)+'</span></div>'+conNoHtml+'<div class="act-meta"><span>'+fullName+'</span><span class="act-role '+roleClass+'">'+esc(role)+'</span></div>'+detailsHtml+'</div></div>';
+  return div;
+}
+
 /* TABS */
 function switchTab(tab){
   if(selectMode)exitSelectMode();
   activeTab=tab;
   document.querySelectorAll('.bnav').forEach(function(b){b.classList.remove('active');});
   var el=document.getElementById('bnav-'+tab);if(el)el.classList.add('active');
-  var isConsumers=tab==='consumers';var isAdminTab=tab==='admin';
+  var isConsumers=tab==='consumers';
+  var isAdminTab=tab==='admin';
+  var isActivity=tab==='activity';
   $('searchSec').classList.toggle('hidden',!isConsumers);
   $('consumerView').classList.toggle('hidden',!isConsumers);
   $('adminPanel').classList.toggle('hidden',!isAdminTab);
+  $('activityPanel').classList.toggle('hidden',!isActivity);
   $('fabBtn').classList.toggle('hidden',!isConsumers||selectMode);
   if(isAdminTab)loadUsers();
-  if(tab==='activity')toast('Activity Log - coming soon!');
+  if(isActivity)loadActivity();
   adjustLayout();
 }
 
@@ -930,7 +996,7 @@ function showErr(msg){$('consumerList').innerHTML='<div class="err-bar"><span cl
 function addRipple(el,e){var r=el.getBoundingClientRect(),sz=Math.max(r.width,r.height)*1.4;var rip=document.createElement('span');rip.className='ripple';rip.style.cssText='width:'+sz+'px;height:'+sz+'px;left:'+(e.clientX-r.left-sz/2)+'px;top:'+(e.clientY-r.top-sz/2)+'px;';el.appendChild(rip);setTimeout(function(){rip.remove();},600);}
 function toast(msg,type){var el=$('toast');el.textContent=msg;el.className='show '+(type||'');clearTimeout(toastT);toastT=setTimeout(function(){el.className=type||'';},2800);}
 function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
-function formatDate(ts){if(!ts||ts==='\u2014')return '\u2014';try{var d=new Date(ts);if(isNaN(d))return ts;return d.toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'});}catch(e){return ts;}}
+function formatDate(ts){if(!ts||ts==='—')return '—';try{var d=new Date(ts);if(isNaN(d))return ts;return d.toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'});}catch(e){return ts;}}
 function timeAgo(ts){var d=Date.now()-ts;if(d<60000)return 'just now';if(d<3600000)return Math.floor(d/60000)+'m ago';return Math.floor(d/3600000)+'h ago';}
 
 init();
