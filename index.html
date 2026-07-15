@@ -567,6 +567,7 @@ async function loadConsumers(showSkeleton){
       await AN_DB.setAllConsumers(list);await AN_DB.setLastSync(Date.now());
       masterList=list;applyFilters();updateChipCounts();setSync('online','Synced');
     } else if(json.code==='UNAUTHORIZED'||json.error==='SESSION_EXPIRED'){
+      localStorage.removeItem('an_bio_vault');
       await AN_DB.clearSession();alert('Session expired. Please log in again.');location.replace('./login.html');
     } else{setSync('online','Loaded from cache');console.warn('[App]',json.message||json.error);}
   }catch(err){
