@@ -383,6 +383,9 @@
       border: 1px solid var(--card-border);
       border-radius: 14px;
       padding: 12px 14px; margin-bottom: 10px;
+      position: relative; cursor: pointer;
+      transition: border-color 0.15s, background 0.15s;
+      -webkit-user-select: none; user-select: none;
     }
     .con-card-top {
       display: flex; justify-content: space-between;
@@ -669,6 +672,141 @@
     }
     @keyframes ripple { to { transform: scale(4); opacity: 0; } }
 
+    /* ===== STEP 11: SELECT MODE ===================================== */
+    .vc-select-bar {
+      display: none; position: sticky; top: 0; z-index: 10;
+      background: var(--primary); padding: 10px 16px;
+      align-items: center; gap: 10px;
+    }
+    .vc-select-bar.active { display: flex; }
+    .vc-select-close {
+      background: none; border: none; color: white; cursor: pointer;
+      padding: 4px; display: flex; align-items: center;
+    }
+    .vc-select-close .material-icons-round { font-size: 22px; }
+    .vc-select-bar-text {
+      flex: 1; color: white;
+      font-family: 'Poppins', sans-serif; font-size: 14px; font-weight: 600;
+    }
+    .vc-sel-del-btn {
+      background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3);
+      color: white; border-radius: 8px; padding: 7px 12px;
+      font-family: 'Poppins', sans-serif; font-size: 13px; font-weight: 600;
+      cursor: pointer; display: flex; align-items: center; gap: 4px;
+    }
+    .vc-sel-del-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+    .vc-sel-del-btn .material-icons-round { font-size: 16px; }
+    .con-card.vc-selected {
+      border-color: var(--primary-light); background: rgba(0,82,180,0.08);
+    }
+    .con-card .vc-chk {
+      display: none; position: absolute; top: 10px; right: 10px;
+      width: 22px; height: 22px; border-radius: 50%;
+      background: var(--card-border); border: 2px solid var(--card-border);
+      align-items: center; justify-content: center;
+    }
+    .vc-select-mode .con-card .vc-chk { display: flex; }
+    .con-card.vc-selected .vc-chk { background: var(--primary); border-color: var(--primary); }
+    .vc-chk .material-icons-round { font-size: 14px; color: white; }
+
+    /* ===== STEP 11: CONSUMER DETAIL ================================== */
+    .vc-detail-row {
+      display: flex; align-items: flex-start; gap: 12px;
+      padding: 9px 0; border-bottom: 1px solid var(--card-border);
+    }
+    .vc-detail-row:last-child { border-bottom: none; }
+    .vc-detail-icon { color: var(--primary-light); font-size: 18px; flex-shrink: 0; margin-top: 1px; }
+    .vc-detail-info { flex: 1; min-width: 0; }
+    .vc-detail-label {
+      font-size: 10px; color: var(--text-secondary);
+      text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 2px;
+    }
+    .vc-detail-value { font-size: 14px; color: var(--text); font-weight: 500; word-break: break-word; }
+    .vc-detail-value.mono { font-family: monospace; font-size: 13px; }
+    .vc-phone-row { display: flex; gap: 8px; padding: 12px 20px 0; }
+    .vc-phone-btn {
+      flex: 1; padding: 10px 8px;
+      border: 1.5px solid var(--card-border); background: transparent; color: var(--text);
+      border-radius: var(--r-btn);
+      font-family: 'Poppins', sans-serif; font-size: 13px; font-weight: 500;
+      cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px;
+      transition: background 0.2s; text-decoration: none;
+    }
+    .vc-phone-btn:active { background: var(--card-border); }
+    .vc-phone-btn .material-icons-round { font-size: 18px; }
+    .vc-phone-btn.wa { color: #25D366; border-color: rgba(37,211,102,0.3); }
+    .vc-detail-actions { display: flex; gap: 10px; padding: 14px 20px 28px; }
+    .btn-edit-ac {
+      flex: 1; padding: 12px; background: var(--primary); color: white; border: none;
+      border-radius: var(--r-btn);
+      font-family: 'Poppins', sans-serif; font-size: 14px; font-weight: 600;
+      cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px;
+      transition: opacity 0.2s;
+    }
+    .btn-edit-ac:active { opacity: 0.85; }
+    .btn-del-ac {
+      flex: 1; padding: 12px; background: rgba(211,47,47,0.1); color: var(--danger);
+      border: 1.5px solid rgba(211,47,47,0.3); border-radius: var(--r-btn);
+      font-family: 'Poppins', sans-serif; font-size: 14px; font-weight: 600;
+      cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px;
+      transition: background 0.2s;
+    }
+    .btn-del-ac:active { background: rgba(211,47,47,0.2); }
+    .btn-edit-ac .material-icons-round, .btn-del-ac .material-icons-round { font-size: 18px; }
+
+    /* ===== STEP 11: DELETE CONFIRM =================================== */
+    .del-info-box {
+      background: rgba(211,47,47,0.06); border: 1px solid rgba(211,47,47,0.2);
+      border-radius: 12px; padding: 12px 14px; margin-bottom: 16px;
+    }
+    .del-info-box .dib-name {
+      font-family: 'Poppins', sans-serif; font-size: 15px; font-weight: 600;
+      color: var(--text); margin-bottom: 2px;
+    }
+    .del-info-box .dib-sub { font-size: 12px; color: var(--text-secondary); }
+    .btn-danger-full {
+      width: 100%; padding: 14px; background: var(--danger); color: white;
+      border: none; border-radius: var(--r-btn);
+      font-family: 'Poppins', sans-serif; font-size: 15px; font-weight: 600;
+      cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;
+      transition: opacity 0.2s, transform 0.1s; margin-top: 8px;
+    }
+    .btn-danger-full:disabled { opacity: 0.6; }
+    .btn-danger-full:active:not(:disabled) { transform: scale(0.98); }
+    .btn-danger-full .material-icons-round { font-size: 18px; }
+    .vcb-prog-wrap {
+      background: var(--card-border); border-radius: 2px; height: 4px;
+      overflow: hidden; margin-top: 6px;
+    }
+    .vcb-prog-bar { height: 100%; background: var(--primary); width: 0%; border-radius: 2px; transition: width 0.3s; }
+
+    /* ===== STEP 11: OFFICE TOGGLE ==================================== */
+    .office-toggle-btn {
+      padding: 7px 12px; border-radius: 8px;
+      font-family: 'Poppins', sans-serif; font-size: 12px; font-weight: 600;
+      cursor: pointer; border: 1.5px solid; transition: background 0.2s; margin-top: 8px;
+      display: inline-flex; align-items: center; gap: 4px;
+    }
+    .office-toggle-btn.btn-deactivate {
+      color: var(--danger); border-color: rgba(211,47,47,0.3); background: rgba(211,47,47,0.07);
+    }
+    .office-toggle-btn.btn-deactivate:active { background: rgba(211,47,47,0.15); }
+    .office-toggle-btn.btn-activate {
+      color: #4CAF50; border-color: rgba(76,175,80,0.3); background: rgba(76,175,80,0.07);
+    }
+    .office-toggle-btn.btn-activate:active { background: rgba(76,175,80,0.15); }
+    .office-toggle-btn .material-icons-round { font-size: 14px; }
+    .toggle-info-box {
+      border-radius: 12px; padding: 12px 14px; margin-bottom: 16px; border: 1px solid;
+    }
+    .toggle-info-box.deactivate { background: rgba(211,47,47,0.06); border-color: rgba(211,47,47,0.2); }
+    .toggle-info-box.activate   { background: rgba(76,175,80,0.06);  border-color: rgba(76,175,80,0.2);  }
+    .toggle-info-box .tib-name {
+      font-family: 'Poppins', sans-serif; font-size: 15px; font-weight: 600;
+      color: var(--text); margin-bottom: 2px;
+    }
+    .toggle-info-box .tib-sub { font-size: 12px; color: var(--text-secondary); }
+
     /* ===== LIGHT MODE ADJUSTMENTS ===== */
     .light-mode .form-input { background: #F8FBFF; }
     .light-mode .profile-dropdown { box-shadow: 0 8px 32px rgba(0,0,40,0.15); }
@@ -928,6 +1066,17 @@
     <div class="sheet-title" id="vcOfficeName">Consumers</div>
     <div class="sheet-subtitle" id="vcSubtitle">Loading...</div>
   </div>
+  <!-- Select bar — appears on 500ms long press -->
+  <div class="vc-select-bar" id="vcSelectBar">
+    <button class="vc-select-close" onclick="vcExitSelect()">
+      <span class="material-icons-round">close</span>
+    </button>
+    <span class="vc-select-bar-text" id="vcSelectCount">0 selected</span>
+    <button class="vc-sel-del-btn" id="vcSelDelBtn" disabled onclick="openVCBulkDelete()">
+      <span class="material-icons-round">delete_sweep</span>
+      Delete
+    </button>
+  </div>
   <!-- Search bar — sticky inside the sheet scroll container -->
   <div class="vc-search-wrap">
     <div class="vc-search-inner">
@@ -940,6 +1089,182 @@
   <div class="vc-count-bar" id="vcCountBar"></div>
   <!-- Consumer list -->
   <div class="vc-list" id="vcList"></div>
+</div>
+
+<!-- CONSUMER DETAIL (tap card) -->
+<div class="bottom-sheet" id="sheetVCDetail">
+  <div class="sheet-handle"></div>
+  <div class="sheet-header">
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;">
+      <div style="flex:1;min-width:0;">
+        <div class="sheet-title" id="vcd-name" style="white-space:normal;word-break:break-word;">Consumer</div>
+        <div class="sheet-subtitle" id="vcd-conno"></div>
+      </div>
+      <span id="vcd-badge" class="con-status s-active" style="margin-top:4px;flex-shrink:0;"></span>
+    </div>
+  </div>
+  <div class="sheet-body" style="padding-bottom:0;">
+    <div id="vcd-rows"></div>
+  </div>
+  <div class="vc-phone-row" id="vcd-phone-row" style="display:none;">
+    <a id="vcd-call-btn" class="vc-phone-btn" href="#">
+      <span class="material-icons-round">call</span> Call
+    </a>
+    <a id="vcd-wa-btn" class="vc-phone-btn wa" href="#">
+      <span class="material-icons-round">chat</span> WhatsApp
+    </a>
+  </div>
+  <div class="vc-detail-actions">
+    <button class="btn-edit-ac" id="vcd-edit-btn">
+      <span class="material-icons-round">edit</span> Edit
+    </button>
+    <button class="btn-del-ac" id="vcd-del-btn">
+      <span class="material-icons-round">delete</span> Delete
+    </button>
+  </div>
+</div>
+
+<!-- CONSUMER EDIT FORM -->
+<div class="bottom-sheet" id="sheetVCEdit">
+  <div class="sheet-handle"></div>
+  <div class="sheet-header">
+    <div class="sheet-title">Edit Consumer</div>
+    <div class="sheet-subtitle" id="vce-sub"></div>
+  </div>
+  <div class="sheet-body">
+    <div class="form-note" style="background:rgba(0,82,180,0.06);border-left-color:var(--primary-light);margin-bottom:16px;">
+      ConNo: <strong id="vce-conno-lbl"></strong> &nbsp;&middot;&nbsp; Read-only
+    </div>
+    <div class="form-group">
+      <label class="form-label">Consumer Name</label>
+      <input type="text" class="form-input" id="vce-name" placeholder="Full name" />
+    </div>
+    <div class="form-group">
+      <label class="form-label">Address</label>
+      <input type="text" class="form-input" id="vce-addr" placeholder="Full address" />
+    </div>
+    <div class="form-group">
+      <label class="form-label">Lab No</label>
+      <input type="text" class="form-input" id="vce-labno" placeholder="Lab number" />
+    </div>
+    <div class="form-group">
+      <label class="form-label">Meter No</label>
+      <input type="text" class="form-input" id="vce-meter" placeholder="Meter number" />
+    </div>
+    <div class="form-group">
+      <label class="form-label">Area Code</label>
+      <select class="form-input" id="vce-area">
+        <option value="">-- Select Area --</option>
+        <option>AHS</option><option>CHS</option><option>MGP1</option><option>MP1</option>
+        <option>OBS</option><option>PAO1</option><option>PLC</option><option>RBV</option>
+        <option>RGT1</option><option>RJM</option><option>RKM</option><option>SCT</option>
+        <option>SJM</option><option>SP1</option><option>SPV</option><option>SSN</option>
+        <option>SSP</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Phone No</label>
+      <input type="tel" class="form-input" id="vce-phone" placeholder="Phone number" />
+    </div>
+    <div class="form-group">
+      <label class="form-label">Status</label>
+      <select class="form-input" id="vce-status">
+        <option value="Active">Active</option>
+        <option value="Inactive">Inactive</option>
+        <option value="Defaulter">Defaulter</option>
+      </select>
+    </div>
+    <div style="border-top:1px solid var(--card-border);margin:8px 0 16px;"></div>
+    <div style="font-size:11px;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:12px;text-align:center;">Security Deposit</div>
+    <div class="form-group">
+      <label class="form-label">Passbook / SD No</label>
+      <input type="text" class="form-input" id="vce-sdno" placeholder="SD / passbook number" />
+    </div>
+    <div class="form-group">
+      <label class="form-label">SD Amount</label>
+      <input type="number" class="form-input" id="vce-sdamt" placeholder="Amount in &#8377;" />
+    </div>
+    <div class="form-group">
+      <label class="form-label">SD Date</label>
+      <input type="date" class="form-input" id="vce-sddate" />
+    </div>
+    <button class="btn-primary" id="vce-save-btn">
+      <span class="material-icons-round">save</span>
+      Save Changes
+    </button>
+    <button class="btn-secondary" onclick="hideSheet('sheetVCEdit')">Cancel</button>
+  </div>
+</div>
+
+<!-- SINGLE DELETE CONFIRM -->
+<div class="bottom-sheet" id="sheetVCDel">
+  <div class="sheet-handle"></div>
+  <div class="sheet-header">
+    <div class="sheet-title">Delete Consumer</div>
+    <div class="sheet-subtitle">This cannot be undone</div>
+  </div>
+  <div class="sheet-body">
+    <div class="del-info-box">
+      <div class="dib-name" id="vcdel-name"></div>
+      <div class="dib-sub"  id="vcdel-sub"></div>
+    </div>
+    <p style="font-size:13px;color:var(--text-secondary);margin-bottom:4px;">
+      This consumer record will be permanently removed from the office sheet.
+    </p>
+    <button class="btn-danger-full" id="vcdel-btn">
+      <span class="material-icons-round">delete_forever</span>
+      Yes, Delete Consumer
+    </button>
+    <button class="btn-secondary" onclick="hideSheet('sheetVCDel')">Cancel</button>
+  </div>
+</div>
+
+<!-- BULK DELETE CONFIRM -->
+<div class="bottom-sheet" id="sheetVCBulkDel">
+  <div class="sheet-handle"></div>
+  <div class="sheet-header">
+    <div class="sheet-title">Bulk Delete</div>
+    <div class="sheet-subtitle" id="vcbdel-sub">Delete selected consumers</div>
+  </div>
+  <div class="sheet-body">
+    <div class="del-info-box">
+      <div class="dib-name" id="vcbdel-count"></div>
+      <div class="dib-sub"  id="vcbdel-office"></div>
+    </div>
+    <p style="font-size:13px;color:var(--text-secondary);margin-bottom:12px;">
+      All selected consumer records will be permanently deleted from the office sheet.
+    </p>
+    <div id="vcbdel-prog-wrap" style="display:none;margin-bottom:12px;">
+      <div style="font-size:12px;color:var(--text-secondary);margin-bottom:4px;" id="vcbdel-prog-text">Deleting...</div>
+      <div class="vcb-prog-wrap"><div class="vcb-prog-bar" id="vcbdel-bar"></div></div>
+    </div>
+    <button class="btn-danger-full" id="vcbdel-btn">
+      <span class="material-icons-round">delete_sweep</span>
+      Delete All Selected
+    </button>
+    <button class="btn-secondary" id="vcbdel-cancel-btn" onclick="hideSheet('sheetVCBulkDel')">Cancel</button>
+  </div>
+</div>
+
+<!-- OFFICE TOGGLE CONFIRM -->
+<div class="bottom-sheet" id="sheetOfficeTog">
+  <div class="sheet-handle"></div>
+  <div class="sheet-header">
+    <div class="sheet-title" id="otog-title">Toggle Office</div>
+    <div class="sheet-subtitle" id="otog-sub">Confirm action</div>
+  </div>
+  <div class="sheet-body">
+    <div class="toggle-info-box" id="otog-box">
+      <div class="tib-name" id="otog-oname"></div>
+      <div class="tib-sub"  id="otog-oid"></div>
+    </div>
+    <p style="font-size:13px;color:var(--text-secondary);margin-bottom:4px;" id="otog-msg"></p>
+    <button class="btn-primary" id="otog-btn" style="margin-top:8px;">
+      <span class="material-icons-round" id="otog-btn-icon">toggle_off</span>
+      <span id="otog-btn-text">Confirm</span>
+    </button>
+    <button class="btn-secondary" onclick="hideSheet('sheetOfficeTog')">Cancel</button>
+  </div>
 </div>
 
 <!-- TOAST -->
@@ -956,7 +1281,7 @@
 const API_URL = 'https://script.google.com/macros/s/AKfycbyeO7pIZrT1WKPHHuR8LKxhPKgf4uELmkSkIgUefNwT88JdCBiAoTAfgKTyCBKEMmBowQ/exec';
 
 // All bottom sheet IDs — keep in sync when adding new sheets
-const ALL_SHEETS = ['sheetAddOffice','sheetApproveReq','sheetChangePwd','sheetViewConsumers'];
+const ALL_SHEETS = ['sheetAddOffice','sheetApproveReq','sheetChangePwd','sheetViewConsumers','sheetVCDetail','sheetVCEdit','sheetVCDel','sheetVCBulkDel','sheetOfficeTog'];
 
 let session         = null;
 let allOffices      = [];
@@ -1128,7 +1453,8 @@ function renderOffices(list) {
     const rawSheetId = o.sheetId || o.SheetID || '';
     const hasSheet   = !!rawSheetId;
     const active     = String(o.isActive ?? o.IsActive ?? 'false').toLowerCase() === 'true';
-    const sid        = esc(rawSheetId);
+    const sid    = esc(rawSheetId);
+    const rawOid = o.officeId || o.OfficeID || '';
     return `
       <div class="office-card">
         <div class="office-card-top">
@@ -1164,6 +1490,14 @@ function renderOffices(list) {
           onclick="openVCFromBtn(this)">
           <span class="material-icons-round">people</span>
           ${hasSheet ? 'View Consumers' : 'No Sheet Linked'}
+        </button>
+        <button class="office-toggle-btn ${active ? 'btn-deactivate' : 'btn-activate'}"
+          data-oid="${esc(rawOid)}"
+          data-name="${name}"
+          data-active="${active}"
+          onclick="openOfficeToggleFromBtn(this)">
+          <span class="material-icons-round">${active ? 'toggle_off' : 'toggle_on'}</span>
+          ${active ? 'Deactivate Office' : 'Activate Office'}
         </button>
       </div>`;
   }).join('');
@@ -1448,6 +1782,14 @@ async function handleChangePwd() {
    CONSUMER VIEW — SuperAdmin read-only
    ============================================= */
 let _vc = { sheetId:'', officeName:'', all:[], filtered:[] };
+// Step 11 state
+let _vcSelectMode = false;
+let _vcSelected   = new Set();
+let _vcLongJust   = false;    // prevents click after long press
+let vcPressT      = null;
+let _vcDetailC    = null;     // consumer open in detail sheet
+let _vcDelC       = null;     // consumer being single-deleted
+let _vcOfficeTog  = { officeId:'', officeName:'', makeActive:false };
 
 /** Called by the inline onclick on the office card button */
 function openVCFromBtn(btn) {
@@ -1460,6 +1802,7 @@ function openViewConsumers(sheetId, officeName) {
     showToast('No sheet linked to this office', 'error');
     return;
   }
+  vcExitSelect(); // reset any active select mode
   _vc = { sheetId, officeName, all:[], filtered:[] };
   document.getElementById('vcOfficeName').textContent = officeName;
   document.getElementById('vcSubtitle').textContent   = 'Loading...';
@@ -1535,7 +1878,7 @@ function renderVC(list) {
 
   const display = list.slice(0, 200);
 
-  el.innerHTML = display.map(c => {
+  el.innerHTML = display.map((c, idx) => {
     const conNo  = esc(c['ConNo']         || '&#8212;');
     const name   = esc(c['ConsumerName']  || '&#8212;');
     const area   = esc(c['TransfCode']    || '');
@@ -1547,7 +1890,8 @@ function renderVC(list) {
                  : rawSt === 'Inactive'   ? 's-inactive' : 's-active';
 
     return `
-      <div class="con-card">
+      <div class="con-card" data-idx="${idx}" onclick="onVCCardClick(this)">
+        <div class="vc-chk"><span class="material-icons-round">check</span></div>
         <div class="con-card-top">
           <span class="con-no">${conNo}</span>
           <span class="con-status ${sClass}">${esc(rawSt)}</span>
@@ -1607,6 +1951,334 @@ window.addEventListener('popstate', () => {
     history.pushState(null, '');
   }
 });
+
+/* =============================================
+   STEP 11 — CONSUMER CRUD + SELECT + OFFICE TOGGLE
+   ============================================= */
+
+/* ── Card click / long press ───────────────────── */
+function onVCCardClick(card) {
+  if (_vcLongJust) { _vcLongJust = false; return; } // long press just fired, skip
+  if (_vcSelectMode) { vcToggleSelect(card); return; }
+  const idx = parseInt(card.dataset.idx);
+  const c = _vc.filtered[idx];
+  if (c) openVCDetail(c);
+}
+
+/* ── Select mode ────────────────────────────────── */
+function vcToggleSelect(card) {
+  const idx = parseInt(card.dataset.idx);
+  if (_vcSelected.has(idx)) {
+    _vcSelected.delete(idx);
+    card.classList.remove('vc-selected');
+  } else {
+    _vcSelected.add(idx);
+    card.classList.add('vc-selected');
+  }
+  const n = _vcSelected.size;
+  document.getElementById('vcSelectCount').textContent = n + ' selected';
+  document.getElementById('vcSelDelBtn').disabled = n === 0;
+}
+
+function vcExitSelect() {
+  _vcSelectMode = false;
+  _vcSelected.clear();
+  _vcLongJust   = false;
+  clearTimeout(vcPressT); vcPressT = null;
+  document.getElementById('vcList').classList.remove('vc-select-mode');
+  const bar = document.getElementById('vcSelectBar');
+  if (bar) bar.classList.remove('active');
+  const cnt = document.getElementById('vcSelectCount');
+  if (cnt) cnt.textContent = '0 selected';
+  const btn = document.getElementById('vcSelDelBtn');
+  if (btn) btn.disabled = true;
+  document.querySelectorAll('#vcList .con-card').forEach(c => c.classList.remove('vc-selected'));
+}
+
+/* ── Consumer detail ────────────────────────────── */
+function openVCDetail(c) {
+  _vcDetailC = c;
+  document.getElementById('vcd-name').textContent  = c['ConsumerName'] || '—';
+  document.getElementById('vcd-conno').textContent = 'ConNo: ' + (c['ConNo'] || '—');
+  const rawSt  = String(c['Status'] || 'Active').trim();
+  const sClass = rawSt === 'Defaulter' ? 's-defaulter' : rawSt === 'Inactive' ? 's-inactive' : 's-active';
+  const badge  = document.getElementById('vcd-badge');
+  badge.textContent = rawSt;
+  badge.className   = 'con-status ' + sClass;
+
+  const fmtDate = v => {
+    if (!v) return '—';
+    try { return new Date(v).toLocaleDateString('en-IN', {day:'2-digit',month:'short',year:'numeric'}); }
+    catch { return String(v); }
+  };
+
+  const fields = [
+    { icon:'tag',           label:'Con No',         val: c['ConNo']          || '—', mono:true },
+    { icon:'location_on',   label:'Area Code',       val: c['TransfCode']     || '—' },
+    { icon:'electric_meter',label:'Meter No',        val: c['MeterNo']        || '—', mono:true },
+    { icon:'science',       label:'Lab No',          val: c['LabNo']          || '—', mono:true },
+    { icon:'home',          label:'Address',         val: c['Address']        || '—' },
+    { icon:'phone',         label:'Phone',           val: c['PhoneNo']        || '—' },
+    { icon:'credit_card',   label:'SD / Passbook No',val: c['Passbook/SD No'] || '—' },
+    { icon:'payments',      label:'SD Amount',       val: c['SD Amount'] ? '₹ ' + c['SD Amount'] : '—' },
+    { icon:'event',         label:'SD Date',         val: fmtDate(c['SD Date']) },
+    { icon:'edit_calendar', label:'Last Edited',     val: fmtDate(c['LastEditedAt']) },
+    { icon:'person',        label:'Edited By',       val: c['LastEditedBy']   || '—' },
+  ];
+
+  document.getElementById('vcd-rows').innerHTML = fields.map(f => `
+    <div class="vc-detail-row">
+      <span class="vc-detail-icon material-icons-round">${esc(f.icon)}</span>
+      <div class="vc-detail-info">
+        <div class="vc-detail-label">${esc(f.label)}</div>
+        <div class="vc-detail-value${f.mono ? ' mono' : ''}">${esc(String(f.val))}</div>
+      </div>
+    </div>`).join('');
+
+  const phone = String(c['PhoneNo'] || '').trim().replace(/[^0-9]/g, '');
+  const prow  = document.getElementById('vcd-phone-row');
+  if (phone) {
+    document.getElementById('vcd-call-btn').href = 'tel:+91' + phone;
+    document.getElementById('vcd-wa-btn').href   = 'https://wa.me/91' + phone;
+    prow.style.display = 'flex';
+  } else {
+    prow.style.display = 'none';
+  }
+  showSheet('sheetVCDetail');
+}
+
+/* ── Consumer edit ──────────────────────────────── */
+function openVCEdit() {
+  const c = _vcDetailC;
+  if (!c) return;
+  document.getElementById('vce-sub').textContent       = 'Editing: ' + (c['ConNo'] || '');
+  document.getElementById('vce-conno-lbl').textContent = c['ConNo'] || '—';
+  document.getElementById('vce-name').value    = c['ConsumerName']  || '';
+  document.getElementById('vce-addr').value    = c['Address']       || '';
+  document.getElementById('vce-labno').value   = c['LabNo']         || '';
+  document.getElementById('vce-meter').value   = c['MeterNo']       || '';
+  document.getElementById('vce-area').value    = c['TransfCode']    || '';
+  document.getElementById('vce-phone').value   = c['PhoneNo']       || '';
+  document.getElementById('vce-status').value  = c['Status']        || 'Active';
+  document.getElementById('vce-sdno').value    = c['Passbook/SD No'] || '';
+  document.getElementById('vce-sdamt').value   = c['SD Amount']     || '';
+  const sdRaw = c['SD Date'];
+  if (sdRaw) {
+    try { document.getElementById('vce-sddate').value = new Date(sdRaw).toISOString().split('T')[0]; }
+    catch { document.getElementById('vce-sddate').value = ''; }
+  } else { document.getElementById('vce-sddate').value = ''; }
+  showSheet('sheetVCEdit');
+}
+
+async function handleVCUpdate() {
+  const c = _vcDetailC;
+  if (!c) return;
+  if (!document.getElementById('vce-name').value.trim()) {
+    showToast('Consumer name is required', 'error'); return;
+  }
+  const btn = document.getElementById('vce-save-btn');
+  btn.disabled = true;
+  btn.innerHTML = '<div class="btn-spin"></div> Saving...';
+  const updated = {
+    'ConNo':           c['ConNo'],
+    'ConsumerName':    document.getElementById('vce-name').value.trim(),
+    'Address':         document.getElementById('vce-addr').value.trim(),
+    'LabNo':           document.getElementById('vce-labno').value.trim(),
+    'MeterNo':         document.getElementById('vce-meter').value.trim(),
+    'TransfCode':      document.getElementById('vce-area').value,
+    'PhoneNo':         document.getElementById('vce-phone').value.trim(),
+    'Status':          document.getElementById('vce-status').value,
+    'Passbook/SD No':  document.getElementById('vce-sdno').value.trim(),
+    'SD Amount':       document.getElementById('vce-sdamt').value.trim(),
+    'SD Date':         document.getElementById('vce-sddate').value,
+  };
+  try {
+    const res = await api({
+      action:        'updateConsumer',
+      token:         session.token,
+      officeSheetId: _vc.sheetId,
+      rowIndex:      c['_rowIndex'],
+      consumer:      updated
+    });
+    if (checkUnauthorized(res)) return;
+    if (res.success) {
+      Object.assign(c, updated); // update in local list
+      showToast('Consumer updated', 'success');
+      hideSheet('sheetVCEdit');
+      openVCDetail(c);           // refresh detail view
+      renderVC(_vc.filtered);    // refresh list
+    } else {
+      showToast(res.message || 'Update failed', 'error');
+    }
+  } catch (err) { showToast('Error: ' + err.message, 'error'); }
+  finally {
+    btn.disabled = false;
+    btn.innerHTML = '<span class="material-icons-round">save</span> Save Changes';
+  }
+}
+
+/* ── Single delete ──────────────────────────────── */
+function openVCDelConfirm() {
+  const c = _vcDetailC;
+  if (!c) return;
+  _vcDelC = c;
+  document.getElementById('vcdel-name').textContent = c['ConsumerName'] || '—';
+  document.getElementById('vcdel-sub').textContent  = 'ConNo: ' + (c['ConNo'] || '—') + ' · ' + _vc.officeName;
+  const btn = document.getElementById('vcdel-btn');
+  btn.disabled = false;
+  btn.innerHTML = '<span class="material-icons-round">delete_forever</span> Yes, Delete Consumer';
+  showSheet('sheetVCDel');
+}
+
+async function handleVCDelete() {
+  const c = _vcDelC;
+  if (!c) return;
+  const btn = document.getElementById('vcdel-btn');
+  btn.disabled = true;
+  btn.innerHTML = '<div class="btn-spin"></div> Deleting...';
+  try {
+    const res = await api({
+      action:        'deleteConsumer',
+      token:         session.token,
+      officeSheetId: _vc.sheetId,
+      rowIndex:      c['_rowIndex'],
+      conNo:         c['ConNo'],
+      consumerName:  c['ConsumerName']
+    });
+    if (checkUnauthorized(res)) return;
+    if (res.success) {
+      const ai = _vc.all.indexOf(c);      if (ai >= 0) _vc.all.splice(ai, 1);
+      const fi = _vc.filtered.indexOf(c); if (fi >= 0) _vc.filtered.splice(fi, 1);
+      showToast('Consumer deleted', 'success');
+      hideSheet('sheetVCDel');
+      hideSheet('sheetVCDetail');
+      renderVC(_vc.filtered);
+    } else { showToast(res.message || 'Delete failed', 'error'); }
+  } catch (err) { showToast('Error: ' + err.message, 'error'); }
+  finally {
+    btn.disabled = false;
+    btn.innerHTML = '<span class="material-icons-round">delete_forever</span> Yes, Delete Consumer';
+  }
+}
+
+/* ── Bulk delete ────────────────────────────────── */
+function openVCBulkDelete() {
+  const n = _vcSelected.size;
+  if (!n) return;
+  document.getElementById('vcbdel-count').textContent  = n + ' consumer' + (n > 1 ? 's' : '') + ' selected';
+  document.getElementById('vcbdel-office').textContent = 'From: ' + _vc.officeName;
+  document.getElementById('vcbdel-sub').textContent    = 'Delete ' + n + ' consumer' + (n > 1 ? 's' : '');
+  document.getElementById('vcbdel-prog-wrap').style.display = 'none';
+  document.getElementById('vcbdel-bar').style.width = '0%';
+  const btn = document.getElementById('vcbdel-btn');
+  btn.disabled = false;
+  btn.innerHTML = '<span class="material-icons-round">delete_sweep</span> Delete All Selected';
+  document.getElementById('vcbdel-cancel-btn').disabled = false;
+  showSheet('sheetVCBulkDel');
+}
+
+async function handleVCBulkDelete() {
+  // Sort selected indices DESC by _rowIndex to avoid row drift
+  const selArr = Array.from(_vcSelected).sort((a, b) => {
+    const ca = _vc.filtered[a], cb = _vc.filtered[b];
+    return ((cb && cb['_rowIndex']) || 0) - ((ca && ca['_rowIndex']) || 0);
+  });
+  const total = selArr.length;
+  if (!total) return;
+
+  const btn     = document.getElementById('vcbdel-btn');
+  const progW   = document.getElementById('vcbdel-prog-wrap');
+  const progBar = document.getElementById('vcbdel-bar');
+  const progTxt = document.getElementById('vcbdel-prog-text');
+  const cancel  = document.getElementById('vcbdel-cancel-btn');
+
+  btn.disabled    = true;
+  cancel.disabled = true;
+  progW.style.display = 'block';
+
+  let done = 0, failed = 0;
+  const removed = [];
+
+  for (const idx of selArr) {
+    const c = _vc.filtered[idx];
+    if (!c) { done++; continue; }
+    progTxt.textContent = 'Deleting ' + (done + 1) + ' of ' + total + '...';
+    progBar.style.width = ((done / total) * 100) + '%';
+    try {
+      const res = await api({
+        action: 'deleteConsumer', token: session.token,
+        officeSheetId: _vc.sheetId,
+        rowIndex: c['_rowIndex'], conNo: c['ConNo'], consumerName: c['ConsumerName']
+      });
+      if (res.success) removed.push(c); else failed++;
+    } catch { failed++; }
+    done++;
+  }
+  progBar.style.width = '100%';
+
+  removed.forEach(c => {
+    const ai = _vc.all.indexOf(c);      if (ai >= 0) _vc.all.splice(ai, 1);
+    const fi = _vc.filtered.indexOf(c); if (fi >= 0) _vc.filtered.splice(fi, 1);
+  });
+
+  hideSheet('sheetVCBulkDel');
+  vcExitSelect();
+  renderVC(_vc.filtered);
+  const msg = failed > 0
+    ? 'Deleted ' + removed.length + ', failed ' + failed
+    : 'Deleted ' + removed.length + ' consumer' + (removed.length !== 1 ? 's' : '');
+  showToast(msg, failed > 0 ? 'error' : 'success', 4000);
+}
+
+/* ── Office toggle ──────────────────────────────── */
+function openOfficeToggleFromBtn(btn) {
+  openOfficeToggle(btn.dataset.oid, btn.dataset.name, btn.dataset.active === 'true');
+}
+
+function openOfficeToggle(officeId, officeName, isCurrentlyActive) {
+  _vcOfficeTog = { officeId, officeName, makeActive: !isCurrentlyActive };
+  const deactivating = isCurrentlyActive;
+  document.getElementById('otog-title').textContent = deactivating ? 'Deactivate Office' : 'Activate Office';
+  document.getElementById('otog-sub').textContent   = officeName;
+  document.getElementById('otog-box').className     = 'toggle-info-box ' + (deactivating ? 'deactivate' : 'activate');
+  document.getElementById('otog-oname').textContent = officeName;
+  document.getElementById('otog-oid').textContent   = 'Office ID: ' + officeId;
+  document.getElementById('otog-msg').textContent   = deactivating
+    ? 'This will prevent the office admin and employees from logging in.'
+    : 'This will allow the office admin and employees to log in again.';
+  document.getElementById('otog-btn-icon').textContent = deactivating ? 'toggle_off' : 'toggle_on';
+  document.getElementById('otog-btn-text').textContent = deactivating ? 'Deactivate Office' : 'Activate Office';
+  const btn = document.getElementById('otog-btn');
+  btn.className = deactivating ? 'btn-danger-full' : 'btn-primary';
+  btn.style.marginTop = '8px';
+  btn.disabled = false;
+  showSheet('sheetOfficeTog');
+}
+
+async function handleOfficeToggle() {
+  const { officeId, makeActive } = _vcOfficeTog;
+  const btn = document.getElementById('otog-btn');
+  btn.disabled = true;
+  btn.innerHTML = '<div class="btn-spin"></div> ' + (makeActive ? 'Activating...' : 'Deactivating...');
+  try {
+    const res = await api({
+      action: 'toggleOfficeActive', token: session.token,
+      officeId, isActive: makeActive
+    });
+    if (checkUnauthorized(res)) return;
+    if (res.success) {
+      showToast(res.message || 'Office updated', 'success');
+      hideSheet('sheetOfficeTog');
+      loadData();
+    } else { showToast(res.message || 'Failed to update office', 'error'); }
+  } catch (err) { showToast('Error: ' + err.message, 'error'); }
+  finally {
+    btn.disabled = false;
+    const icon = makeActive ? 'toggle_on' : 'toggle_off';
+    const text = makeActive ? 'Activate Office' : 'Deactivate Office';
+    btn.innerHTML = '<span class="material-icons-round">' + icon + '</span> ' + text;
+  }
+}
 
 /* =============================================
    UNAUTHORIZED HANDLER
@@ -1719,6 +2391,39 @@ async function init() {
       : _vc.all;
     renderVC(_vc.filtered);
   });
+
+  // ── Step 11: Long press detection on consumer list (event delegation) ────────
+  const vcListEl = document.getElementById('vcList');
+  vcListEl.addEventListener('touchstart', function(e) {
+    if (_vcSelectMode) return; // already in select mode
+    const card = e.target.closest('.con-card');
+    if (!card) return;
+    vcPressT = setTimeout(() => {
+      vcPressT      = null;
+      _vcLongJust   = true;
+      _vcSelectMode = true;
+      vcListEl.classList.add('vc-select-mode');
+      document.getElementById('vcSelectBar').classList.add('active');
+      vcToggleSelect(card);
+      if (navigator.vibrate) navigator.vibrate(50);
+    }, 500);
+  }, { passive: true });
+  vcListEl.addEventListener('touchend',  () => { clearTimeout(vcPressT); vcPressT = null; }, { passive: true });
+  vcListEl.addEventListener('touchmove', () => { clearTimeout(vcPressT); vcPressT = null; }, { passive: true });
+
+  // ── Step 11: Consumer detail actions ────────────────────────────────────────
+  document.getElementById('vcd-edit-btn').addEventListener('click', openVCEdit);
+  document.getElementById('vcd-del-btn').addEventListener('click', openVCDelConfirm);
+
+  // ── Step 11: Edit save ───────────────────────────────────────────────────────
+  document.getElementById('vce-save-btn').addEventListener('click', handleVCUpdate);
+
+  // ── Step 11: Delete confirmations ────────────────────────────────────────────
+  document.getElementById('vcdel-btn').addEventListener('click', handleVCDelete);
+  document.getElementById('vcbdel-btn').addEventListener('click', handleVCBulkDelete);
+
+  // ── Step 11: Office toggle confirm ───────────────────────────────────────────
+  document.getElementById('otog-btn').addEventListener('click', handleOfficeToggle);
 
   // Eye buttons (password fields)
   setupEyeButtons();
