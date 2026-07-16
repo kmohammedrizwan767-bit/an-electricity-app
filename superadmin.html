@@ -1230,6 +1230,9 @@ async function loadData() {
       api({ action: 'getOfficeRequests', token: session.token })
     ]);
 
+    // Session expired — clear vault and redirect to login
+    if (checkUnauthorized(offRes)) return;
+
     if (offRes.success) {
       allOffices = offRes.data || [];
       renderOffices(allOffices);
@@ -1476,6 +1479,8 @@ async function fetchOfficeConsumers() {
       officeSheetId: _vc.sheetId          // SuperAdmin explicit sheet override
     });
 
+    if (checkUnauthorized(res)) return;
+
     if (res.success) {
       _vc.all      = res.data || [];
       _vc.filtered = _vc.all;
@@ -1602,6 +1607,25 @@ window.addEventListener('popstate', () => {
     history.pushState(null, '');
   }
 });
+
+/* =============================================
+   UNAUTHORIZED HANDLER
+   Clears vault + session and redirects to login
+   Called whenever any API returns UNAUTHORIZED
+   ============================================= */
+function checkUnauthorized(res) {
+  if (!res) return false;
+  if (res.code === 'UNAUTHORIZED' ||
+      (res.message || '').toLowerCase().includes('session expired') ||
+      (res.message || '').toLowerCase().includes('please login')) {
+    localStorage.removeItem('an_bio_vault');
+    AN_DB.clearSession();
+    AN_DB.clearAllData();
+    window.location.replace('./login.html');
+    return true;
+  }
+  return false;
+}
 
 /* =============================================
    INIT
