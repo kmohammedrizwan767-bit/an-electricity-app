@@ -335,6 +335,112 @@
     .office-meta-item .material-icons-round { font-size: 14px; }
     .office-meta-item.no-sheet { color: #EF5350; }
 
+    /* ===== VIEW CONSUMERS BUTTON (on office card) ===== */
+    .view-cons-btn {
+      width: 100%; padding: 9px 12px;
+      border: 1.5px solid var(--card-border);
+      background: transparent; color: var(--primary-light);
+      border-radius: var(--r-btn);
+      font-family: 'Poppins', sans-serif;
+      font-size: 13px; font-weight: 500;
+      cursor: pointer; margin-top: 12px;
+      display: flex; align-items: center; justify-content: center; gap: 6px;
+      transition: background 0.2s, border-color 0.2s, opacity 0.2s;
+    }
+    .view-cons-btn:active:not(:disabled) {
+      background: rgba(0,82,180,0.12);
+      border-color: var(--primary-light);
+    }
+    .view-cons-btn:disabled { opacity: 0.35; cursor: not-allowed; color: var(--text-secondary); }
+    .view-cons-btn .material-icons-round { font-size: 16px; }
+
+    /* ===== CONSUMER VIEW SHEET ===== */
+    .vc-search-wrap {
+      padding: 10px 16px 10px;
+      position: sticky; top: 0;
+      background: var(--card);
+      border-bottom: 1px solid var(--card-border);
+      z-index: 5;
+    }
+    .vc-search-inner { position: relative; }
+    .vc-search-inner .search-icon {
+      position: absolute; left: 12px; top: 50%;
+      transform: translateY(-50%);
+      font-size: 18px; color: var(--text-secondary); pointer-events: none;
+    }
+    .vc-search-inner .form-input { padding-left: 40px; }
+    .vc-count-bar {
+      padding: 6px 16px;
+      font-size: 12px; color: var(--text-secondary);
+      border-bottom: 1px solid var(--card-border);
+      min-height: 30px;
+    }
+    .vc-list { padding: 10px 16px 48px; }
+
+    /* Consumer card inside vc sheet */
+    .con-card {
+      background: var(--bg);
+      border: 1px solid var(--card-border);
+      border-radius: 14px;
+      padding: 12px 14px; margin-bottom: 10px;
+    }
+    .con-card-top {
+      display: flex; justify-content: space-between;
+      align-items: flex-start; gap: 8px; margin-bottom: 6px;
+    }
+    .con-no {
+      font-family: 'Poppins', sans-serif;
+      font-size: 13px; font-weight: 700;
+      color: var(--primary-light);
+      background: rgba(0,82,180,0.10);
+      padding: 2px 10px; border-radius: 6px;
+      border: 1px solid rgba(0,82,180,0.2);
+    }
+    .con-status {
+      font-size: 10px; font-weight: 700;
+      padding: 2px 8px; border-radius: 10px; flex-shrink: 0;
+    }
+    .con-status.s-active {
+      background: rgba(76,175,80,0.15); color: #4CAF50;
+      border: 1px solid rgba(76,175,80,0.3);
+    }
+    .con-status.s-inactive {
+      background: rgba(211,47,47,0.12); color: #EF5350;
+      border: 1px solid rgba(211,47,47,0.3);
+    }
+    .con-status.s-defaulter {
+      background: rgba(255,193,7,0.12); color: var(--accent);
+      border: 1px solid rgba(255,193,7,0.3);
+    }
+    .con-name {
+      font-family: 'Poppins', sans-serif;
+      font-size: 14px; font-weight: 600; color: var(--text);
+      margin-bottom: 5px;
+    }
+    .con-chips {
+      display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 5px;
+    }
+    .con-chip {
+      display: flex; align-items: center; gap: 3px;
+      font-size: 11px; color: var(--text-secondary);
+      background: var(--card); border: 1px solid var(--card-border);
+      border-radius: 8px; padding: 2px 8px;
+    }
+    .con-chip .material-icons-round { font-size: 12px; }
+    .con-addr {
+      font-size: 12px; color: var(--text-secondary);
+      overflow: hidden;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+    }
+    .vc-more-hint {
+      text-align: center; padding: 16px 0;
+      color: var(--text-secondary); font-size: 13px;
+      border-top: 1px solid var(--card-border);
+      margin-top: 6px;
+    }
+
     /* ===== REQUEST CARDS ===== */
     .request-card {
       background: var(--card);
@@ -443,6 +549,8 @@
       transition: transform 0.3s cubic-bezier(0.32, 0.72, 0, 1);
     }
     .bottom-sheet.open { display: block; transform: translateY(0); }
+    /* Consumer view sheet gets more height */
+    #sheetViewConsumers { max-height: 95vh; }
     .sheet-handle {
       width: 40px; height: 4px; background: var(--card-border);
       border-radius: 2px; margin: 12px auto 8px;
@@ -564,6 +672,8 @@
     /* ===== LIGHT MODE ADJUSTMENTS ===== */
     .light-mode .form-input { background: #F8FBFF; }
     .light-mode .profile-dropdown { box-shadow: 0 8px 32px rgba(0,0,40,0.15); }
+    .light-mode .con-card { background: #F4F7FF; }
+    .light-mode .con-chip { background: #FFFFFF; }
   </style>
 </head>
 <body class="dark-mode">
@@ -587,7 +697,7 @@
   <!-- HEADER -->
   <header class="header">
     <div class="header-brand">
-      <h1>⚡ A&amp;N Electricity</h1>
+      <h1>&#9889; A&amp;N Electricity</h1>
       <p>SUPER ADMIN</p>
     </div>
     <div class="header-actions">
@@ -599,7 +709,7 @@
         <div class="profile-dropdown" id="profileDropdown">
           <div class="profile-dropdown-header">
             <div class="name" id="profileName">Super Admin</div>
-            <div class="role">⭐ SuperAdmin</div>
+            <div class="role">&#11088; SuperAdmin</div>
           </div>
           <button class="profile-menu-item" id="changePwdMenuBtn">
             <span class="material-icons-round">lock_reset</span>
@@ -632,18 +742,18 @@
     <!-- STATS -->
     <div class="stats-grid">
       <div class="stat-card">
-        <div class="stat-icon">🏢</div>
-        <div class="stat-value" id="statTotal">—</div>
+        <div class="stat-icon">&#127970;</div>
+        <div class="stat-value" id="statTotal">&#8212;</div>
         <div class="stat-label">Offices</div>
       </div>
       <div class="stat-card">
-        <div class="stat-icon">✅</div>
-        <div class="stat-value" id="statActive">—</div>
+        <div class="stat-icon">&#9989;</div>
+        <div class="stat-value" id="statActive">&#8212;</div>
         <div class="stat-label">Active</div>
       </div>
       <div class="stat-card">
-        <div class="stat-icon">🔔</div>
-        <div class="stat-value" id="statRequests">—</div>
+        <div class="stat-icon">&#128276;</div>
+        <div class="stat-value" id="statRequests">&#8212;</div>
         <div class="stat-label">Requests</div>
       </div>
     </div>
@@ -698,10 +808,8 @@
       <input type="text" class="form-input" id="newOfficeName"
         placeholder="e.g. Port Blair Site Office" />
     </div>
-
     <div class="form-divider"></div>
     <div class="form-section-label">Admin Account for This Office</div>
-
     <div class="form-group">
       <label class="form-label">Admin Full Name</label>
       <input type="text" class="form-input" id="newAdminFullName"
@@ -723,7 +831,7 @@
       </div>
     </div>
     <div class="form-note">
-      ⚠ Admin must change password on first login. The office Google Sheet is created automatically — no manual setup needed.
+      &#9888; Admin must change password on first login. The office Google Sheet is created automatically.
     </div>
     <button class="btn-primary" id="submitAddOffice">
       <span class="material-icons-round">add_business</span>
@@ -762,7 +870,7 @@
       </div>
     </div>
     <div class="form-note">
-      ⚠ Approving creates the office and sends admin credentials. Admin must change password on first login.
+      &#9888; Approving creates the office and sets admin credentials. Admin must change password on first login.
     </div>
     <button class="btn-primary" id="submitApproveReq">
       <span class="material-icons-round">check_circle</span>
@@ -813,6 +921,27 @@
   </div>
 </div>
 
+<!-- VIEW OFFICE CONSUMERS (SuperAdmin read-only) -->
+<div class="bottom-sheet" id="sheetViewConsumers">
+  <div class="sheet-handle"></div>
+  <div class="sheet-header">
+    <div class="sheet-title" id="vcOfficeName">Consumers</div>
+    <div class="sheet-subtitle" id="vcSubtitle">Loading...</div>
+  </div>
+  <!-- Search bar — sticky inside the sheet scroll container -->
+  <div class="vc-search-wrap">
+    <div class="vc-search-inner">
+      <span class="material-icons-round search-icon">search</span>
+      <input type="search" id="vcSearch" class="form-input"
+        placeholder="Search by name, ConNo or meter no..." autocomplete="off" />
+    </div>
+  </div>
+  <!-- Record count -->
+  <div class="vc-count-bar" id="vcCountBar"></div>
+  <!-- Consumer list -->
+  <div class="vc-list" id="vcList"></div>
+</div>
+
 <!-- TOAST -->
 <div id="toast"></div>
 
@@ -826,18 +955,19 @@
    ============================================= */
 const API_URL = 'https://script.google.com/macros/s/AKfycbyeO7pIZrT1WKPHHuR8LKxhPKgf4uELmkSkIgUefNwT88JdCBiAoTAfgKTyCBKEMmBowQ/exec';
 
-let session = null;
-let allOffices = [];
-let allRequests = [];
-let pendingRequestId = null;   // request being approved
-let toastTimer = null;
-let isDark = true;
+// All bottom sheet IDs — keep in sync when adding new sheets
+const ALL_SHEETS = ['sheetAddOffice','sheetApproveReq','sheetChangePwd','sheetViewConsumers'];
+
+let session         = null;
+let allOffices      = [];
+let allRequests     = [];
+let pendingRequestId = null;
+let toastTimer      = null;
+let isDark          = true;
 
 /* =============================================
    UTILITIES
    ============================================= */
-
-// XSS-safe escape
 function esc(v) {
   if (v == null) return '';
   return String(v)
@@ -846,16 +976,14 @@ function esc(v) {
     .replace(/'/g,'&#x27;');
 }
 
-// Human-readable date
 function fmtDate(s) {
-  if (!s) return '—';
+  if (!s) return '&#8212;';
   try {
     return new Date(s).toLocaleDateString('en-IN',
       { day:'2-digit', month:'short', year:'numeric' });
   } catch { return s; }
 }
 
-// SHA-256 hash:  password + username_lower + salt
 async function hashPwd(pwd, user) {
   const raw = pwd + user.toLowerCase() + 'AN_ELECT_SECRET_2025';
   const buf = await crypto.subtle.digest('SHA-256',
@@ -864,7 +992,6 @@ async function hashPwd(pwd, user) {
     .map(b => b.toString(16).padStart(2,'0')).join('');
 }
 
-// Toast notification
 function showToast(msg, type = 'info', ms = 3200) {
   const el = document.getElementById('toast');
   el.textContent = msg;
@@ -873,13 +1000,12 @@ function showToast(msg, type = 'info', ms = 3200) {
   toastTimer = setTimeout(() => { el.className = ''; }, ms);
 }
 
-// Ripple on button
 function ripple(btn, e) {
   const sp = document.createElement('span');
   sp.className = 'ripple';
   const r = btn.getBoundingClientRect();
   sp.style.left = ((e?.clientX || r.left + r.width/2) - r.left - 40) + 'px';
-  sp.style.top  = ((e?.clientY || r.top  + r.height/2) - r.top - 40) + 'px';
+  sp.style.top  = ((e?.clientY || r.top  + r.height/2) - r.top  - 40) + 'px';
   btn.style.position = 'relative';
   btn.style.overflow = 'hidden';
   btn.appendChild(sp);
@@ -893,24 +1019,24 @@ function showSheet(id) {
   document.getElementById('overlay').classList.add('open');
   const el = document.getElementById(id);
   el.style.display = 'block';
-  // Trigger reflow so transition plays
-  el.offsetHeight;
+  el.offsetHeight; // force reflow so CSS transition plays
   el.classList.add('open');
 }
+
 function hideSheet(id) {
   const el = document.getElementById(id);
   if (!el) return;
   el.classList.remove('open');
   setTimeout(() => {
     el.style.display = 'none';
-    // Only remove overlay if no other sheet is open
-    const anyOpen = ['sheetAddOffice','sheetApproveReq','sheetChangePwd']
-      .some(sid => document.getElementById(sid)?.classList.contains('open'));
+    const anyOpen = ALL_SHEETS.some(sid =>
+      document.getElementById(sid)?.classList.contains('open'));
     if (!anyOpen) document.getElementById('overlay').classList.remove('open');
   }, 310);
 }
+
 function hideAllSheets() {
-  ['sheetAddOffice','sheetApproveReq','sheetChangePwd'].forEach(id => {
+  ALL_SHEETS.forEach(id => {
     const el = document.getElementById(id);
     if (el) { el.classList.remove('open'); el.style.display = 'none'; }
   });
@@ -958,7 +1084,7 @@ async function api(body) {
 }
 
 /* =============================================
-   RENDER SKELETONS
+   SKELETONS
    ============================================= */
 function skeletons(containerId, n = 3) {
   document.getElementById(containerId).innerHTML =
@@ -968,6 +1094,16 @@ function skeletons(containerId, n = 3) {
         <div class="sk-line w50"></div>
         <div class="sk-line w30"></div>
       </div>`).join('');
+}
+
+function vcSkeletons(n) {
+  // Smaller skeleton for consumer cards inside the vc sheet
+  return Array.from({length: n}, () => `
+    <div class="skeleton" style="border-radius:14px;padding:12px 14px;margin-bottom:10px;">
+      <div class="sk-line w30"></div>
+      <div class="sk-line w70"></div>
+      <div class="sk-line w50"></div>
+    </div>`).join('');
 }
 
 /* =============================================
@@ -985,13 +1121,14 @@ function renderOffices(list) {
     return;
   }
   el.innerHTML = list.map(o => {
-    // Normalise field names (Apps Script may return different casing)
-    const name    = esc(o.officeName  || o.OfficeName  || '—');
-    const oid     = esc(o.officeId    || o.OfficeID    || '—');
-    const admin   = esc(o.adminUsername || o.AdminUsername || '—');
-    const created = fmtDate(o.createdAt || o.CreatedAt);
-    const hasSheet = !!(o.sheetId || o.SheetID);
-    const active  = String(o.isActive ?? o.IsActive ?? 'false').toLowerCase() === 'true';
+    const name       = esc(o.officeName    || o.OfficeName    || '&#8212;');
+    const oid        = esc(o.officeId      || o.OfficeID      || '&#8212;');
+    const admin      = esc(o.adminUsername || o.AdminUsername || '&#8212;');
+    const created    = fmtDate(o.createdAt || o.CreatedAt);
+    const rawSheetId = o.sheetId || o.SheetID || '';
+    const hasSheet   = !!rawSheetId;
+    const active     = String(o.isActive ?? o.IsActive ?? 'false').toLowerCase() === 'true';
+    const sid        = esc(rawSheetId);
     return `
       <div class="office-card">
         <div class="office-card-top">
@@ -1020,6 +1157,14 @@ function renderOffices(list) {
             ${hasSheet ? 'Sheet linked' : 'No sheet linked'}
           </div>
         </div>
+        <button class="view-cons-btn"
+          data-sid="${sid}"
+          data-name="${name}"
+          ${hasSheet ? '' : 'disabled'}
+          onclick="openVCFromBtn(this)">
+          <span class="material-icons-round">people</span>
+          ${hasSheet ? 'View Consumers' : 'No Sheet Linked'}
+        </button>
       </div>`;
   }).join('');
 }
@@ -1040,21 +1185,21 @@ function renderRequests(list) {
   }
   el.innerHTML = list.map(r => {
     const status   = (r.status || r.Status || 'pending').toLowerCase();
-    const name     = esc(r.officeName  || r.OfficeName  || '—');
-    const by       = esc(r.requestedBy || r.RequestedBy || '—');
+    const name     = esc(r.officeName  || r.OfficeName  || '&#8212;');
+    const by       = esc(r.requestedBy || r.RequestedBy || '&#8212;');
     const email    = esc(r.adminEmail  || r.AdminEmail  || '');
     const created  = fmtDate(r.createdAt || r.CreatedAt);
     const rid      = esc(r.requestId   || r.RequestID   || '');
     const notes    = esc(r.notes || r.Notes || '');
-    const statusLabel = status === 'approved' ? '✅ Approved'
-                      : status === 'rejected' ? '❌ Rejected' : '⏳ Pending';
+    const statusLabel = status === 'approved' ? '&#9989; Approved'
+                      : status === 'rejected' ? '&#10060; Rejected' : '&#9203; Pending';
     return `
       <div class="request-card ${status}">
         <div class="request-card-top">
           <div>
             <div class="request-office-name">${name}</div>
-            <div class="request-meta">Requested by: ${by}${email ? ' · ' + email : ''}</div>
-            <div class="request-meta">📅 ${created}${notes ? ' · ' + notes : ''}</div>
+            <div class="request-meta">Requested by: ${by}${email ? ' &middot; ' + email : ''}</div>
+            <div class="request-meta">&#128197; ${created}${notes ? ' &middot; ' + notes : ''}</div>
           </div>
           <div class="request-status ${status}">${statusLabel}</div>
         </div>
@@ -1069,7 +1214,7 @@ function renderRequests(list) {
 }
 
 /* =============================================
-   LOAD DATA
+   LOAD DASHBOARD DATA
    ============================================= */
 async function loadData() {
   const dot      = document.getElementById('syncDot');
@@ -1080,13 +1225,11 @@ async function loadData() {
   skeletons('requestsList', 2);
 
   try {
-    // Fetch offices + requests in parallel
     const [offRes, reqRes] = await Promise.all([
       api({ action: 'getOffices',        token: session.token }),
       api({ action: 'getOfficeRequests', token: session.token })
     ]);
 
-    // Offices
     if (offRes.success) {
       allOffices = offRes.data || [];
       renderOffices(allOffices);
@@ -1100,17 +1243,14 @@ async function loadData() {
         </div>`;
     }
 
-    // Requests
     if (reqRes.success) {
       allRequests = reqRes.data || [];
       renderRequests(allRequests);
     } else {
-      // Not a hard error — requests tab just shows empty
       allRequests = [];
       renderRequests([]);
     }
 
-    // Stats
     const activeCount  = allOffices.filter(o =>
       String(o.isActive ?? o.IsActive ?? false).toLowerCase() === 'true').length;
     const pendingCount = allRequests.filter(r =>
@@ -1120,7 +1260,6 @@ async function loadData() {
     document.getElementById('statActive').textContent   = activeCount;
     document.getElementById('statRequests').textContent = pendingCount;
 
-    // Badge on requests tab
     const badge = document.getElementById('pendingBadge');
     if (pendingCount > 0) {
       badge.textContent = pendingCount;
@@ -1129,7 +1268,6 @@ async function loadData() {
       badge.style.display = 'none';
     }
 
-    // Sync bar
     const now = new Date().toLocaleTimeString('en-IN',
       { hour:'2-digit', minute:'2-digit' });
     dot.className  = 'sync-dot synced';
@@ -1148,10 +1286,10 @@ async function loadData() {
    ADD OFFICE
    ============================================= */
 async function handleAddOffice() {
-  const officeName     = document.getElementById('newOfficeName').value.trim();
-  const adminFullName  = document.getElementById('newAdminFullName').value.trim();
-  const adminUsername  = document.getElementById('newAdminUsername').value.trim().toLowerCase();
-  const adminPassword  = document.getElementById('newAdminPwd').value;
+  const officeName    = document.getElementById('newOfficeName').value.trim();
+  const adminFullName = document.getElementById('newAdminFullName').value.trim();
+  const adminUsername = document.getElementById('newAdminUsername').value.trim().toLowerCase();
+  const adminPassword = document.getElementById('newAdminPwd').value;
 
   if (!officeName)    { showToast('Enter office name', 'error'); return; }
   if (!adminFullName) { showToast('Enter admin full name', 'error'); return; }
@@ -1171,18 +1309,17 @@ async function handleAddOffice() {
   try {
     const pwdHash = await hashPwd(adminPassword, adminUsername);
     const res = await api({
-      action:         'addOffice',
-      token:          session.token,
+      action:        'addOffice',
+      token:         session.token,
       officeName,
       adminUsername,
-      adminPassword:  pwdHash,    // field name as documented in Code.gs
+      adminPassword: pwdHash,
       adminFullName
     });
 
     if (res.success) {
-      showToast('✅ Office created successfully!', 'success', 4000);
+      showToast('&#9989; Office created successfully!', 'success', 4000);
       hideSheet('sheetAddOffice');
-      // Clear form
       ['newOfficeName','newAdminFullName','newAdminUsername','newAdminPwd']
         .forEach(id => { document.getElementById(id).value = ''; });
       loadData();
@@ -1204,7 +1341,6 @@ function openApproveSheet(requestId, officeName) {
   pendingRequestId = requestId;
   document.getElementById('approveSubtitle').textContent =
     'Approving: ' + officeName;
-  // Auto-suggest username from office name
   const suggested = 'admin_' + officeName
     .toLowerCase().replace(/[^a-z0-9]/g,'_')
     .replace(/_+/g,'_').replace(/^_|_$/g,'');
@@ -1237,16 +1373,16 @@ async function handleApproveRequest() {
   try {
     const pwdHash = await hashPwd(adminPassword, adminUsername);
     const res = await api({
-      action:         'approveOfficeRequest',
-      token:          session.token,
-      requestId:      pendingRequestId,
+      action:        'approveOfficeRequest',
+      token:         session.token,
+      requestId:     pendingRequestId,
       adminUsername,
-      adminPassword:  pwdHash,
+      adminPassword: pwdHash,
       adminFullName
     });
 
     if (res.success) {
-      showToast('✅ Office approved and created!', 'success', 4000);
+      showToast('&#9989; Office approved and created!', 'success', 4000);
       hideSheet('sheetApproveReq');
       pendingRequestId = null;
       loadData();
@@ -1269,18 +1405,17 @@ async function handleChangePwd() {
   const newP    = document.getElementById('newPwd').value;
   const confirm = document.getElementById('confirmPwd').value;
 
-  if (!curr)          { showToast('Enter current password', 'error'); return; }
-  if (newP.length < 8){ showToast('New password min 8 characters', 'error'); return; }
-  if (newP !== confirm){ showToast('Passwords do not match', 'error'); return; }
+  if (!curr)           { showToast('Enter current password', 'error'); return; }
+  if (newP.length < 8) { showToast('New password min 8 characters', 'error'); return; }
+  if (newP !== confirm) { showToast('Passwords do not match', 'error'); return; }
 
   const btn = document.getElementById('submitChangePwd');
   btn.disabled = true;
   btn.innerHTML = '<div class="btn-spin"></div> Updating...';
 
   try {
-    const currHash = await hashPwd(curr,  session.username);
-    const newHash  = await hashPwd(newP,  session.username);
-
+    const currHash = await hashPwd(curr, session.username);
+    const newHash  = await hashPwd(newP, session.username);
     const res = await api({
       action:              'changePassword',
       token:               session.token,
@@ -1290,7 +1425,7 @@ async function handleChangePwd() {
     });
 
     if (res.success) {
-      showToast('✅ Password updated', 'success');
+      showToast('&#9989; Password updated', 'success');
       hideSheet('sheetChangePwd');
       ['currPwd','newPwd','confirmPwd'].forEach(id => {
         document.getElementById(id).value = '';
@@ -1307,6 +1442,130 @@ async function handleChangePwd() {
 }
 
 /* =============================================
+   CONSUMER VIEW — SuperAdmin read-only
+   ============================================= */
+let _vc = { sheetId:'', officeName:'', all:[], filtered:[] };
+
+/** Called by the inline onclick on the office card button */
+function openVCFromBtn(btn) {
+  // dataset.name is HTML-decoded by the browser automatically
+  openViewConsumers(btn.dataset.sid, btn.dataset.name);
+}
+
+function openViewConsumers(sheetId, officeName) {
+  if (!sheetId) {
+    showToast('No sheet linked to this office', 'error');
+    return;
+  }
+  _vc = { sheetId, officeName, all:[], filtered:[] };
+  document.getElementById('vcOfficeName').textContent = officeName;
+  document.getElementById('vcSubtitle').textContent   = 'Loading...';
+  document.getElementById('vcCountBar').textContent   = '';
+  document.getElementById('vcSearch').value           = '';
+  document.getElementById('vcList').innerHTML         = vcSkeletons(5);
+  showSheet('sheetViewConsumers');
+  fetchOfficeConsumers();
+}
+
+async function fetchOfficeConsumers() {
+  try {
+    const res = await api({
+      action:        'getConsumers',
+      token:         session.token,
+      sheetName:     'CONSUMER DATA ALL',
+      officeSheetId: _vc.sheetId          // SuperAdmin explicit sheet override
+    });
+
+    if (res.success) {
+      _vc.all      = res.data || [];
+      _vc.filtered = _vc.all;
+      renderVC(_vc.filtered);
+    } else {
+      document.getElementById('vcList').innerHTML = `
+        <div class="empty-state">
+          <span class="material-icons-round">error_outline</span>
+          <h3>Failed to load</h3>
+          <p>${esc(res.message || 'Unknown error')}</p>
+        </div>`;
+      showToast(res.message || 'Failed to load consumers', 'error');
+    }
+  } catch (err) {
+    document.getElementById('vcList').innerHTML = `
+      <div class="empty-state">
+        <span class="material-icons-round">wifi_off</span>
+        <h3>Network error</h3>
+        <p>${esc(err.message)}</p>
+      </div>`;
+    showToast('Network error: ' + err.message, 'error');
+  }
+}
+
+/**
+ * Render consumer cards in the view-consumers sheet.
+ * Displays up to 200 at a time; search filters the full list.
+ */
+function renderVC(list) {
+  const total = _vc.all.length;
+  const shown = list.length;
+
+  // Update header subtitle + count bar
+  document.getElementById('vcSubtitle').textContent =
+    total ? `${total} consumers · Read-only` : 'No consumers found';
+  document.getElementById('vcCountBar').textContent =
+    shown === total
+      ? `Showing all ${total} records`
+      : `Showing ${shown} of ${total} records`;
+
+  const el = document.getElementById('vcList');
+
+  if (!shown) {
+    el.innerHTML = `
+      <div class="empty-state">
+        <span class="material-icons-round">people_outline</span>
+        <h3>No consumers found</h3>
+        <p>Try a different search term</p>
+      </div>`;
+    return;
+  }
+
+  const display = list.slice(0, 200);
+
+  el.innerHTML = display.map(c => {
+    const conNo  = esc(c['ConNo']         || '&#8212;');
+    const name   = esc(c['ConsumerName']  || '&#8212;');
+    const area   = esc(c['TransfCode']    || '');
+    const meter  = esc(c['MeterNo']       || '');
+    const phone  = esc(c['PhoneNo']       || '');
+    const addr   = esc(c['Address']       || '');
+    const rawSt  = String(c['Status']     || 'Active').trim();
+    const sClass = rawSt === 'Defaulter'  ? 's-defaulter'
+                 : rawSt === 'Inactive'   ? 's-inactive' : 's-active';
+
+    return `
+      <div class="con-card">
+        <div class="con-card-top">
+          <span class="con-no">${conNo}</span>
+          <span class="con-status ${sClass}">${esc(rawSt)}</span>
+        </div>
+        <div class="con-name">${name}</div>
+        <div class="con-chips">
+          ${area  ? `<span class="con-chip"><span class="material-icons-round">location_on</span>${area}</span>` : ''}
+          ${meter ? `<span class="con-chip"><span class="material-icons-round">electric_meter</span>${meter}</span>` : ''}
+          ${phone ? `<span class="con-chip"><span class="material-icons-round">phone</span>${phone}</span>` : ''}
+        </div>
+        ${addr ? `<div class="con-addr">${addr}</div>` : ''}
+      </div>`;
+  }).join('');
+
+  if (list.length > 200) {
+    el.innerHTML += `
+      <div class="vc-more-hint">
+        Showing first 200 of ${list.length} — use the search box to find specific consumers
+      </div>`;
+  }
+}
+
+/* =============================================
    LOGOUT
    ============================================= */
 async function handleLogout() {
@@ -1317,7 +1576,7 @@ async function handleLogout() {
 }
 
 /* =============================================
-   PASSWORD EYE TOGGLE (all eye buttons)
+   PASSWORD EYE TOGGLE
    ============================================= */
 function setupEyeButtons() {
   document.querySelectorAll('.eye-btn').forEach(btn => {
@@ -1336,7 +1595,7 @@ function setupEyeButtons() {
    ANDROID BACK BUTTON
    ============================================= */
 window.addEventListener('popstate', () => {
-  const openSheet = ['sheetAddOffice','sheetApproveReq','sheetChangePwd']
+  const openSheet = ALL_SHEETS
     .find(id => document.getElementById(id)?.classList.contains('open'));
   if (openSheet) {
     hideSheet(openSheet);
@@ -1360,7 +1619,7 @@ async function init() {
     window.location.replace('./index.html'); return;
   }
 
-  // Update profile UI
+  // Profile UI
   const initials = (session.fullName || 'SA')
     .split(' ').map(n => n[0]).join('').substring(0,2).toUpperCase();
   document.getElementById('profileAvatar').textContent = initials;
@@ -1376,10 +1635,7 @@ async function init() {
     }, 420);
   }, 800);
 
-  // Load data after splash
   setTimeout(loadData, 950);
-
-  // Push state for Android back handling
   history.pushState(null, '');
 
   /* ---- Event Listeners ---- */
@@ -1387,7 +1643,7 @@ async function init() {
   // Theme
   document.getElementById('themeToggle').addEventListener('click', () => applyTheme(!isDark));
 
-  // Profile avatar → dropdown
+  // Profile dropdown
   document.getElementById('profileAvatar').addEventListener('click', e => {
     e.stopPropagation();
     document.getElementById('profileDropdown').classList.toggle('open');
@@ -1396,7 +1652,7 @@ async function init() {
     document.getElementById('profileDropdown').classList.remove('open');
   });
 
-  // Menu items
+  // Profile menu items
   document.getElementById('changePwdMenuBtn').addEventListener('click', () => {
     document.getElementById('profileDropdown').classList.remove('open');
     showSheet('sheetChangePwd');
@@ -1418,7 +1674,7 @@ async function init() {
   document.querySelectorAll('.tab-btn').forEach(btn =>
     btn.addEventListener('click', () => switchTab(btn.dataset.tab)));
 
-  // Overlay → close sheets
+  // Overlay click → close all sheets
   document.getElementById('overlay').addEventListener('click', hideAllSheets);
 
   // Sync refresh
@@ -1428,7 +1684,19 @@ async function init() {
     loadData().finally(() => refreshBtn.classList.remove('spinning'));
   });
 
-  // Password eye buttons
+  // Consumer view search (live filter)
+  document.getElementById('vcSearch').addEventListener('input', function() {
+    const q = this.value.trim().toLowerCase();
+    _vc.filtered = q
+      ? _vc.all.filter(c =>
+          String(c['ConNo']        || '').toLowerCase().includes(q) ||
+          String(c['ConsumerName'] || '').toLowerCase().includes(q) ||
+          String(c['MeterNo']      || '').toLowerCase().includes(q))
+      : _vc.all;
+    renderVC(_vc.filtered);
+  });
+
+  // Eye buttons (password fields)
   setupEyeButtons();
 }
 
