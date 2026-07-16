@@ -254,7 +254,6 @@
   #toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
   #toast.err{background:var(--danger)}
   #toast.ok{background:var(--success)}
-  /* ADMIN PANEL */
   .admin-panel{padding:4px 0;}
   .ap-hdr{display:flex;align-items:center;justify-content:space-between;padding:8px 0 16px;}
   .ap-title{font-family:var(--fd);font-size:16px;font-weight:700;color:var(--t1);}
@@ -291,7 +290,6 @@
   .ap-empty{text-align:center;padding:48px 24px;color:var(--t2);}
   .ap-empty .material-icons-round{font-size:48px;opacity:.3;display:block;margin-bottom:12px;}
   .ug-icon-ok .material-icons-round{color:var(--success)!important;}
-  /* ACTIVITY PANEL */
   .activity-panel{padding:4px 0;}
   .act-hdr{display:flex;align-items:center;justify-content:space-between;padding:8px 0 16px;}
   .act-hdr-title{font-family:var(--fd);font-size:16px;font-weight:700;color:var(--t1);}
@@ -355,8 +353,7 @@
   <div class="ab-row"><span class="material-icons-round">storage</span><div><div class="ab-key">Data</div><div class="ab-val">Google Sheets &#183; Private &amp; Secure</div></div></div>
   <div class="ab-row"><span class="material-icons-round">offline_bolt</span><div><div class="ab-key">Platform</div><div class="ab-val">PWA &#183; Works Offline &#183; GitHub Pages</div></div></div>
 </div>
-<div class="bottom-sheet" id="detailSheet"><div class="sheet-handle" id="detHandle"></div><div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:4px;"><div style="flex:1;min-width:0;"><div class="det-name" id="detName">&#8212;</div><div class="det-conno" id="detConno">&#8212;</div></div><button onclick="closeSheet()" style="background:none;border:none;color:var(--t2);cursor:pointer;padding:4px;display:flex;align-items:center;border-radius:50%;flex-shrink:0;margin-top:2px;"><span class="material-icons-round" style="font-size:22px;">close</span></button></div>
-style="font-size:22px;">close</span></button></div><div id="detFields"></div><div class="det-actions" id="detActions"></div></div>
+<div class="bottom-sheet" id="detailSheet"><div class="sheet-handle" id="detHandle"></div><div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:4px;"><div style="flex:1;min-width:0;"><div class="det-name" id="detName">&#8212;</div><div class="det-conno" id="detConno">&#8212;</div></div><button onclick="closeSheet()" style="background:none;border:none;color:var(--t2);cursor:pointer;padding:4px;display:flex;align-items:center;border-radius:50%;flex-shrink:0;margin-top:2px;"><span class="material-icons-round" style="font-size:22px;">close</span></button></div><div id="detFields"></div><div class="det-actions" id="detActions"></div></div>
 <div class="bottom-sheet" id="delSheet">
   <div class="sheet-handle" id="delHandle"></div>
   <div class="del-ico"><span class="material-icons-round">delete_forever</span></div>
@@ -459,7 +456,6 @@ style="font-size:22px;">close</span></button></div><div id="detFields"></div><di
     <div id="userList"></div>
     <div class="ap-empty hidden" id="userEmpty"><span class="material-icons-round">people_outline</span><div style="font-family:var(--fd);font-weight:700;margin-bottom:4px;">No employees yet</div><div style="font-size:12px;">Tap + to add the first employee</div></div>
   </div>
-  <!-- ACTIVITY PANEL -->
   <div id="activityPanel" class="hidden activity-panel">
     <div class="act-hdr">
       <div class="act-hdr-title">Activity Log</div>
@@ -480,7 +476,6 @@ style="font-size:22px;">close</span></button></div><div id="detFields"></div><di
 <script src="./db.js"></script>
 <script>
 'use strict';
-
 const API_URL='https://script.google.com/macros/s/AKfycbyeO7pIZrT1WKPHHuR8LKxhPKgf4uELmkSkIgUefNwT88JdCBiAoTAfgKTyCBKEMmBowQ/exec';
 const PAGE_SIZE=30,TIMEOUT=30000;
 let session=null,isAdmin=false,masterList=[],filtered=[],displayedN=0;
@@ -495,19 +490,12 @@ const CF={mode:'add',consumer:null};
 let userForReset=null,userForToggle=null;
 var _userCache={};
 const $=id=>document.getElementById(id);
-
 async function init(){
   session=AN_DB.getSession();
   if(!session||!session.token){location.replace('./login.html');return;}
   if(session.role==='superadmin'||session.role==='SuperAdmin'){location.replace('./superadmin.html');return;}
   isAdmin=session.role==='admin'||session.role==='Admin';
-  if('serviceWorker' in navigator){
-    navigator.serviceWorker.register('./sw.js').then(reg=>{
-      swReg=reg;
-      navigator.serviceWorker.addEventListener('message',onSWMsg);
-      reg.addEventListener('updatefound',()=>{const nw=reg.installing;if(!nw)return;nw.addEventListener('statechange',()=>{if(nw.state==='installed'&&navigator.serviceWorker.controller)$('updateBanner').classList.remove('hidden');});});
-    }).catch(()=>{});
-  }
+  if('serviceWorker' in navigator){navigator.serviceWorker.register('./sw.js').then(reg=>{swReg=reg;navigator.serviceWorker.addEventListener('message',onSWMsg);reg.addEventListener('updatefound',()=>{const nw=reg.installing;if(!nw)return;nw.addEventListener('statechange',()=>{if(nw.state==='installed'&&navigator.serviceWorker.controller)$('updateBanner').classList.remove('hidden');});});}).catch(()=>{});}
   window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferredInstall=e;$('installBtn').classList.remove('hidden');});
   window.addEventListener('online',onOnline);window.addEventListener('offline',onOffline);
   history.pushState(null,'');
@@ -532,16 +520,10 @@ async function init(){
   await loadConsumers();
   hideSplash();
 }
-
-function adjustLayout(){
-  const navH=$('navbar').offsetHeight;
-  const searchH=$('searchSec').classList.contains('hidden')?0:$('searchSec').offsetHeight;
-  $('main').style.paddingTop=(navH+searchH+4)+'px';
-}
+function adjustLayout(){const navH=$('navbar').offsetHeight;const searchH=$('searchSec').classList.contains('hidden')?0:$('searchSec').offsetHeight;$('main').style.paddingTop=(navH+searchH+4)+'px';}
 function hideSplash(){const s=$('splash');s.classList.add('out');setTimeout(()=>s.style.display='none',400);}
 async function installApp(){if(!deferredInstall)return;closeUserMenu();deferredInstall.prompt();const{outcome}=await deferredInstall.userChoice;deferredInstall=null;$('installBtn').classList.add('hidden');if(outcome==='accepted')toast('App installed!','ok');}
 function applyUpdate(){if(swReg&&swReg.waiting)swReg.waiting.postMessage({type:'SKIP_WAITING'});window.location.reload();}
-
 function setupSwipeClose(){
   ['cpHandle','aboutHandle','detHandle','delHandle','cfHandle','addUserHandle','rpHandle','ugHandle'].forEach(id=>{
     const el=$(id);if(!el)return;
@@ -550,7 +532,6 @@ function setupSwipeClose(){
     el.addEventListener('touchmove',e=>{if(e.touches[0].clientY-startY>70)closeSheet();},{passive:true});
   });
 }
-
 async function loadConsumers(showSkeleton){
   if(showSkeleton!==false)renderSkeleton();
   setRefreshSpin(true);setSync('syncing','Loading...');
@@ -563,14 +544,9 @@ async function loadConsumers(showSkeleton){
     const res=await fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({action:'getConsumers',token:session.token,officeId:session.officeId,sheetName:'CONSUMER DATA ALL'}),signal:controller.signal});
     clearTimeout(tid);
     const json=await res.json();
-    if(json.success&&Array.isArray(json.data)){
-      const list=json.data.map(normalize);
-      await AN_DB.setAllConsumers(list);await AN_DB.setLastSync(Date.now());
-      masterList=list;applyFilters();updateChipCounts();setSync('online','Synced');
-    } else if(json.code==='UNAUTHORIZED'||json.error==='SESSION_EXPIRED'){
-      localStorage.removeItem('an_bio_vault');
-      await AN_DB.clearSession();alert('Session expired. Please log in again.');location.replace('./login.html');
-    } else{setSync('online','Loaded from cache');console.warn('[App]',json.message||json.error);}
+    if(json.success&&Array.isArray(json.data)){const list=json.data.map(normalize);await AN_DB.setAllConsumers(list);await AN_DB.setLastSync(Date.now());masterList=list;applyFilters();updateChipCounts();setSync('online','Synced');}
+    else if(json.code==='UNAUTHORIZED'||json.error==='SESSION_EXPIRED'){localStorage.removeItem('an_bio_vault');await AN_DB.clearSession();alert('Session expired. Please log in again.');location.replace('./login.html');}
+    else{setSync('online','Loaded from cache');console.warn('[App]',json.message||json.error);}
   }catch(err){
     if(err.name==='AbortError'){setSync('offline','Request timed out');toast('Network timeout. Try again.','err');}
     else{if(!cached.length)showErr('Could not connect. Check your internet.');setSync('offline','Offline - showing cached data');}
@@ -578,18 +554,12 @@ async function loadConsumers(showSkeleton){
   setRefreshSpin(false);
 }
 function refreshData(){loadConsumers();}
-
 function normalize(c){
   function get(){for(var i=0;i<arguments.length;i++){var v=c[arguments[i]];if(v!==undefined&&v!==null&&String(v).trim()!==''&&String(v).trim()!=='0')return String(v).trim();}return '';}
   var mr=c['MeterNo']||c.meterNo||c['Meter No']||'';
   return {_rowIndex:c._rowIndex||0,sNo:get('S.No.','sNo'),conNo:get('ConNo','conNo'),consumerName:get('ConsumerName','Consumer Name','consumerName'),address:get('Address','address'),labNo:get('LabNo','labNo','Lab No'),meterNo:mr?String(mr).trim():'',transfCode:get('TransfCode','transfCode','Transf Code','AreaCode','areaCode'),phoneNo:get('PhoneNo','phoneNo','Phone','phone'),status:get('Status','status')||'Active',lastEditedBy:get('LastEditedBy','lastEditedBy'),lastEditedAt:get('LastEditedAt','lastEditedAt'),createdAt:get('CreatedAt','createdAt'),sdPassbookNo:get('Passbook/SD No','sdPassbookNo'),sdAmount:get('SD Amount','sdAmount'),sdDate:get('SD Date','sdDate')};
 }
-
-function updateChipCounts(){
-  var counts={};masterList.forEach(function(c){if(c.transfCode)counts[c.transfCode]=(counts[c.transfCode]||0)+1;});
-  document.querySelectorAll('.chip').forEach(function(chip){var a=chip.dataset.area;if(!a)return;if(a==='ALL')chip.textContent='All ('+masterList.length+')';else if(counts[a])chip.textContent=a+' · '+counts[a];});
-}
-
+function updateChipCounts(){var counts={};masterList.forEach(function(c){if(c.transfCode)counts[c.transfCode]=(counts[c.transfCode]||0)+1;});document.querySelectorAll('.chip').forEach(function(chip){var a=chip.dataset.area;if(!a)return;if(a==='ALL')chip.textContent='All ('+masterList.length+')';else if(counts[a])chip.textContent=a+' · '+counts[a];});}
 function applyFilters(){
   filtered=masterList;
   if(activeArea!=='ALL')filtered=filtered.filter(function(c){return c.transfCode===activeArea;});
@@ -601,13 +571,7 @@ function applyFilters(){
   if(!filtered.length){$('consumerList').innerHTML='';$('emptyState').classList.remove('hidden');if(searchQ||activeArea!=='ALL'||activeStatus!=='ALL'){$('emptyIco').textContent='search_off';$('emptyTtl').textContent='No results';$('emptySub').textContent='Try different search, area, or status filter';}else{$('emptyIco').textContent='people_outline';$('emptyTtl').textContent='No consumers yet';$('emptySub').textContent='Tap + to add the first consumer';}return;}
   $('emptyState').classList.add('hidden');displayedN=0;$('consumerList').innerHTML='';appendCards();
 }
-
-function appendCards(){
-  var frag=document.createDocumentFragment();var end=Math.min(displayedN+PAGE_SIZE,filtered.length);
-  for(var i=displayedN;i<end;i++){var card=makeCard(filtered[i]);card.style.animationDelay=((i-displayedN)*.03)+'s';frag.appendChild(card);}
-  $('consumerList').appendChild(frag);displayedN=end;
-}
-
+function appendCards(){var frag=document.createDocumentFragment();var end=Math.min(displayedN+PAGE_SIZE,filtered.length);for(var i=displayedN;i<end;i++){var card=makeCard(filtered[i]);card.style.animationDelay=((i-displayedN)*.03)+'s';frag.appendChild(card);}$('consumerList').appendChild(frag);displayedN=end;}
 function makeCard(c){
   var div=document.createElement('div');div.className='c-card';
   if(selectMode&&selectedSet.has(c.conNo))div.classList.add('selected');
@@ -618,47 +582,41 @@ function makeCard(c){
   var addr=c.address?'<div class="c-mi addr"><span class="material-icons-round">location_on</span>'+esc(c.address).substring(0,28)+'</div>':'';
   var check=selectMode?'<div class="c-check"><span class="material-icons-round">check</span></div>':'';
   var arrow=selectMode?'':'<span class="c-arrow material-icons-round">chevron_right</span>';
-  div.innerHTML='<div class="c-inner">'+check+'<div class="c-body"><div class="c-row1"><span class="c-conno">'+esc(c.conNo||'—')+'</span><div class="badges">'+area+'<span class="status-badge '+status+'">'+esc(c.status||'Active')+'</span></div></div><div class="c-name">'+esc(c.consumerName||'—')+'</div><div class="c-meta">'+meter+phone+addr+'</div></div>'+arrow+'</div>';
+  div.innerHTML='<div class="c-inner">'+check+'<div class="c-body"><div class="c-row1"><span class="c-conno">'+esc(c.conNo||'&#8212;')+'</span><div class="badges">'+area+'<span class="status-badge '+status+'">'+esc(c.status||'Active')+'</span></div></div><div class="c-name">'+esc(c.consumerName||'&#8212;')+'</div><div class="c-meta">'+meter+phone+addr+'</div></div>'+arrow+'</div>';
   if(selectMode){div.addEventListener('click',function(){toggleCard(c.conNo,div);});}
   else{div.addEventListener('click',function(){openDetail(c);});attachLongPress(div,c);div.addEventListener('pointerdown',function(e){addRipple(div,e);});}
   return div;
 }
-
 function renderSkeleton(){$('emptyState').classList.add('hidden');$('consumerList').innerHTML=Array(6).fill('<div class="skeleton"><div class="sk-row"><div class="sk" style="width:30%;height:11px"></div><div class="sk" style="width:18%;height:11px"></div></div><div class="sk" style="width:62%;height:14px;margin-bottom:8px"></div><div class="sk" style="width:42%;height:11px"></div></div>').join('');}
-
 function openDetail(c){
   lastScrollY=window.scrollY;
-  $('detName').textContent=c.consumerName||'—';
-  $('detConno').textContent='Consumer No: '+(c.conNo||'—');
+  $('detName').textContent=c.consumerName||'&#8212;';
+  $('detConno').textContent='Consumer No: '+(c.conNo||'&#8212;');
   var fh='';
   function af(lbl,val){fh+='<div class="det-field"><span class="det-label">'+lbl+'</span><span class="det-value">'+val+'</span></div>';}
-  af('Serial No',esc(c.sNo||'—'));af('Meter No',esc(c.meterNo||'—'));af('Area Code',esc(c.transfCode||'—'));af('Address',esc(c.address||'—'));af('Lab No',esc(c.labNo||'—'));
+  af('Serial No',esc(c.sNo||'&#8212;'));af('Meter No',esc(c.meterNo||'&#8212;'));af('Area Code',esc(c.transfCode||'&#8212;'));af('Address',esc(c.address||'&#8212;'));af('Lab No',esc(c.labNo||'&#8212;'));
   if(c.phoneNo){var cl=c.phoneNo.replace(/[^0-9]/g,'');fh+='<div class="det-field"><span class="det-label">Phone</span><div class="det-phone-row"><span class="det-phone-num">'+esc(c.phoneNo)+'</span><a href="tel:'+esc(c.phoneNo)+'" class="det-phone-btn call"><span class="material-icons-round">call</span>Call</a>'+(cl.length>=10?'<a href="https://wa.me/91'+cl.slice(-10)+'" target="_blank" rel="noopener" class="det-phone-btn wa"><span class="material-icons-round">message</span>WA</a>':'')+'</div></div>';}
-  else af('Phone','—');
+  else af('Phone','&#8212;');
   var st=(c.status||'Active').toLowerCase();fh+='<div class="det-field"><span class="det-label">Status</span><span class="det-badge '+st+'">'+esc(c.status||'Active')+'</span></div>';
-  af('Last Edited By',esc(c.lastEditedBy||'—'));af('Created',esc(formatDate(c.createdAt)));
+  af('Last Edited By',esc(c.lastEditedBy||'&#8212;'));af('Created',esc(formatDate(c.createdAt)));
   fh+='<div class="det-section-hdr">Security Deposit</div>';
-  af('Passbook/SD No',esc(c.sdPassbookNo||'—'));
-  af('SD Amount',c.sdAmount?'&#8377; '+esc(c.sdAmount):'—');
-  af('SD Date',c.sdDate?esc(formatDate(c.sdDate)):'—');
+  af('Passbook/SD No',esc(c.sdPassbookNo||'&#8212;'));
+  af('SD Amount',c.sdAmount?'&#8377; '+esc(c.sdAmount):'&#8212;');
+  af('SD Date',c.sdDate?esc(formatDate(c.sdDate)):'&#8212;');
   $('detFields').innerHTML=fh;
   var delBtn=isAdmin?'<button class="det-btn det-del" onclick="confirmDelete('+c._rowIndex+',\''+esc(c.conNo)+'\',\''+esc(c.consumerName)+'\')"><span class="material-icons-round">delete</span>Delete</button>':'';
   $('detActions').innerHTML='<button class="det-btn det-edit" onclick="openEditForm(\''+esc(c.conNo)+'\')"><span class="material-icons-round">edit</span>Edit</button>'+delBtn;
   openSheet('detailSheet');
 }
-
 $('searchInp').addEventListener('input',function(e){searchQ=e.target.value;$('sClear').classList.toggle('hidden',!searchQ);clearTimeout(searchT);searchT=setTimeout(applyFilters,280);});
 function clearSearch(){$('searchInp').value='';searchQ='';$('sClear').classList.add('hidden');applyFilters();}
 function setArea(el,code){activeArea=code;document.querySelectorAll('.chip').forEach(function(c){c.classList.remove('active');});el.classList.add('active');applyFilters();}
 function setStatus(el,status){activeStatus=status;document.querySelectorAll('.f-pill').forEach(function(p){p.classList.remove('active','active-s','inactive-s','defaulter-s');});if(status==='ALL')el.classList.add('active');else if(status==='Active')el.classList.add('active-s');else if(status==='Inactive')el.classList.add('inactive-s');else if(status==='Defaulter')el.classList.add('defaulter-s');applyFilters();}
-function cycleSort(){var orders=['default','asc','desc'],labels=['Default','A → Z','Z → A'];var cur=orders.indexOf(sortOrder);sortOrder=orders[(cur+1)%3];$('sortLbl').textContent=labels[orders.indexOf(sortOrder)];$('sortBtn').classList.toggle('active',sortOrder!=='default');applyFilters();}
-
+function cycleSort(){var orders=['default','asc','desc'],labels=['Default','A \u2192 Z','Z \u2192 A'];var cur=orders.indexOf(sortOrder);sortOrder=orders[(cur+1)%3];$('sortLbl').textContent=labels[orders.indexOf(sortOrder)];$('sortBtn').classList.toggle('active',sortOrder!=='default');applyFilters();}
 function applyTheme(t){document.documentElement.setAttribute('data-theme',t);$('themeIcon').textContent=t==='dark'?'dark_mode':'light_mode';$('themeColorMeta').content=t==='dark'?'#0F1F3C':'#0052B4';localStorage.setItem('an_elect_theme',t);}
 $('themeToggle').addEventListener('click',function(){applyTheme(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark');});
-
 $('userMenuBtn').addEventListener('click',function(){var open=$('userMenu').classList.contains('show');if(open)closeUserMenu();else{$('userMenu').classList.add('show');$('menuOv').classList.remove('hidden');}});
 function closeUserMenu(){$('userMenu').classList.remove('show');$('menuOv').classList.add('hidden');}
-
 function openChangePass(){closeUserMenu();$('cpCur').value=$('cpNew').value=$('cpCfm').value='';$('cpErr').classList.remove('show');$('cpOk').classList.remove('show');$('sfi').style.width='0%';$('stxt').textContent='';openSheet('cpSheet');}
 function chkStrength(v){var fi=$('sfi'),tx=$('stxt');if(!v){fi.style.width='0%';tx.textContent='';return;}var s=0;if(v.length>=8)s++;if(/[A-Z]/.test(v))s++;if(/[0-9]/.test(v))s++;if(/[^A-Za-z0-9]/.test(v))s++;var L=[{w:'25%',b:'#F44336',t:'Too weak'},{w:'50%',b:'#FF9800',t:'Weak'},{w:'75%',b:'#FFC107',t:'Good'},{w:'100%',b:'#4CAF50',t:'Strong'}][s-1]||{w:'25%',b:'#F44336',t:'Too weak'};fi.style.width=L.w;fi.style.background=L.b;tx.textContent=L.t;}
 async function submitCP(){
@@ -671,20 +629,12 @@ async function submitCP(){
 }
 function showCpErr(msg){$('cpErrMsg').textContent=msg;$('cpErr').classList.add('show');}
 function openAbout(){closeUserMenu();openSheet('aboutSheet');}
-
-async function handleLogout(){
-  closeUserMenu();
-  $('logoutOv').classList.remove('hidden');
-  await AN_DB.clearAllData();await AN_DB.clearSession();
-  location.replace('./login.html');
-}
-
+async function handleLogout(){closeUserMenu();$('logoutOv').classList.remove('hidden');await AN_DB.clearAllData();await AN_DB.clearSession();location.replace('./login.html');}
 function enterSelectMode(){if(!isAdmin)return;selectMode=true;selectedSet.clear();$('selBar').classList.remove('hidden');$('navbar').classList.add('hidden');$('fabBtn').classList.add('hidden');$('bottomNav').classList.add('hide');updateSelUI();applyFilters();}
 function exitSelectMode(){selectMode=false;selectedSet.clear();$('selBar').classList.add('hidden');$('navbar').classList.remove('hidden');if(activeTab==='consumers')$('fabBtn').classList.remove('hidden');$('bottomNav').classList.remove('hide');$('delBar').classList.add('hidden');applyFilters();}
 function toggleCard(conNo,el){if(selectedSet.has(conNo)){selectedSet.delete(conNo);el.classList.remove('selected');}else{selectedSet.add(conNo);el.classList.add('selected');}updateSelUI();}
 function toggleSelectAll(){var allSel=selectedSet.size===filtered.length;selectedSet.clear();if(!allSel)filtered.forEach(function(c){selectedSet.add(c.conNo);});document.querySelectorAll('.c-card').forEach(function(card){card.classList.toggle('selected',!allSel);});updateSelUI();}
 function updateSelUI(){var n=selectedSet.size;$('selCnt').textContent=n===0?'Tap cards to select':n+' selected';$('delBarCnt').textContent=n;$('delBar').classList.toggle('hidden',n===0);$('selAllBtn').textContent=n===filtered.length?'Deselect All':'Select All';}
-
 function bulkDeleteConfirm(){var n=selectedSet.size;if(!n)return;$('delWho').textContent=n+' consumer'+(n!==1?'s':'')+' will be permanently deleted.';window._bulkDelete=true;openSheet('delSheet');}
 async function doDelete(){closeSheet();if(window._bulkDelete){window._bulkDelete=false;await executeBulkDelete();}else await executeSingleDelete();}
 async function executeBulkDelete(){
@@ -704,10 +654,7 @@ async function executeSingleDelete(){
   try{if(navigator.onLine){var res=await fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({action:'deleteConsumer',token:session.token,officeId:session.officeId,sheetName:'CONSUMER DATA ALL',rowIndex:delRowIdx,conNo:delConNo,consumerName:delName})});var json=await res.json();if(json.success){await AN_DB.deleteConsumer(delConNo);masterList=masterList.filter(function(c){return c.conNo!==delConNo;});applyFilters();toast('Consumer deleted','ok');if(navigator.onLine)setTimeout(function(){loadConsumers(false);},800);}else toast(json.error||json.message||'Delete failed','err');}
   else{await AN_DB.deleteConsumer(delConNo);await AN_DB.addPendingChange('deleteConsumer',{rowIndex:delRowIdx,conNo:delConNo},session.officeId);masterList=masterList.filter(function(c){return c.conNo!==delConNo;});applyFilters();toast('Deleted offline - will sync when online');AN_DB.requestSync();}}catch(e){toast('Error deleting','err');}
 }
-
-/* ADD/EDIT CONSUMER */
 function toDateInput(v){if(!v)return '';try{var d=new Date(v);return isNaN(d)?'':d.toISOString().split('T')[0];}catch(e){return '';}}
-
 function openAddForm(){
   CF.mode='add';CF.consumer=null;
   $('cfTitle').textContent='Add Consumer';$('cfBtnLbl').textContent='Add Consumer';
@@ -755,8 +702,6 @@ async function saveConsumer(){
   btn.classList.remove('loading');
 }
 function showCfErr(msg){$('cfErrMsg').textContent=msg;$('cfErr').classList.add('show');}
-
-/* ADMIN PANEL */
 async function loadUsers(){
   $('userList').innerHTML=Array(3).fill('<div class="skeleton u-skel" style="height:100px;margin-bottom:10px"></div>').join('');
   $('userEmpty').classList.add('hidden');
@@ -770,18 +715,7 @@ async function loadUsers(){
     else{$('userList').innerHTML='<div class="err-bar"><span class="material-icons-round">warning_amber</span>'+esc(json.error||'Failed to load users.')+'</div>';}
   }catch(err){$('userList').innerHTML='<div class="err-bar"><span class="material-icons-round">warning_amber</span>'+(err.name==='AbortError'?'Request timed out.':'Network error.')+'</div>';}
 }
-
-function renderUserList(users){
-  _userCache={};
-  users.forEach(function(u){_userCache[u['UserID']]=u;});
-  $('userList').innerHTML='';
-  if(!users.length){$('userEmpty').classList.remove('hidden');return;}
-  $('userEmpty').classList.add('hidden');
-  var frag=document.createDocumentFragment();
-  users.forEach(function(u){frag.appendChild(makeUserCard(u));});
-  $('userList').appendChild(frag);
-}
-
+function renderUserList(users){_userCache={};users.forEach(function(u){_userCache[u['UserID']]=u;});$('userList').innerHTML='';if(!users.length){$('userEmpty').classList.remove('hidden');return;}$('userEmpty').classList.add('hidden');var frag=document.createDocumentFragment();users.forEach(function(u){frag.appendChild(makeUserCard(u));});$('userList').appendChild(frag);}
 function makeUserCard(u){
   var div=document.createElement('div');div.className='u-card';
   var isMe=u['UserID']===session.userId;
@@ -798,31 +732,12 @@ function makeUserCard(u){
   var meName=isMe?' <span class="u-me">(You)</span>':'';
   var actionsHtml='';
   if(isMe){actionsHtml='<div class="u-note">Cannot modify your own account.</div>';}
-  else{
-    var toggleClass=active?'u-btn-off':'u-btn-on';
-    var toggleIco=active?'block':'check_circle';
-    var toggleTxt=active?'Deactivate':'Activate';
-    actionsHtml='<div class="u-actions"><button class="u-btn u-btn-pwd js-rpwd"><span class="material-icons-round">lock_reset</span>Reset PWD</button><button class="u-btn '+toggleClass+' js-toggle"><span class="material-icons-round">'+toggleIco+'</span>'+toggleTxt+'</button></div>';
-  }
+  else{var toggleClass=active?'u-btn-off':'u-btn-on';var toggleIco=active?'block':'check_circle';var toggleTxt=active?'Deactivate':'Activate';actionsHtml='<div class="u-actions"><button class="u-btn u-btn-pwd js-rpwd"><span class="material-icons-round">lock_reset</span>Reset PWD</button><button class="u-btn '+toggleClass+' js-toggle"><span class="material-icons-round">'+toggleIco+'</span>'+toggleTxt+'</button></div>';}
   div.innerHTML='<div class="u-top"><div class="u-avatar">'+esc(initials)+'</div><div class="u-info"><div class="u-name">'+esc(name)+meName+'</div><div class="u-meta">@'+esc(username)+' <span class="u-badge '+roleClass+'">'+esc(role)+'</span></div><div class="u-status"><span class="u-dot '+dotClass+'"></span>'+statusTxt+' · '+esc(lastLogin)+'</div></div></div>'+actionsHtml;
-  if(!isMe){
-    var rpBtn=div.querySelector('.js-rpwd');
-    var tgBtn=div.querySelector('.js-toggle');
-    var uid=u['UserID'];
-    var isAct=active;
-    if(rpBtn)rpBtn.addEventListener('click',function(){openResetPwdForm(uid);});
-    if(tgBtn)tgBtn.addEventListener('click',function(){promptToggleUser(uid,isAct);});
-  }
+  if(!isMe){var rpBtn=div.querySelector('.js-rpwd');var tgBtn=div.querySelector('.js-toggle');var uid=u['UserID'];var isAct=active;if(rpBtn)rpBtn.addEventListener('click',function(){openResetPwdForm(uid);});if(tgBtn)tgBtn.addEventListener('click',function(){promptToggleUser(uid,isAct);});}
   return div;
 }
-
-function openAddUserForm(){
-  $('auName').value='';$('auUser').value='';$('auPass').value='';
-  $('auErr').classList.remove('show');$('auErrMsg').textContent='';$('auBtn').classList.remove('loading');
-  openSheet('addUserSheet');
-  setTimeout(function(){$('auName').focus();},380);
-}
-
+function openAddUserForm(){$('auName').value='';$('auUser').value='';$('auPass').value='';$('auErr').classList.remove('show');$('auErrMsg').textContent='';$('auBtn').classList.remove('loading');openSheet('addUserSheet');setTimeout(function(){$('auName').focus();},380);}
 async function doAddUser(){
   var name=$('auName').value.trim(),username=$('auUser').value.trim().toLowerCase(),password=$('auPass').value;
   $('auErr').classList.remove('show');
@@ -832,176 +747,43 @@ async function doAddUser(){
   if(!password||password.length<6){$('auErrMsg').textContent='Password must be at least 6 characters.';$('auErr').classList.add('show');$('auPass').focus();return;}
   if(!session||!session.token){location.replace('./login.html');return;}
   var btn=$('auBtn');btn.classList.add('loading');
-  try{
-    var controller=new AbortController();var tid=setTimeout(function(){controller.abort();},TIMEOUT);
-    var res=await fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({action:'addUser',token:session.token,username:username,password:password,fullName:name,role:'Employee'}),redirect:'follow',signal:controller.signal});clearTimeout(tid);
-    var json=await res.json();
-    if(json.success){closeSheet();toast('Employee added successfully','ok');setTimeout(loadUsers,500);}
-    else{$('auErrMsg').textContent=json.error||json.message||'Failed to add user.';$('auErr').classList.add('show');}
-  }catch(err){$('auErrMsg').textContent=err.name==='AbortError'?'Request timed out.':'Network error. Please retry.';$('auErr').classList.add('show');}
+  try{var controller=new AbortController();var tid=setTimeout(function(){controller.abort();},TIMEOUT);var res=await fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({action:'addUser',token:session.token,username:username,password:password,fullName:name,role:'Employee'}),redirect:'follow',signal:controller.signal});clearTimeout(tid);var json=await res.json();if(json.success){closeSheet();toast('Employee added successfully','ok');setTimeout(loadUsers,500);}else{$('auErrMsg').textContent=json.error||json.message||'Failed to add user.';$('auErr').classList.add('show');}}catch(err){$('auErrMsg').textContent=err.name==='AbortError'?'Request timed out.':'Network error. Please retry.';$('auErr').classList.add('show');}
   btn.classList.remove('loading');
 }
-
-function openResetPwdForm(userId){
-  var u=_userCache[userId]||{};
-  var name=u['FullName']||'User';
-  userForReset={userId:userId,name:name};
-  $('rpTitle').textContent='Reset Password: '+name;
-  $('rpPass').value='';$('rpErr').classList.remove('show');$('rpErrMsg').textContent='';$('rpBtn').classList.remove('loading');
-  openSheet('rpSheet');
-  setTimeout(function(){$('rpPass').focus();},380);
-}
-
+function openResetPwdForm(userId){var u=_userCache[userId]||{};var name=u['FullName']||'User';userForReset={userId:userId,name:name};$('rpTitle').textContent='Reset Password: '+name;$('rpPass').value='';$('rpErr').classList.remove('show');$('rpErrMsg').textContent='';$('rpBtn').classList.remove('loading');openSheet('rpSheet');setTimeout(function(){$('rpPass').focus();},380);}
 async function doResetPassword(){
   if(!userForReset)return;
   var password=$('rpPass').value;
   $('rpErr').classList.remove('show');
   if(!password||password.length<6){$('rpErrMsg').textContent='Password must be at least 6 characters.';$('rpErr').classList.add('show');return;}
   var btn=$('rpBtn');btn.classList.add('loading');
-  try{
-    var controller=new AbortController();var tid=setTimeout(function(){controller.abort();},TIMEOUT);
-    var res=await fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({action:'resetUserPassword',token:session.token,targetUserId:userForReset.userId,newPassword:password}),redirect:'follow',signal:controller.signal});clearTimeout(tid);
-    var json=await res.json();
-    if(json.success){closeSheet();toast('Password reset. User must change on next login.','ok');}
-    else{$('rpErrMsg').textContent=json.error||json.message||'Failed to reset password.';$('rpErr').classList.add('show');}
-  }catch(err){$('rpErrMsg').textContent=err.name==='AbortError'?'Request timed out.':'Network error. Please retry.';$('rpErr').classList.add('show');}
+  try{var controller=new AbortController();var tid=setTimeout(function(){controller.abort();},TIMEOUT);var res=await fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({action:'resetUserPassword',token:session.token,targetUserId:userForReset.userId,newPassword:password}),redirect:'follow',signal:controller.signal});clearTimeout(tid);var json=await res.json();if(json.success){closeSheet();toast('Password reset. User must change on next login.','ok');}else{$('rpErrMsg').textContent=json.error||json.message||'Failed to reset password.';$('rpErr').classList.add('show');}}catch(err){$('rpErrMsg').textContent=err.name==='AbortError'?'Request timed out.':'Network error. Please retry.';$('rpErr').classList.add('show');}
   btn.classList.remove('loading');
 }
-
-function promptToggleUser(userId,isActive){
-  var u=_userCache[userId]||{};
-  var name=u['FullName']||'User';
-  userForToggle={userId:userId,name:name,isActive:isActive};
-  var ico=$('ugIco').querySelector('.material-icons-round');
-  if(isActive){ico.textContent='block';ico.style.color='var(--danger)';$('ugTitle').textContent='Deactivate '+name+'?';$('ugSub').textContent='This user will no longer be able to login.';$('ugConfirmBtn').style.background='var(--danger)';}
-  else{ico.textContent='check_circle';ico.style.color='var(--success)';$('ugTitle').textContent='Activate '+name+'?';$('ugSub').textContent='This user will be able to login again.';$('ugConfirmBtn').style.background='var(--success)';}
-  openSheet('ugSheet');
-}
-
-async function doToggleUser(){
-  if(!userForToggle)return;
-  closeSheet();
-  try{
-    var controller=new AbortController();var tid=setTimeout(function(){controller.abort();},TIMEOUT);
-    var res=await fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({action:'updateUser',token:session.token,targetUserId:userForToggle.userId,isActive:!userForToggle.isActive}),redirect:'follow',signal:controller.signal});clearTimeout(tid);
-    var json=await res.json();
-    if(json.success){toast(userForToggle.isActive?'User deactivated':'User activated','ok');setTimeout(loadUsers,500);}
-    else toast(json.error||json.message||'Failed.','err');
-  }catch(err){toast(err.name==='AbortError'?'Request timed out.':'Network error.','err');}
-  userForToggle=null;
-}
-
-/* ACTIVITY LOG - Step 8 */
-function getActionMeta(action){
-  var a=(action||'').toUpperCase();
-  var map=[
-    {keys:['ADD_CONSUMER','ADD'],icon:'add_circle',color:'#2E7D32',bg:'rgba(46,125,50,.12)',label:'Added Consumer'},
-    {keys:['UPDATE_CONSUMER','EDIT','UPDATE'],icon:'edit',color:'#0052B4',bg:'rgba(0,82,180,.1)',label:'Edited Consumer'},
-    {keys:['DELETE_CONSUMER','DELETE'],icon:'delete',color:'#D32F2F',bg:'rgba(211,47,47,.12)',label:'Deleted Consumer'},
-    {keys:['BULK_DELETE'],icon:'delete_sweep',color:'#D32F2F',bg:'rgba(211,47,47,.12)',label:'Bulk Delete'},
-    {keys:['IMPORT'],icon:'upload_file',color:'#7B1FA2',bg:'rgba(123,31,162,.1)',label:'Import'},
-    {keys:['LOGIN'],icon:'login',color:'#F57C00',bg:'rgba(245,124,0,.1)',label:'Login'},
-    {keys:['LOGOUT'],icon:'logout',color:'#757575',bg:'rgba(120,120,120,.1)',label:'Logout'},
-    {keys:['CHANGE_PASSWORD','PASSWORD_CHANGE'],icon:'lock_reset',color:'#0288D1',bg:'rgba(2,136,209,.1)',label:'Password Changed'},
-    {keys:['ADD_USER'],icon:'person_add',color:'#00838F',bg:'rgba(0,131,143,.1)',label:'Added User'},
-    {keys:['RESET_PASSWORD'],icon:'lock_reset',color:'#E64A19',bg:'rgba(230,74,25,.1)',label:'Reset Password'},
-    {keys:['TOGGLE_USER','UPDATEUSER','UPDATE_USER'],icon:'manage_accounts',color:'#455A64',bg:'rgba(69,90,100,.1)',label:'User Updated'},
-  ];
-  for(var i=0;i<map.length;i++){if(map[i].keys.some(function(k){return a.indexOf(k)>=0;}))return map[i];}
-  return {icon:'history',color:'#5A6A85',bg:'rgba(90,106,133,.1)',label:action||'Activity'};
-}
-
-async function loadActivity(){
-  $('activityList').innerHTML=Array(5).fill('<div class="skeleton" style="height:72px;margin-bottom:9px"></div>').join('');
-  $('activityEmpty').classList.add('hidden');
-  var actRefreshBtn=$('actRefreshBtn');if(actRefreshBtn)actRefreshBtn.classList.add('spin');
-  if(!navigator.onLine){$('activityList').innerHTML='<div class="err-bar"><span class="material-icons-round">wifi_off</span>Cannot load activity while offline.</div>';if(actRefreshBtn)actRefreshBtn.classList.remove('spin');return;}
-  try{
-    var controller=new AbortController();var tid=setTimeout(function(){controller.abort();},TIMEOUT);
-    var res=await fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({action:'getActivityLog',token:session.token,limit:200}),redirect:'follow',signal:controller.signal});clearTimeout(tid);
-    var json=await res.json();
-    if(json.success){renderActivityList(json.data||[]);}
-    else if(json.code==='UNAUTHORIZED'||json.error==='SESSION_EXPIRED'){await AN_DB.clearSession();location.replace('./login.html');}
-    else{$('activityList').innerHTML='<div class="err-bar"><span class="material-icons-round">warning_amber</span>'+esc(json.error||'Failed to load activity.')+'</div>';}
-  }catch(err){$('activityList').innerHTML='<div class="err-bar"><span class="material-icons-round">warning_amber</span>'+(err.name==='AbortError'?'Request timed out.':'Network error.')+'</div>';}
-  if(actRefreshBtn)actRefreshBtn.classList.remove('spin');
-}
-
-function renderActivityList(entries){
-  $('activityList').innerHTML='';
-  if(!entries.length){$('activityEmpty').classList.remove('hidden');return;}
-  $('activityEmpty').classList.add('hidden');
-  var frag=document.createDocumentFragment();
-  entries.forEach(function(e){frag.appendChild(makeActivityCard(e));});
-  $('activityList').appendChild(frag);
-}
-
-function makeActivityCard(entry){
-  var div=document.createElement('div');div.className='act-card';
-  var action=entry.Action||entry.action||'';
-  var meta=getActionMeta(action);
-  var fullName=esc(entry.FullName||entry.fullName||'Unknown');
-  var role=entry.Role||entry.role||'';
-  var conNo=entry.ConNo||entry.conNo||'';
-  var details=esc(entry.Details||entry.details||'');
-  var ts=entry.Timestamp||entry.timestamp||'';
-  var timeStr=ts?formatDate(ts):'';
-  var roleClass=role==='Admin'?'role-admin':'role-emp';
-  var conNoHtml=conNo?'<div class="act-conno">'+esc(conNo)+'</div>':'';
-  var detailsHtml=details?'<div class="act-details">'+details+'</div>':'';
-  div.innerHTML='<div class="act-inner"><div class="act-ico-wrap" style="background:'+meta.bg+'"><span class="material-icons-round act-ico" style="color:'+meta.color+'">'+meta.icon+'</span></div><div class="act-body"><div class="act-top"><span class="act-action">'+meta.label+'</span><span class="act-time">'+esc(timeStr)+'</span></div>'+conNoHtml+'<div class="act-meta"><span>'+fullName+'</span><span class="act-role '+roleClass+'">'+esc(role)+'</span></div>'+detailsHtml+'</div></div>';
-  return div;
-}
-
-/* TABS */
-function switchTab(tab){
-  if(selectMode)exitSelectMode();
-  activeTab=tab;
-  document.querySelectorAll('.bnav').forEach(function(b){b.classList.remove('active');});
-  var el=document.getElementById('bnav-'+tab);if(el)el.classList.add('active');
-  var isConsumers=tab==='consumers';
-  var isAdminTab=tab==='admin';
-  var isActivity=tab==='activity';
-  $('searchSec').classList.toggle('hidden',!isConsumers);
-  $('consumerView').classList.toggle('hidden',!isConsumers);
-  $('adminPanel').classList.toggle('hidden',!isAdminTab);
-  $('activityPanel').classList.toggle('hidden',!isActivity);
-  $('fabBtn').classList.toggle('hidden',!isConsumers||selectMode);
-  if(isAdminTab)loadUsers();
-  if(isActivity)loadActivity();
-  adjustLayout();
-}
-
-/* SHEETS */
+function promptToggleUser(userId,isActive){var u=_userCache[userId]||{};var name=u['FullName']||'User';userForToggle={userId:userId,name:name,isActive:isActive};var ico=$('ugIco').querySelector('.material-icons-round');if(isActive){ico.textContent='block';ico.style.color='var(--danger)';$('ugTitle').textContent='Deactivate '+name+'?';$('ugSub').textContent='This user will no longer be able to login.';$('ugConfirmBtn').style.background='var(--danger)';}else{ico.textContent='check_circle';ico.style.color='var(--success)';$('ugTitle').textContent='Activate '+name+'?';$('ugSub').textContent='This user will be able to login again.';$('ugConfirmBtn').style.background='var(--success)';}openSheet('ugSheet');}
+async function doToggleUser(){if(!userForToggle)return;closeSheet();try{var controller=new AbortController();var tid=setTimeout(function(){controller.abort();},TIMEOUT);var res=await fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({action:'updateUser',token:session.token,targetUserId:userForToggle.userId,isActive:!userForToggle.isActive}),redirect:'follow',signal:controller.signal});clearTimeout(tid);var json=await res.json();if(json.success){toast(userForToggle.isActive?'User deactivated':'User activated','ok');setTimeout(loadUsers,500);}else toast(json.error||json.message||'Failed.','err');}catch(err){toast(err.name==='AbortError'?'Request timed out.':'Network error.','err');}userForToggle=null;}
+function getActionMeta(action){var a=(action||'').toUpperCase();var map=[{keys:['ADD_CONSUMER','ADD'],icon:'add_circle',color:'#2E7D32',bg:'rgba(46,125,50,.12)',label:'Added Consumer'},{keys:['UPDATE_CONSUMER','EDIT','UPDATE'],icon:'edit',color:'#0052B4',bg:'rgba(0,82,180,.1)',label:'Edited Consumer'},{keys:['DELETE_CONSUMER','DELETE'],icon:'delete',color:'#D32F2F',bg:'rgba(211,47,47,.12)',label:'Deleted Consumer'},{keys:['BULK_DELETE'],icon:'delete_sweep',color:'#D32F2F',bg:'rgba(211,47,47,.12)',label:'Bulk Delete'},{keys:['IMPORT'],icon:'upload_file',color:'#7B1FA2',bg:'rgba(123,31,162,.1)',label:'Import'},{keys:['LOGIN'],icon:'login',color:'#F57C00',bg:'rgba(245,124,0,.1)',label:'Login'},{keys:['LOGOUT'],icon:'logout',color:'#757575',bg:'rgba(120,120,120,.1)',label:'Logout'},{keys:['CHANGE_PASSWORD','PASSWORD_CHANGE'],icon:'lock_reset',color:'#0288D1',bg:'rgba(2,136,209,.1)',label:'Password Changed'},{keys:['ADD_USER'],icon:'person_add',color:'#00838F',bg:'rgba(0,131,143,.1)',label:'Added User'},{keys:['RESET_PASSWORD'],icon:'lock_reset',color:'#E64A19',bg:'rgba(230,74,25,.1)',label:'Reset Password'},{keys:['TOGGLE_USER','UPDATEUSER','UPDATE_USER'],icon:'manage_accounts',color:'#455A64',bg:'rgba(69,90,100,.1)',label:'User Updated'},];for(var i=0;i<map.length;i++){if(map[i].keys.some(function(k){return a.indexOf(k)>=0;}))return map[i];}return {icon:'history',color:'#5A6A85',bg:'rgba(90,106,133,.1)',label:action||'Activity'};}
+async function loadActivity(){$('activityList').innerHTML=Array(5).fill('<div class="skeleton" style="height:72px;margin-bottom:9px"></div>').join('');$('activityEmpty').classList.add('hidden');var actRefreshBtn=$('actRefreshBtn');if(actRefreshBtn)actRefreshBtn.classList.add('spin');if(!navigator.onLine){$('activityList').innerHTML='<div class="err-bar"><span class="material-icons-round">wifi_off</span>Cannot load activity while offline.</div>';if(actRefreshBtn)actRefreshBtn.classList.remove('spin');return;}try{var controller=new AbortController();var tid=setTimeout(function(){controller.abort();},TIMEOUT);var res=await fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({action:'getActivityLog',token:session.token,limit:200}),redirect:'follow',signal:controller.signal});clearTimeout(tid);var json=await res.json();if(json.success){renderActivityList(json.data||[]);}else if(json.code==='UNAUTHORIZED'||json.error==='SESSION_EXPIRED'){await AN_DB.clearSession();location.replace('./login.html');}else{$('activityList').innerHTML='<div class="err-bar"><span class="material-icons-round">warning_amber</span>'+esc(json.error||'Failed to load activity.')+'</div>';}}catch(err){$('activityList').innerHTML='<div class="err-bar"><span class="material-icons-round">warning_amber</span>'+(err.name==='AbortError'?'Request timed out.':'Network error.')+'</div>';}if(actRefreshBtn)actRefreshBtn.classList.remove('spin');}
+function renderActivityList(entries){$('activityList').innerHTML='';if(!entries.length){$('activityEmpty').classList.remove('hidden');return;}$('activityEmpty').classList.add('hidden');var frag=document.createDocumentFragment();entries.forEach(function(e){frag.appendChild(makeActivityCard(e));});$('activityList').appendChild(frag);}
+function makeActivityCard(entry){var div=document.createElement('div');div.className='act-card';var action=entry.Action||entry.action||'';var meta=getActionMeta(action);var fullName=esc(entry.FullName||entry.fullName||'Unknown');var role=entry.Role||entry.role||'';var conNo=entry.ConNo||entry.conNo||'';var details=esc(entry.Details||entry.details||'');var ts=entry.Timestamp||entry.timestamp||'';var timeStr=ts?formatDate(ts):'';var roleClass=role==='Admin'?'role-admin':'role-emp';var conNoHtml=conNo?'<div class="act-conno">'+esc(conNo)+'</div>':'';var detailsHtml=details?'<div class="act-details">'+details+'</div>':'';div.innerHTML='<div class="act-inner"><div class="act-ico-wrap" style="background:'+meta.bg+'"><span class="material-icons-round act-ico" style="color:'+meta.color+'">'+meta.icon+'</span></div><div class="act-body"><div class="act-top"><span class="act-action">'+meta.label+'</span><span class="act-time">'+esc(timeStr)+'</span></div>'+conNoHtml+'<div class="act-meta"><span>'+fullName+'</span><span class="act-role '+roleClass+'">'+esc(role)+'</span></div>'+detailsHtml+'</div></div>';return div;}
+function switchTab(tab){if(selectMode)exitSelectMode();activeTab=tab;document.querySelectorAll('.bnav').forEach(function(b){b.classList.remove('active');});var el=document.getElementById('bnav-'+tab);if(el)el.classList.add('active');var isConsumers=tab==='consumers';var isAdminTab=tab==='admin';var isActivity=tab==='activity';$('searchSec').classList.toggle('hidden',!isConsumers);$('consumerView').classList.toggle('hidden',!isConsumers);$('adminPanel').classList.toggle('hidden',!isAdminTab);$('activityPanel').classList.toggle('hidden',!isActivity);$('fabBtn').classList.toggle('hidden',!isConsumers||selectMode);if(isAdminTab)loadUsers();if(isActivity)loadActivity();adjustLayout();}
 function openSheet(id){if(activeSheet)document.getElementById(activeSheet).classList.remove('open');activeSheet=id;document.getElementById(id).classList.add('open');$('backdrop').classList.add('show');$('backdrop').onclick=id==='delSheet'||id==='ugSheet'?null:closeSheet;}
 function closeSheet(){if(activeSheet){document.getElementById(activeSheet).classList.remove('open');activeSheet=null;}$('backdrop').classList.remove('show');$('backdrop').onclick=closeSheet;window._bulkDelete=false;requestAnimationFrame(function(){window.scrollTo(0,lastScrollY);});}
 function toggleEye(inputId,iconId){var inp=document.getElementById(inputId),icon=document.getElementById(iconId);inp.type=inp.type==='password'?'text':'password';icon.textContent=inp.type==='text'?'visibility':'visibility_off';}
-
-/* LONG PRESS */
-function attachLongPress(el,consumer){
-  el.addEventListener('pointerdown',function(e){if(!isAdmin)return;pressPos={x:e.clientX,y:e.clientY};pressCard=el;el.classList.add('pressing');pressTimer=setTimeout(function(){if(navigator.vibrate)navigator.vibrate(50);el.classList.remove('pressing');pressTimer=null;enterSelectMode();toggleCard(consumer.conNo,el);},500);});
-  el.addEventListener('pointermove',function(e){if(!pressPos)return;if(Math.abs(e.clientX-pressPos.x)>12||Math.abs(e.clientY-pressPos.y)>12)clearPressTimer();});
-  ['pointerup','pointercancel','pointerleave'].forEach(function(evt){el.addEventListener(evt,clearPressTimer);});
-}
+function attachLongPress(el,consumer){el.addEventListener('pointerdown',function(e){if(!isAdmin)return;pressPos={x:e.clientX,y:e.clientY};pressCard=el;el.classList.add('pressing');pressTimer=setTimeout(function(){if(navigator.vibrate)navigator.vibrate(50);el.classList.remove('pressing');pressTimer=null;enterSelectMode();toggleCard(consumer.conNo,el);},500);});el.addEventListener('pointermove',function(e){if(!pressPos)return;if(Math.abs(e.clientX-pressPos.x)>12||Math.abs(e.clientY-pressPos.y)>12)clearPressTimer();});['pointerup','pointercancel','pointerleave'].forEach(function(evt){el.addEventListener(evt,clearPressTimer);});}
 function clearPressTimer(){clearTimeout(pressTimer);pressTimer=null;pressPos=null;if(pressCard){pressCard.classList.remove('pressing');pressCard=null;}}
-
-/* SYNC */
 function setSync(type,txt){$('syncDot').className='sync-dot '+type;$('syncTxt').textContent=txt;}
 function setRefreshSpin(on){$('refreshBtn').classList.toggle('spin',on);}
 function onOnline(){setSync('syncing','Back online - syncing...');AN_DB.requestSync();setTimeout(loadConsumers,600);}
 function onOffline(){setSync('offline','Offline - edits save locally');}
 function onSWMsg(e){var data=e.data;if(!data)return;if(data.type==='SYNC_COMPLETE'){setSync('online',data.synced+' change'+(data.synced!==1?'s':'')+' synced');loadConsumers(false);}if(data.type==='SYNC_FAILED')setSync('pending','Sync failed - will retry');}
-
-/* UTILS */
 function showErr(msg){$('consumerList').innerHTML='<div class="err-bar"><span class="material-icons-round">warning_amber</span>'+esc(msg)+'</div>';}
 function addRipple(el,e){var r=el.getBoundingClientRect(),sz=Math.max(r.width,r.height)*1.4;var rip=document.createElement('span');rip.className='ripple';rip.style.cssText='width:'+sz+'px;height:'+sz+'px;left:'+(e.clientX-r.left-sz/2)+'px;top:'+(e.clientY-r.top-sz/2)+'px;';el.appendChild(rip);setTimeout(function(){rip.remove();},600);}
 function toast(msg,type){var el=$('toast');el.textContent=msg;el.className='show '+(type||'');clearTimeout(toastT);toastT=setTimeout(function(){el.className=type||'';},2800);}
 function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
-function formatDate(ts){if(!ts||ts==='—')return '—';try{var d=new Date(ts);if(isNaN(d))return ts;return d.toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'});}catch(e){return ts;}}
+function formatDate(ts){if(!ts||ts==='&#8212;')return '&#8212;';try{var d=new Date(ts);if(isNaN(d))return ts;return d.toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'});}catch(e){return ts;}}
 function timeAgo(ts){var d=Date.now()-ts;if(d<60000)return 'just now';if(d<3600000)return Math.floor(d/60000)+'m ago';return Math.floor(d/3600000)+'h ago';}
-
 init();
-
 </script>
 </body>
 </html>
