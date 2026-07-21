@@ -1308,7 +1308,7 @@ function esc(v) {
 }
 
 function fmtDate(s) {
-  if (!s) return '&#8212;';
+  if (!s) return '—';
   try {
     return new Date(s).toLocaleDateString('en-IN',
       { day:'2-digit', month:'short', year:'numeric' });
@@ -1452,9 +1452,9 @@ function renderOffices(list) {
     return;
   }
   el.innerHTML = list.map(o => {
-    const name       = esc(o.officeName    || o.OfficeName    || '&#8212;');
-    const oid        = esc(o.officeId      || o.OfficeID      || '&#8212;');
-    const admin      = esc(o.adminUsername || o.AdminUsername || '&#8212;');
+    const name       = esc(o.officeName    || o.OfficeName    || '—');
+    const oid        = esc(o.officeId      || o.OfficeID      || '—');
+    const admin      = esc(o.adminUsername || o.AdminUsername || '—');
     const created    = fmtDate(o.createdAt || o.CreatedAt);
     const rawSheetId = o.sheetId || o.SheetID || '';
     const hasSheet   = !!rawSheetId;
@@ -1525,8 +1525,8 @@ function renderRequests(list) {
   }
   el.innerHTML = list.map(r => {
     const status   = (r.status || r.Status || 'pending').toLowerCase();
-    const name     = esc(r.officeName  || r.OfficeName  || '&#8212;');
-    const by       = esc(r.requestedBy || r.RequestedBy || '&#8212;');
+    const name     = esc(r.officeName  || r.OfficeName  || '—');
+    const by       = esc(r.requestedBy || r.RequestedBy || '—');
     const email    = esc(r.adminEmail  || r.AdminEmail  || '');
     const created  = fmtDate(r.createdAt || r.CreatedAt);
     const rid      = esc(r.requestId   || r.RequestID   || '');
@@ -1885,8 +1885,8 @@ function renderVC(list) {
   const display = list.slice(0, 200);
 
   el.innerHTML = display.map((c, idx) => {
-    const conNo  = esc(c['ConNo']         || '&#8212;');
-    const name   = esc(c['ConsumerName']  || '&#8212;');
+    const conNo  = esc(c['ConNo']         || '—');
+    const name   = esc(c['ConsumerName']  || '—');
     const area   = esc(c['TransfCode']    || '');
     const meter  = esc(c['MeterNo']       || '');
     const phone  = esc(c['PhoneNo']       || '');
