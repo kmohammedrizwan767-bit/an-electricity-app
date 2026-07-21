@@ -191,6 +191,8 @@
   .refresh-btn.spin .material-icons-round{animation:spin .7s linear infinite}
   .c-card{background:var(--card);border:1px solid var(--card-b);border-radius:var(--r);padding:13px 14px;margin-bottom:9px;box-shadow:var(--sh);position:relative;overflow:hidden;animation:fadeUp .28s var(--ease) both;cursor:pointer;transition:transform .1s,border-color .15s,background .15s;user-select:none;-webkit-user-select:none;}
   @keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+  @keyframes tabFade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+  .tab-anim{animation:tabFade .25s cubic-bezier(.4,0,.2,1) both;}
   .c-card:active{transform:scale(.985)}
   .c-card.selected{border-color:var(--primary)}
   .c-card.pressing{background:rgba(0,82,180,.04)}
@@ -386,6 +388,7 @@
   <div class="sf"><label class="sl">Passbook/SD No</label><div class="siw"><span class="material-icons-round">book</span><input class="sinp" type="text" id="cfSdNo" placeholder="Passbook/SD number" maxlength="50" autocomplete="off"></div></div>
   <div class="sf"><label class="sl">SD Amount (&#8377;)</label><div class="siw"><span class="material-icons-round">currency_rupee</span><input class="sinp" type="number" id="cfSdAmt" placeholder="Amount in rupees" min="0" autocomplete="off"></div></div>
   <div class="sf"><label class="sl">SD Date</label><div class="siw"><span class="material-icons-round">calendar_today</span><input class="sinp" type="date" id="cfSdDate" autocomplete="off"></div></div>
+  <div id="cfCustomFields"></div>
   <button class="btn-sh" id="cfBtn" onclick="saveConsumer()"><span class="bl" id="cfBtnLbl">Add Consumer</span><div class="spin"></div></button>
   <button class="btn-cancel" onclick="closeSheet()">Cancel</button>
 </div>
@@ -544,8 +547,21 @@ async function init(){
   document.fonts.ready.then(adjustLayout);
   new IntersectionObserver(entries=>{if(entries[0].isIntersecting&&displayedN<filtered.length)appendCards();},{threshold:0.1}).observe($('sentinel'));
   setupSwipeClose();
-  await loadConsumers();
+  fetchActiveCustomFields();
+  renderSkeleton();
+  const cached=await AN_DB.getAllConsumers();
+  if(cached.length){masterList=cached;applyFilters();updateChipCounts();setSync('syncing','Refreshing...');}
+  else{setSync('syncing','Loading...');}
   hideSplash();
+  loadConsumers(false);
+}
+async function fetchActiveCustomFields(){
+  if(!session||!session.token)return;
+  try{
+    var res=await fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({action:'getCustomFields',token:session.token})});
+    var json=await res.json();
+    if(json.success)_customFields=json.data||[];
+  }catch(e){}
 }
 function adjustLayout(){const navH=$('navbar').offsetHeight;const searchH=$('searchSec').classList.contains('hidden')?0:$('searchSec').offsetHeight;$('main').style.paddingTop=(navH+searchH+4)+'px';}
 function hideSplash(){const s=$('splash');s.classList.add('out');setTimeout(()=>s.style.display='none',400);}
@@ -584,7 +600,10 @@ function refreshData(){loadConsumers();}
 function normalize(c){
   function get(){for(var i=0;i<arguments.length;i++){var v=c[arguments[i]];if(v!==undefined&&v!==null&&String(v).trim()!==''&&String(v).trim()!=='0')return String(v).trim();}return '';}
   var mr=c['MeterNo']||c.meterNo||c['Meter No']||'';
-  return {_rowIndex:c._rowIndex||0,sNo:get('S.No.','sNo'),conNo:get('ConNo','conNo'),consumerName:get('ConsumerName','Consumer Name','consumerName'),address:get('Address','address'),labNo:get('LabNo','labNo','Lab No'),meterNo:mr?String(mr).trim():'',transfCode:get('TransfCode','transfCode','Transf Code','AreaCode','areaCode'),phoneNo:get('PhoneNo','phoneNo','Phone','phone'),status:get('Status','status')||'Active',lastEditedBy:get('LastEditedBy','lastEditedBy'),lastEditedAt:get('LastEditedAt','lastEditedAt'),createdAt:get('CreatedAt','createdAt'),sdPassbookNo:get('Passbook/SD No','sdPassbookNo'),sdAmount:get('SD Amount','sdAmount'),sdDate:get('SD Date','sdDate')};
+  var result={_rowIndex:c._rowIndex||0,sNo:get('S.No.','sNo'),conNo:get('ConNo','conNo'),consumerName:get('ConsumerName','Consumer Name','consumerName'),address:get('Address','address'),labNo:get('LabNo','labNo','Lab No'),meterNo:mr?String(mr).trim():'',transfCode:get('TransfCode','transfCode','Transf Code','AreaCode','areaCode'),phoneNo:get('PhoneNo','phoneNo','Phone','phone'),status:get('Status','status')||'Active',lastEditedBy:get('LastEditedBy','lastEditedBy'),lastEditedAt:get('LastEditedAt','lastEditedAt'),createdAt:get('CreatedAt','createdAt'),sdPassbookNo:get('Passbook/SD No','sdPassbookNo'),sdAmount:get('SD Amount','sdAmount'),sdDate:get('SD Date','sdDate')};
+  var known=['S.No.','sNo','ConNo','conNo','ConsumerName','Consumer Name','consumerName','Address','address','LabNo','labNo','Lab No','MeterNo','meterNo','Meter No','TransfCode','transfCode','Transf Code','AreaCode','areaCode','PhoneNo','phoneNo','Phone','phone','Status','status','LastEditedBy','lastEditedBy','LastEditedAt','lastEditedAt','CreatedAt','createdAt','Passbook/SD No','sdPassbookNo','SD Amount','sdAmount','SD Date','sdDate','_rowIndex'];
+  Object.keys(c).forEach(function(k){if(known.indexOf(k)===-1)result[k]=(c[k]!==undefined&&c[k]!==null)?String(c[k]).trim():'';});
+  return result;
 }
 function updateChipCounts(){var counts={};masterList.forEach(function(c){if(c.transfCode)counts[c.transfCode]=(counts[c.transfCode]||0)+1;});document.querySelectorAll('.chip').forEach(function(chip){var a=chip.dataset.area;if(!a)return;if(a==='ALL')chip.textContent='All ('+masterList.length+')';else if(counts[a])chip.textContent=a+' · '+counts[a];});}
 function applyFilters(){
@@ -630,6 +649,11 @@ function openDetail(c){
   af('Passbook/SD No',esc(c.sdPassbookNo||'—'));
   af('SD Amount',c.sdAmount?'&#8377; '+esc(c.sdAmount):'—');
   af('SD Date',c.sdDate?esc(formatDate(c.sdDate)):'—');
+  var cfList=activeFieldsList();
+  if(cfList.length){
+    fh+='<div class="det-section-hdr">Additional Details</div>';
+    cfList.forEach(function(f){var lbl=f['FieldLabel']||'';af(esc(lbl),esc(c[lbl]||'—'));});
+  }
   $('detFields').innerHTML=fh;
   var delBtn=isAdmin?'<button class="det-btn det-del" onclick="confirmDelete('+c._rowIndex+',\''+esc(c.conNo)+'\',\''+esc(c.consumerName)+'\')"><span class="material-icons-round">delete</span>Delete</button>':'';
   $('detActions').innerHTML='<button class="det-btn det-edit" onclick="openEditForm(\''+esc(c.conNo)+'\')"><span class="material-icons-round">edit</span>Edit</button>'+delBtn;
@@ -682,11 +706,32 @@ async function executeSingleDelete(){
   else{await AN_DB.deleteConsumer(delConNo);await AN_DB.addPendingChange('deleteConsumer',{rowIndex:delRowIdx,conNo:delConNo},session.officeId);masterList=masterList.filter(function(c){return c.conNo!==delConNo;});applyFilters();toast('Deleted offline - will sync when online');AN_DB.requestSync();}}catch(e){toast('Error deleting','err');}
 }
 function toDateInput(v){if(!v)return '';try{var d=new Date(v);return isNaN(d)?'':d.toISOString().split('T')[0];}catch(e){return '';}}
+function activeFieldsList(){return _customFields.filter(function(f){return f['IsActive']===undefined||f['IsActive']==='TRUE'||f['IsActive']===true;});}
+function renderCustomFieldInputs(existingValues){
+  var container=$('cfCustomFields');
+  var fields=activeFieldsList();
+  if(!fields.length){container.innerHTML='';return;}
+  var html='<div class="cf-section-hdr">Additional Details</div>';
+  fields.forEach(function(f){
+    var label=f['FieldLabel']||'';
+    var val=(existingValues&&existingValues[label])?existingValues[label]:'';
+    if(f['FieldType']==='dropdown'){
+      var opts=(f['Options']||'').split(',').map(function(o){return o.trim();}).filter(Boolean);
+      html+='<div class="sf"><label class="sl">'+esc(label)+'</label><div class="cf-sel-wrap"><select class="cf-sel" data-field-label="'+esc(label)+'"><option value="">&#8212; Select &#8212;</option>';
+      opts.forEach(function(o){html+='<option value="'+esc(o)+'"'+(o===val?' selected':'')+'>'+esc(o)+'</option>';});
+      html+='</select><span class="material-icons-round cf-sel-ico">expand_more</span></div></div>';
+    }else{
+      html+='<div class="sf"><label class="sl">'+esc(label)+'</label><div class="siw"><span class="material-icons-round">edit_note</span><input class="sinp" type="text" data-field-label="'+esc(label)+'" value="'+esc(val)+'" maxlength="100" autocomplete="off"></div></div>';
+    }
+  });
+  container.innerHTML=html;
+}
 function openAddForm(){
   CF.mode='add';CF.consumer=null;
   $('cfTitle').textContent='Add Consumer';$('cfBtnLbl').textContent='Add Consumer';
   $('cfConNo').value='';$('cfConNo').disabled=false;$('cfCName').value='';$('cfAddr').value='';$('cfLabNo').value='';$('cfMeter').value='';$('cfTransf').value='';$('cfPhone').value='';$('cfStatus').value='Active';
   $('cfSdNo').value='';$('cfSdAmt').value='';$('cfSdDate').value='';
+  renderCustomFieldInputs(null);
   $('cfErr').classList.remove('show');$('cfErrMsg').textContent='';$('cfBtn').classList.remove('loading');
   openSheet('cfSheet');setTimeout(function(){$('cfConNo').focus();},380);
 }
@@ -699,6 +744,7 @@ function openEditForm(conNo){
   $('cfConNo').value=c.conNo||'';$('cfConNo').disabled=true;
   $('cfCName').value=c.consumerName||'';$('cfAddr').value=c.address||'';$('cfLabNo').value=c.labNo||'';$('cfMeter').value=c.meterNo||'';$('cfTransf').value=c.transfCode||'';$('cfPhone').value=c.phoneNo||'';$('cfStatus').value=c.status||'Active';
   $('cfSdNo').value=c.sdPassbookNo||'';$('cfSdAmt').value=c.sdAmount||'';$('cfSdDate').value=toDateInput(c.sdDate);
+  renderCustomFieldInputs(c);
   $('cfErr').classList.remove('show');$('cfErrMsg').textContent='';$('cfBtn').classList.remove('loading');
   closeSheet();setTimeout(function(){openSheet('cfSheet');},200);
 }
@@ -710,6 +756,7 @@ async function saveConsumer(){
   if(!session||!session.token){location.replace('./login.html');return;}
   var btn=$('cfBtn');btn.classList.add('loading');
   var consumerData={ConNo:conNo,ConsumerName:cName,Address:addr,LabNo:labNo,MeterNo:meter,TransfCode:transf,PhoneNo:phone,Status:status,'Passbook/SD No':sdNo,'SD Amount':sdAmt,'SD Date':sdDate};
+  document.querySelectorAll('#cfCustomFields [data-field-label]').forEach(function(el){consumerData[el.getAttribute('data-field-label')]=el.value.trim();});
   if(!navigator.onLine){
     try{if(CF.mode==='add'){await AN_DB.addPendingChange('addConsumer',consumerData,session.officeId);var tmp=normalize(Object.assign({},consumerData,{_rowIndex:-1}));await AN_DB.upsertConsumer(tmp);masterList.unshift(tmp);}
     else{await AN_DB.addPendingChange('updateConsumer',{rowIndex:CF.consumer._rowIndex,consumer:consumerData},session.officeId);var upd=normalize(Object.assign({},consumerData,{_rowIndex:CF.consumer._rowIndex}));await AN_DB.upsertConsumer(upd);var idx=masterList.findIndex(function(c){return c.conNo===CF.consumer.conNo;});if(idx!==-1)masterList[idx]=upd;}}catch(e){console.warn('CF offline:',e);}
@@ -877,7 +924,7 @@ function getActionMeta(action){var a=(action||'').toUpperCase();var map=[{keys:[
 async function loadActivity(){$('activityList').innerHTML=Array(5).fill('<div class="skeleton" style="height:72px;margin-bottom:9px"></div>').join('');$('activityEmpty').classList.add('hidden');var actRefreshBtn=$('actRefreshBtn');if(actRefreshBtn)actRefreshBtn.classList.add('spin');if(!navigator.onLine){$('activityList').innerHTML='<div class="err-bar"><span class="material-icons-round">wifi_off</span>Cannot load activity while offline.</div>';if(actRefreshBtn)actRefreshBtn.classList.remove('spin');return;}try{var controller=new AbortController();var tid=setTimeout(function(){controller.abort();},TIMEOUT);var res=await fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({action:'getActivityLog',token:session.token,limit:200}),redirect:'follow',signal:controller.signal});clearTimeout(tid);var json=await res.json();if(json.success){renderActivityList(json.data||[]);}else if(json.code==='UNAUTHORIZED'||json.error==='SESSION_EXPIRED'){await AN_DB.clearSession();location.replace('./login.html');}else{$('activityList').innerHTML='<div class="err-bar"><span class="material-icons-round">warning_amber</span>'+esc(json.error||'Failed to load activity.')+'</div>';}}catch(err){$('activityList').innerHTML='<div class="err-bar"><span class="material-icons-round">warning_amber</span>'+(err.name==='AbortError'?'Request timed out.':'Network error.')+'</div>';}if(actRefreshBtn)actRefreshBtn.classList.remove('spin');}
 function renderActivityList(entries){$('activityList').innerHTML='';if(!entries.length){$('activityEmpty').classList.remove('hidden');return;}$('activityEmpty').classList.add('hidden');var frag=document.createDocumentFragment();entries.forEach(function(e){frag.appendChild(makeActivityCard(e));});$('activityList').appendChild(frag);}
 function makeActivityCard(entry){var div=document.createElement('div');div.className='act-card';var action=entry.Action||entry.action||'';var meta=getActionMeta(action);var fullName=esc(entry.FullName||entry.fullName||'Unknown');var role=entry.Role||entry.role||'';var conNo=entry.ConNo||entry.conNo||'';var details=esc(entry.Details||entry.details||'');var ts=entry.Timestamp||entry.timestamp||'';var timeStr=ts?formatDate(ts):'';var roleClass=role==='Admin'?'role-admin':'role-emp';var conNoHtml=conNo?'<div class="act-conno">'+esc(conNo)+'</div>':'';var detailsHtml=details?'<div class="act-details">'+details+'</div>':'';div.innerHTML='<div class="act-inner"><div class="act-ico-wrap" style="background:'+meta.bg+'"><span class="material-icons-round act-ico" style="color:'+meta.color+'">'+meta.icon+'</span></div><div class="act-body"><div class="act-top"><span class="act-action">'+meta.label+'</span><span class="act-time">'+esc(timeStr)+'</span></div>'+conNoHtml+'<div class="act-meta"><span>'+fullName+'</span><span class="act-role '+roleClass+'">'+esc(role)+'</span></div>'+detailsHtml+'</div></div>';return div;}
-function switchTab(tab){if(selectMode)exitSelectMode();activeTab=tab;document.querySelectorAll('.bnav').forEach(function(b){b.classList.remove('active');});var el=document.getElementById('bnav-'+tab);if(el)el.classList.add('active');var isConsumers=tab==='consumers';var isAdminTab=tab==='admin';var isActivity=tab==='activity';$('searchSec').classList.toggle('hidden',!isConsumers);$('consumerView').classList.toggle('hidden',!isConsumers);$('adminPanel').classList.toggle('hidden',!isAdminTab);$('activityPanel').classList.toggle('hidden',!isActivity);$('fabBtn').classList.toggle('hidden',!isConsumers||selectMode);if(isAdminTab){loadUsers();loadCustomFields();}if(isActivity)loadActivity();adjustLayout();}
+function switchTab(tab){if(selectMode)exitSelectMode();activeTab=tab;document.querySelectorAll('.bnav').forEach(function(b){b.classList.remove('active');});var el=document.getElementById('bnav-'+tab);if(el)el.classList.add('active');var isConsumers=tab==='consumers';var isAdminTab=tab==='admin';var isActivity=tab==='activity';$('searchSec').classList.toggle('hidden',!isConsumers);$('consumerView').classList.toggle('hidden',!isConsumers);$('adminPanel').classList.toggle('hidden',!isAdminTab);$('activityPanel').classList.toggle('hidden',!isActivity);$('fabBtn').classList.toggle('hidden',!isConsumers||selectMode);if(isAdminTab){loadUsers();loadCustomFields();}if(isActivity)loadActivity();adjustLayout();var shown=isConsumers?$('consumerView'):(isAdminTab?$('adminPanel'):$('activityPanel'));shown.classList.remove('tab-anim');void shown.offsetWidth;shown.classList.add('tab-anim');}
 function openSheet(id){if(activeSheet)document.getElementById(activeSheet).classList.remove('open');activeSheet=id;document.getElementById(id).classList.add('open');$('backdrop').classList.add('show');$('backdrop').onclick=id==='delSheet'||id==='ugSheet'?null:closeSheet;}
 function closeSheet(){if(activeSheet){document.getElementById(activeSheet).classList.remove('open');activeSheet=null;}$('backdrop').classList.remove('show');$('backdrop').onclick=closeSheet;window._bulkDelete=false;requestAnimationFrame(function(){window.scrollTo(0,lastScrollY);});}
 function toggleEye(inputId,iconId){var inp=document.getElementById(inputId),icon=document.getElementById(iconId);inp.type=inp.type==='password'?'text':'password';icon.textContent=inp.type==='text'?'visibility':'visibility_off';}
