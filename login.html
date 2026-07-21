@@ -10,6 +10,8 @@
   <link rel="manifest" href="./manifest.json">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://script.google.com">
+  <link rel="preconnect" href="https://script.googleusercontent.com">
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
   <style>
@@ -333,14 +335,24 @@
     function hideAll(...ids) { ids.forEach(id => $(id).classList.remove('show')); }
 
     async function apiCall(payload) {
-      const res = await fetch(CFG.API_URL, {
-        method:  'POST',
-        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body:    JSON.stringify(payload),
-        redirect:'follow'
-      });
-      if (!res.ok) throw new Error('HTTP ' + res.status);
-      return res.json();
+      const controller = new AbortController();
+      const timeoutId  = setTimeout(() => controller.abort(), 30000); // 30s timeout
+      try {
+        const res = await fetch(CFG.API_URL, {
+          method:  'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body:    JSON.stringify(payload),
+          redirect:'follow',
+          signal:  controller.signal
+        });
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        return res.json();
+      } catch (err) {
+        if (err.name === 'AbortError') throw new Error('Request timed out. Check your connection.');
+        throw err;
+      } finally {
+        clearTimeout(timeoutId);
+      }
     }
 
     function setLoading(btnId, state) {
