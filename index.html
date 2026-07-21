@@ -582,7 +582,7 @@ function makeCard(c){
   var addr=c.address?'<div class="c-mi addr"><span class="material-icons-round">location_on</span>'+esc(c.address).substring(0,28)+'</div>':'';
   var check=selectMode?'<div class="c-check"><span class="material-icons-round">check</span></div>':'';
   var arrow=selectMode?'':'<span class="c-arrow material-icons-round">chevron_right</span>';
-  div.innerHTML='<div class="c-inner">'+check+'<div class="c-body"><div class="c-row1"><span class="c-conno">'+esc(c.conNo||'&#8212;')+'</span><div class="badges">'+area+'<span class="status-badge '+status+'">'+esc(c.status||'Active')+'</span></div></div><div class="c-name">'+esc(c.consumerName||'&#8212;')+'</div><div class="c-meta">'+meter+phone+addr+'</div></div>'+arrow+'</div>';
+  div.innerHTML='<div class="c-inner">'+check+'<div class="c-body"><div class="c-row1"><span class="c-conno">'+esc(c.conNo||'—')+'</span><div class="badges">'+area+'<span class="status-badge '+status+'">'+esc(c.status||'Active')+'</span></div></div><div class="c-name">'+esc(c.consumerName||'—')+'</div><div class="c-meta">'+meter+phone+addr+'</div></div>'+arrow+'</div>';
   if(selectMode){div.addEventListener('click',function(){toggleCard(c.conNo,div);});}
   else{div.addEventListener('click',function(){openDetail(c);});attachLongPress(div,c);div.addEventListener('pointerdown',function(e){addRipple(div,e);});}
   return div;
@@ -590,19 +590,19 @@ function makeCard(c){
 function renderSkeleton(){$('emptyState').classList.add('hidden');$('consumerList').innerHTML=Array(6).fill('<div class="skeleton"><div class="sk-row"><div class="sk" style="width:30%;height:11px"></div><div class="sk" style="width:18%;height:11px"></div></div><div class="sk" style="width:62%;height:14px;margin-bottom:8px"></div><div class="sk" style="width:42%;height:11px"></div></div>').join('');}
 function openDetail(c){
   lastScrollY=window.scrollY;
-  $('detName').textContent=c.consumerName||'&#8212;';
-  $('detConno').textContent='Consumer No: '+(c.conNo||'&#8212;');
+  $('detName').textContent=c.consumerName||'—';
+  $('detConno').textContent='Consumer No: '+(c.conNo||'—');
   var fh='';
   function af(lbl,val){fh+='<div class="det-field"><span class="det-label">'+lbl+'</span><span class="det-value">'+val+'</span></div>';}
-  af('Serial No',c.sNo ? esc(c.sNo) : '&#8212;');af('Meter No',c.meterNo ? esc(c.meterNo) : '&#8212;');af('Area Code',c.transfCode ? esc(c.transfCode) : '&#8212;');af('Address',c.address ? esc(c.address) : '&#8212;');af('Lab No',c.labNo ? esc(c.labNo) : '&#8212;');
+  af('Serial No',esc(c.sNo||'—'));af('Meter No',esc(c.meterNo||'—'));af('Area Code',esc(c.transfCode||'—'));af('Address',esc(c.address||'—'));af('Lab No',esc(c.labNo||'—'));
   if(c.phoneNo){var cl=c.phoneNo.replace(/[^0-9]/g,'');fh+='<div class="det-field"><span class="det-label">Phone</span><div class="det-phone-row"><span class="det-phone-num">'+esc(c.phoneNo)+'</span><a href="tel:'+esc(c.phoneNo)+'" class="det-phone-btn call"><span class="material-icons-round">call</span>Call</a>'+(cl.length>=10?'<a href="https://wa.me/91'+cl.slice(-10)+'" target="_blank" rel="noopener" class="det-phone-btn wa"><span class="material-icons-round">message</span>WA</a>':'')+'</div></div>';}
-  else af('Phone','&#8212;');
+  else af('Phone','—');
   var st=(c.status||'Active').toLowerCase();fh+='<div class="det-field"><span class="det-label">Status</span><span class="det-badge '+st+'">'+esc(c.status||'Active')+'</span></div>';
-  af('Last Edited By',c.lastEditedBy ? esc(c.lastEditedBy) : '&#8212;');af('Created',formatDate(c.createdAt));
+  af('Last Edited By',esc(c.lastEditedBy||'—'));af('Created',esc(formatDate(c.createdAt)));
   fh+='<div class="det-section-hdr">Security Deposit</div>';
-  af('Passbook/SD No',c.sdPassbookNo ? esc(c.sdPassbookNo) : '&#8212;');
-  af('SD Amount',c.sdAmount?'&#8377; '+esc(c.sdAmount):'&#8212;');
-  af('SD Date',formatDate(c.sdDate));
+  af('Passbook/SD No',esc(c.sdPassbookNo||'—'));
+  af('SD Amount',c.sdAmount?'&#8377; '+esc(c.sdAmount):'—');
+  af('SD Date',c.sdDate?esc(formatDate(c.sdDate)):'—');
   $('detFields').innerHTML=fh;
   var delBtn=isAdmin?'<button class="det-btn det-del" onclick="confirmDelete('+c._rowIndex+',\''+esc(c.conNo)+'\',\''+esc(c.consumerName)+'\')"><span class="material-icons-round">delete</span>Delete</button>':'';
   $('detActions').innerHTML='<button class="det-btn det-edit" onclick="openEditForm(\''+esc(c.conNo)+'\')"><span class="material-icons-round">edit</span>Edit</button>'+delBtn;
@@ -781,7 +781,7 @@ function showErr(msg){$('consumerList').innerHTML='<div class="err-bar"><span cl
 function addRipple(el,e){var r=el.getBoundingClientRect(),sz=Math.max(r.width,r.height)*1.4;var rip=document.createElement('span');rip.className='ripple';rip.style.cssText='width:'+sz+'px;height:'+sz+'px;left:'+(e.clientX-r.left-sz/2)+'px;top:'+(e.clientY-r.top-sz/2)+'px;';el.appendChild(rip);setTimeout(function(){rip.remove();},600);}
 function toast(msg,type){var el=$('toast');el.textContent=msg;el.className='show '+(type||'');clearTimeout(toastT);toastT=setTimeout(function(){el.className=type||'';},2800);}
 function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
-function formatDate(ts){if(!ts||ts==='&#8212;') return '&#8212;';try{var d=new Date(ts);if(isNaN(d)) return ts;return d.toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'});}catch(e){return ts;}}
+function formatDate(ts){if(!ts||ts==='—')return '—';try{var d=new Date(ts);if(isNaN(d))return ts;return d.toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'});}catch(e){return ts;}}
 function timeAgo(ts){var d=Date.now()-ts;if(d<60000)return 'just now';if(d<3600000)return Math.floor(d/60000)+'m ago';return Math.floor(d/3600000)+'h ago';}
 init();
 </script>
