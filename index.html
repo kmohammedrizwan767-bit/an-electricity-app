@@ -409,6 +409,25 @@
   <button class="btn-sh" id="rpBtn" onclick="doResetPassword()"><span class="bl">Reset Password</span><div class="spin"></div></button>
   <button class="btn-cancel" onclick="closeSheet()">Cancel</button>
 </div>
+<div class="bottom-sheet" id="afSheet">
+  <div class="sheet-handle" id="afHandle"></div>
+  <div class="sheet-title">Add Custom Field</div>
+  <div class="s-alert err" id="afErr"><span class="material-icons-round">error_outline</span><span id="afErrMsg"></span></div>
+  <div class="sf"><label class="sl">Field Name <span style="color:var(--danger)">*</span></label><div class="siw"><span class="material-icons-round">label</span><input class="sinp" type="text" id="afLabel" placeholder="e.g. Connection Type" maxlength="40" autocomplete="off"></div></div>
+  <div class="sf"><label class="sl">Field Type</label><div class="cf-sel-wrap"><select class="cf-sel" id="afType" onchange="toggleFieldOptions()"><option value="text">Text (free entry)</option><option value="dropdown">Dropdown (fixed choices)</option></select><span class="material-icons-round cf-sel-ico">expand_more</span></div></div>
+  <div class="sf hidden" id="afOptionsWrap"><label class="sl">Options (comma separated)</label><div class="siw"><span class="material-icons-round">list</span><input class="sinp" type="text" id="afOptions" placeholder="e.g. Domestic,Commercial,Industrial" maxlength="200" autocomplete="off"></div></div>
+  <div style="font-size:11px;color:var(--t2);padding:6px 2px 14px;line-height:1.5;display:flex;align-items:flex-start;gap:6px;"><span class="material-icons-round" style="font-size:14px;flex-shrink:0;margin-top:1px;color:var(--accent)">info</span>This field will apply to all consumers in your office. Existing consumers will show it blank until edited.</div>
+  <button class="btn-sh" id="afBtn" onclick="doAddField()"><span class="bl">Add Field</span><div class="spin"></div></button>
+  <button class="btn-cancel" onclick="closeSheet()">Cancel</button>
+</div>
+<div class="bottom-sheet" id="fdSheet">
+  <div class="sheet-handle" id="fdHandle"></div>
+  <div class="del-ico" id="fdIco"><span class="material-icons-round">visibility_off</span></div>
+  <div class="del-ttl" id="fdTitle">Hide Field?</div>
+  <div class="del-sub" id="fdSub">This field will stop showing on forms. Existing data is preserved.</div>
+  <button class="btn-del-confirm" id="fdConfirmBtn" onclick="doToggleField()">Confirm</button>
+  <button class="btn-cancel" onclick="closeSheet()">Cancel</button>
+</div>
 <div class="backdrop" id="backdrop" onclick="closeSheet()"></div>
 <div class="search-sec" id="searchSec">
   <div class="search-wrap"><span class="material-icons-round s-ico">search</span><input class="search-inp" type="search" id="searchInp" placeholder="Name, ConNo, meter, phone, address&#8230;" autocomplete="off" autocorrect="off" autocapitalize="none"><button class="s-clr hidden" id="sClear" onclick="clearSearch()"><span class="material-icons-round">close</span></button></div>
@@ -455,6 +474,12 @@
     <div class="s-alert err hidden" id="apErr" style="margin-bottom:12px"><span class="material-icons-round">error_outline</span><span id="apErrMsg"></span></div>
     <div id="userList"></div>
     <div class="ap-empty hidden" id="userEmpty"><span class="material-icons-round">people_outline</span><div style="font-family:var(--fd);font-weight:700;margin-bottom:4px;">No employees yet</div><div style="font-size:12px;">Tap + to add the first employee</div></div>
+    <div class="ap-hdr" style="margin-top:24px;padding-top:20px;border-top:1px solid var(--card-b);">
+      <div class="ap-title">Custom Fields</div>
+      <button class="ap-add-btn" onclick="openAddFieldForm()"><span class="material-icons-round">playlist_add</span></button>
+    </div>
+    <div id="fieldList"></div>
+    <div class="ap-empty hidden" id="fieldEmpty"><span class="material-icons-round">dynamic_form</span><div style="font-family:var(--fd);font-weight:700;margin-bottom:4px;">No custom fields yet</div><div style="font-size:12px;">Add fields like Connection Type, apply to all consumers</div></div>
   </div>
   <div id="activityPanel" class="hidden activity-panel">
     <div class="act-hdr">
@@ -489,6 +514,8 @@ let activeTab='consumers';
 const CF={mode:'add',consumer:null};
 let userForReset=null,userForToggle=null;
 var _userCache={};
+var _customFields=[];
+var _fieldForToggle=null;
 const $=id=>document.getElementById(id);
 async function init(){
   session=AN_DB.getSession();
@@ -500,7 +527,7 @@ async function init(){
   window.addEventListener('online',onOnline);window.addEventListener('offline',onOffline);
   history.pushState(null,'');
   window.addEventListener('popstate',()=>{
-    if(activeSheet==='cfSheet'||activeSheet==='addUserSheet'||activeSheet==='rpSheet'||activeSheet==='ugSheet'){closeSheet();history.pushState(null,'');return;}
+    if(activeSheet==='cfSheet'||activeSheet==='addUserSheet'||activeSheet==='rpSheet'||activeSheet==='ugSheet'||activeSheet==='afSheet'||activeSheet==='fdSheet'){closeSheet();history.pushState(null,'');return;}
     if(activeSheet){closeSheet();history.pushState(null,'');return;}
     if(selectMode){exitSelectMode();history.pushState(null,'');return;}
   });
@@ -525,7 +552,7 @@ function hideSplash(){const s=$('splash');s.classList.add('out');setTimeout(()=>
 async function installApp(){if(!deferredInstall)return;closeUserMenu();deferredInstall.prompt();const{outcome}=await deferredInstall.userChoice;deferredInstall=null;$('installBtn').classList.add('hidden');if(outcome==='accepted')toast('App installed!','ok');}
 function applyUpdate(){if(swReg&&swReg.waiting)swReg.waiting.postMessage({type:'SKIP_WAITING'});window.location.reload();}
 function setupSwipeClose(){
-  ['cpHandle','aboutHandle','detHandle','delHandle','cfHandle','addUserHandle','rpHandle','ugHandle'].forEach(id=>{
+  ['cpHandle','aboutHandle','detHandle','delHandle','cfHandle','addUserHandle','rpHandle','ugHandle','afHandle','fdHandle'].forEach(id=>{
     const el=$(id);if(!el)return;
     let startY=0;
     el.addEventListener('touchstart',e=>{startY=e.touches[0].clientY;},{passive:true});
@@ -762,11 +789,95 @@ async function doResetPassword(){
 }
 function promptToggleUser(userId,isActive){var u=_userCache[userId]||{};var name=u['FullName']||'User';userForToggle={userId:userId,name:name,isActive:isActive};var ico=$('ugIco').querySelector('.material-icons-round');if(isActive){ico.textContent='block';ico.style.color='var(--danger)';$('ugTitle').textContent='Deactivate '+name+'?';$('ugSub').textContent='This user will no longer be able to login.';$('ugConfirmBtn').style.background='var(--danger)';}else{ico.textContent='check_circle';ico.style.color='var(--success)';$('ugTitle').textContent='Activate '+name+'?';$('ugSub').textContent='This user will be able to login again.';$('ugConfirmBtn').style.background='var(--success)';}openSheet('ugSheet');}
 async function doToggleUser(){if(!userForToggle)return;closeSheet();try{var controller=new AbortController();var tid=setTimeout(function(){controller.abort();},TIMEOUT);var res=await fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({action:'updateUser',token:session.token,targetUserId:userForToggle.userId,isActive:!userForToggle.isActive}),redirect:'follow',signal:controller.signal});clearTimeout(tid);var json=await res.json();if(json.success){toast(userForToggle.isActive?'User deactivated':'User activated','ok');setTimeout(loadUsers,500);}else toast(json.error||json.message||'Failed.','err');}catch(err){toast(err.name==='AbortError'?'Request timed out.':'Network error.','err');}userForToggle=null;}
+
+/* CUSTOM FIELDS - Step 12 */
+async function loadCustomFields(){
+  $('fieldList').innerHTML=Array(2).fill('<div class="skeleton" style="height:64px;margin-bottom:9px"></div>').join('');
+  $('fieldEmpty').classList.add('hidden');
+  if(!navigator.onLine){$('fieldList').innerHTML='<div class="err-bar"><span class="material-icons-round">wifi_off</span>Cannot load fields while offline.</div>';return;}
+  try{
+    var controller=new AbortController();var tid=setTimeout(function(){controller.abort();},TIMEOUT);
+    var res=await fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({action:'getCustomFields',token:session.token}),redirect:'follow',signal:controller.signal});clearTimeout(tid);
+    var json=await res.json();
+    if(json.success){_customFields=json.data||[];renderFieldList(_customFields);}
+    else{$('fieldList').innerHTML='<div class="err-bar"><span class="material-icons-round">warning_amber</span>'+esc(json.error||'Failed to load fields.')+'</div>';}
+  }catch(err){$('fieldList').innerHTML='<div class="err-bar"><span class="material-icons-round">warning_amber</span>'+(err.name==='AbortError'?'Request timed out.':'Network error.')+'</div>';}
+}
+function renderFieldList(fields){
+  $('fieldList').innerHTML='';
+  if(!fields.length){$('fieldEmpty').classList.remove('hidden');return;}
+  $('fieldEmpty').classList.add('hidden');
+  var frag=document.createDocumentFragment();
+  fields.forEach(function(f){frag.appendChild(makeFieldCard(f));});
+  $('fieldList').appendChild(frag);
+}
+function makeFieldCard(f){
+  var div=document.createElement('div');div.className='u-card';
+  var active=f['IsActive']===undefined||f['IsActive']==='TRUE'||f['IsActive']===true;
+  var typeLabel=f['FieldType']==='dropdown'?'Dropdown':'Text';
+  var optsInfo=f['FieldType']==='dropdown'&&f['Options']?' · '+esc(f['Options']):'';
+  var dotClass=active?'on':'off';
+  var statusTxt=active?'Active':'Hidden';
+  var toggleClass=active?'u-btn-off':'u-btn-on';
+  var toggleIco=active?'visibility_off':'visibility';
+  var toggleTxt=active?'Hide':'Restore';
+  div.innerHTML='<div class="u-top"><div class="u-avatar"><span class="material-icons-round" style="font-size:20px;">dynamic_form</span></div><div class="u-info"><div class="u-name">'+esc(f['FieldLabel']||'—')+'</div><div class="u-meta"><span class="u-badge role-emp">'+typeLabel+'</span>'+optsInfo+'</div><div class="u-status"><span class="u-dot '+dotClass+'"></span>'+statusTxt+'</div></div></div><div class="u-actions"><button class="u-btn '+toggleClass+' js-field-toggle"><span class="material-icons-round">'+toggleIco+'</span>'+toggleTxt+'</button></div>';
+  var btn=div.querySelector('.js-field-toggle');
+  var fid=f['FieldID'];
+  if(btn)btn.addEventListener('click',function(){promptToggleField(fid,f['FieldLabel'],active);});
+  return div;
+}
+function openAddFieldForm(){
+  $('afLabel').value='';$('afType').value='text';$('afOptions').value='';
+  $('afOptionsWrap').classList.add('hidden');
+  $('afErr').classList.remove('show');$('afErrMsg').textContent='';$('afBtn').classList.remove('loading');
+  openSheet('afSheet');
+  setTimeout(function(){$('afLabel').focus();},380);
+}
+function toggleFieldOptions(){
+  $('afOptionsWrap').classList.toggle('hidden',$('afType').value!=='dropdown');
+}
+async function doAddField(){
+  var label=$('afLabel').value.trim(),type=$('afType').value,options=$('afOptions').value.trim();
+  $('afErr').classList.remove('show');
+  if(!label){$('afErrMsg').textContent='Field name is required.';$('afErr').classList.add('show');$('afLabel').focus();return;}
+  if(type==='dropdown'&&!options){$('afErrMsg').textContent='Add at least one option for dropdown fields.';$('afErr').classList.add('show');$('afOptions').focus();return;}
+  if(!session||!session.token){location.replace('./login.html');return;}
+  var btn=$('afBtn');btn.classList.add('loading');
+  try{
+    var controller=new AbortController();var tid=setTimeout(function(){controller.abort();},TIMEOUT);
+    var res=await fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({action:'addCustomField',token:session.token,fieldLabel:label,fieldType:type,options:options}),redirect:'follow',signal:controller.signal});clearTimeout(tid);
+    var json=await res.json();
+    if(json.success){closeSheet();toast('Field "'+label+'" added','ok');setTimeout(loadCustomFields,500);}
+    else{$('afErrMsg').textContent=json.error||json.message||'Failed to add field.';$('afErr').classList.add('show');}
+  }catch(err){$('afErrMsg').textContent=err.name==='AbortError'?'Request timed out.':'Network error. Please retry.';$('afErr').classList.add('show');}
+  btn.classList.remove('loading');
+}
+function promptToggleField(fieldId,label,isActive){
+  _fieldForToggle={fieldId:fieldId,label:label,isActive:isActive};
+  var ico=$('fdIco').querySelector('.material-icons-round');
+  if(isActive){ico.textContent='visibility_off';ico.style.color='var(--danger)';$('fdTitle').textContent='Hide "'+label+'"?';$('fdSub').textContent='This field will stop showing on forms. Existing data is preserved.';$('fdConfirmBtn').style.background='var(--danger)';}
+  else{ico.textContent='visibility';ico.style.color='var(--success)';$('fdTitle').textContent='Restore "'+label+'"?';$('fdSub').textContent='This field will show on forms again.';$('fdConfirmBtn').style.background='var(--success)';}
+  openSheet('fdSheet');
+}
+async function doToggleField(){
+  if(!_fieldForToggle)return;
+  closeSheet();
+  var action=_fieldForToggle.isActive?'deactivateCustomField':'reactivateCustomField';
+  try{
+    var controller=new AbortController();var tid=setTimeout(function(){controller.abort();},TIMEOUT);
+    var res=await fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({action:action,token:session.token,fieldId:_fieldForToggle.fieldId}),redirect:'follow',signal:controller.signal});clearTimeout(tid);
+    var json=await res.json();
+    if(json.success){toast(_fieldForToggle.isActive?'Field hidden':'Field restored','ok');setTimeout(loadCustomFields,500);}
+    else toast(json.error||json.message||'Failed.','err');
+  }catch(err){toast(err.name==='AbortError'?'Request timed out.':'Network error.','err');}
+  _fieldForToggle=null;
+}
 function getActionMeta(action){var a=(action||'').toUpperCase();var map=[{keys:['ADD_CONSUMER','ADD'],icon:'add_circle',color:'#2E7D32',bg:'rgba(46,125,50,.12)',label:'Added Consumer'},{keys:['UPDATE_CONSUMER','EDIT','UPDATE'],icon:'edit',color:'#0052B4',bg:'rgba(0,82,180,.1)',label:'Edited Consumer'},{keys:['DELETE_CONSUMER','DELETE'],icon:'delete',color:'#D32F2F',bg:'rgba(211,47,47,.12)',label:'Deleted Consumer'},{keys:['BULK_DELETE'],icon:'delete_sweep',color:'#D32F2F',bg:'rgba(211,47,47,.12)',label:'Bulk Delete'},{keys:['IMPORT'],icon:'upload_file',color:'#7B1FA2',bg:'rgba(123,31,162,.1)',label:'Import'},{keys:['LOGIN'],icon:'login',color:'#F57C00',bg:'rgba(245,124,0,.1)',label:'Login'},{keys:['LOGOUT'],icon:'logout',color:'#757575',bg:'rgba(120,120,120,.1)',label:'Logout'},{keys:['CHANGE_PASSWORD','PASSWORD_CHANGE'],icon:'lock_reset',color:'#0288D1',bg:'rgba(2,136,209,.1)',label:'Password Changed'},{keys:['ADD_USER'],icon:'person_add',color:'#00838F',bg:'rgba(0,131,143,.1)',label:'Added User'},{keys:['RESET_PASSWORD'],icon:'lock_reset',color:'#E64A19',bg:'rgba(230,74,25,.1)',label:'Reset Password'},{keys:['TOGGLE_USER','UPDATEUSER','UPDATE_USER'],icon:'manage_accounts',color:'#455A64',bg:'rgba(69,90,100,.1)',label:'User Updated'},];for(var i=0;i<map.length;i++){if(map[i].keys.some(function(k){return a.indexOf(k)>=0;}))return map[i];}return {icon:'history',color:'#5A6A85',bg:'rgba(90,106,133,.1)',label:action||'Activity'};}
 async function loadActivity(){$('activityList').innerHTML=Array(5).fill('<div class="skeleton" style="height:72px;margin-bottom:9px"></div>').join('');$('activityEmpty').classList.add('hidden');var actRefreshBtn=$('actRefreshBtn');if(actRefreshBtn)actRefreshBtn.classList.add('spin');if(!navigator.onLine){$('activityList').innerHTML='<div class="err-bar"><span class="material-icons-round">wifi_off</span>Cannot load activity while offline.</div>';if(actRefreshBtn)actRefreshBtn.classList.remove('spin');return;}try{var controller=new AbortController();var tid=setTimeout(function(){controller.abort();},TIMEOUT);var res=await fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({action:'getActivityLog',token:session.token,limit:200}),redirect:'follow',signal:controller.signal});clearTimeout(tid);var json=await res.json();if(json.success){renderActivityList(json.data||[]);}else if(json.code==='UNAUTHORIZED'||json.error==='SESSION_EXPIRED'){await AN_DB.clearSession();location.replace('./login.html');}else{$('activityList').innerHTML='<div class="err-bar"><span class="material-icons-round">warning_amber</span>'+esc(json.error||'Failed to load activity.')+'</div>';}}catch(err){$('activityList').innerHTML='<div class="err-bar"><span class="material-icons-round">warning_amber</span>'+(err.name==='AbortError'?'Request timed out.':'Network error.')+'</div>';}if(actRefreshBtn)actRefreshBtn.classList.remove('spin');}
 function renderActivityList(entries){$('activityList').innerHTML='';if(!entries.length){$('activityEmpty').classList.remove('hidden');return;}$('activityEmpty').classList.add('hidden');var frag=document.createDocumentFragment();entries.forEach(function(e){frag.appendChild(makeActivityCard(e));});$('activityList').appendChild(frag);}
 function makeActivityCard(entry){var div=document.createElement('div');div.className='act-card';var action=entry.Action||entry.action||'';var meta=getActionMeta(action);var fullName=esc(entry.FullName||entry.fullName||'Unknown');var role=entry.Role||entry.role||'';var conNo=entry.ConNo||entry.conNo||'';var details=esc(entry.Details||entry.details||'');var ts=entry.Timestamp||entry.timestamp||'';var timeStr=ts?formatDate(ts):'';var roleClass=role==='Admin'?'role-admin':'role-emp';var conNoHtml=conNo?'<div class="act-conno">'+esc(conNo)+'</div>':'';var detailsHtml=details?'<div class="act-details">'+details+'</div>':'';div.innerHTML='<div class="act-inner"><div class="act-ico-wrap" style="background:'+meta.bg+'"><span class="material-icons-round act-ico" style="color:'+meta.color+'">'+meta.icon+'</span></div><div class="act-body"><div class="act-top"><span class="act-action">'+meta.label+'</span><span class="act-time">'+esc(timeStr)+'</span></div>'+conNoHtml+'<div class="act-meta"><span>'+fullName+'</span><span class="act-role '+roleClass+'">'+esc(role)+'</span></div>'+detailsHtml+'</div></div>';return div;}
-function switchTab(tab){if(selectMode)exitSelectMode();activeTab=tab;document.querySelectorAll('.bnav').forEach(function(b){b.classList.remove('active');});var el=document.getElementById('bnav-'+tab);if(el)el.classList.add('active');var isConsumers=tab==='consumers';var isAdminTab=tab==='admin';var isActivity=tab==='activity';$('searchSec').classList.toggle('hidden',!isConsumers);$('consumerView').classList.toggle('hidden',!isConsumers);$('adminPanel').classList.toggle('hidden',!isAdminTab);$('activityPanel').classList.toggle('hidden',!isActivity);$('fabBtn').classList.toggle('hidden',!isConsumers||selectMode);if(isAdminTab)loadUsers();if(isActivity)loadActivity();adjustLayout();}
+function switchTab(tab){if(selectMode)exitSelectMode();activeTab=tab;document.querySelectorAll('.bnav').forEach(function(b){b.classList.remove('active');});var el=document.getElementById('bnav-'+tab);if(el)el.classList.add('active');var isConsumers=tab==='consumers';var isAdminTab=tab==='admin';var isActivity=tab==='activity';$('searchSec').classList.toggle('hidden',!isConsumers);$('consumerView').classList.toggle('hidden',!isConsumers);$('adminPanel').classList.toggle('hidden',!isAdminTab);$('activityPanel').classList.toggle('hidden',!isActivity);$('fabBtn').classList.toggle('hidden',!isConsumers||selectMode);if(isAdminTab){loadUsers();loadCustomFields();}if(isActivity)loadActivity();adjustLayout();}
 function openSheet(id){if(activeSheet)document.getElementById(activeSheet).classList.remove('open');activeSheet=id;document.getElementById(id).classList.add('open');$('backdrop').classList.add('show');$('backdrop').onclick=id==='delSheet'||id==='ugSheet'?null:closeSheet;}
 function closeSheet(){if(activeSheet){document.getElementById(activeSheet).classList.remove('open');activeSheet=null;}$('backdrop').classList.remove('show');$('backdrop').onclick=closeSheet;window._bulkDelete=false;requestAnimationFrame(function(){window.scrollTo(0,lastScrollY);});}
 function toggleEye(inputId,iconId){var inp=document.getElementById(inputId),icon=document.getElementById(iconId);inp.type=inp.type==='password'?'text':'password';icon.textContent=inp.type==='text'?'visibility':'visibility_off';}
