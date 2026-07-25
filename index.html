@@ -158,7 +158,8 @@
   .search-inp::-webkit-search-decoration,.search-inp::-webkit-search-cancel-button,.search-inp::-webkit-search-results-button,.search-inp::-webkit-search-results-decoration{display:none}
   .s-clr{background:none;border:none;cursor:pointer;color:var(--t2);display:flex;padding:2px}
   .s-clr .material-icons-round{font-size:18px}
-  .f-row{display:flex;align-items:center;gap:6px;padding:8px 0 4px}
+  .f-row{display:flex;align-items:center;gap:6px;padding:8px 0 4px;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;scroll-behavior:smooth}
+  .f-row::-webkit-scrollbar{display:none}
   .f-pill{flex-shrink:0;background:var(--inp);border:1.5px solid var(--inp-b);border-radius:20px;padding:3px 12px;font-size:11.5px;font-family:var(--fd);font-weight:500;color:var(--t2);cursor:pointer;transition:all .15s;}
   .f-pill.active{background:var(--primary);border-color:var(--primary);color:#fff}
   .f-pill.active-s{background:rgba(46,125,50,.15);border-color:rgba(46,125,50,.3);color:#2E7D32}
@@ -708,7 +709,7 @@ async function submitCP(){
 function showCpErr(msg){$('cpErrMsg').textContent=msg;$('cpErr').classList.add('show');}
 function openAbout(){closeUserMenu();openSheet('aboutSheet');}
 async function handleLogout(){closeUserMenu();$('logoutOv').classList.remove('hidden');await AN_DB.clearAllData();await AN_DB.clearSession();location.replace('./login.html');}
-function enterSelectMode(){if(!isAdmin)return;selectMode=true;selectedSet.clear();$('selBar').classList.remove('hidden');$('navbar').classList.add('hidden');$('fabBtn').classList.add('hidden');$('bottomNav').classList.add('hide');updateSelUI();applyFilters();}
+function enterSelectMode(initialConNo){if(!isAdmin)return;selectMode=true;selectedSet.clear();if(initialConNo)selectedSet.add(initialConNo);$('selBar').classList.remove('hidden');$('navbar').classList.add('hidden');$('fabBtn').classList.add('hidden');$('bottomNav').classList.add('hide');updateSelUI();applyFilters();}
 function exitSelectMode(){selectMode=false;selectedSet.clear();$('selBar').classList.add('hidden');$('navbar').classList.remove('hidden');if(activeTab==='consumers')$('fabBtn').classList.remove('hidden');$('bottomNav').classList.remove('hide');$('delBar').classList.add('hidden');applyFilters();}
 function toggleCard(conNo,el){if(selectedSet.has(conNo)){selectedSet.delete(conNo);el.classList.remove('selected');}else{selectedSet.add(conNo);el.classList.add('selected');}updateSelUI();}
 function toggleSelectAll(){var allSel=selectedSet.size===filtered.length;selectedSet.clear();if(!allSel)filtered.forEach(function(c){selectedSet.add(c.conNo);});document.querySelectorAll('.c-card').forEach(function(card){card.classList.toggle('selected',!allSel);});updateSelUI();}
@@ -1004,7 +1005,7 @@ function switchTab(tab){if(selectMode)exitSelectMode();activeTab=tab;document.qu
 function openSheet(id){if(activeSheet)document.getElementById(activeSheet).classList.remove('open');activeSheet=id;document.getElementById(id).classList.add('open');$('backdrop').classList.add('show');$('backdrop').onclick=(id==='delSheet'||id==='ugSheet'||id==='fdelSheet')?null:closeSheet;}
 function closeSheet(){if(activeSheet){document.getElementById(activeSheet).classList.remove('open');activeSheet=null;}$('backdrop').classList.remove('show');$('backdrop').onclick=closeSheet;window._bulkDelete=false;requestAnimationFrame(function(){window.scrollTo(0,lastScrollY);});}
 function toggleEye(inputId,iconId){var inp=document.getElementById(inputId),icon=document.getElementById(iconId);inp.type=inp.type==='password'?'text':'password';icon.textContent=inp.type==='text'?'visibility':'visibility_off';}
-function attachLongPress(el,consumer){el.addEventListener('pointerdown',function(e){if(!isAdmin)return;pressPos={x:e.clientX,y:e.clientY};pressCard=el;el.classList.add('pressing');pressTimer=setTimeout(function(){if(navigator.vibrate)navigator.vibrate(50);el.classList.remove('pressing');pressTimer=null;enterSelectMode();toggleCard(consumer.conNo,el);},500);});el.addEventListener('pointermove',function(e){if(!pressPos)return;if(Math.abs(e.clientX-pressPos.x)>12||Math.abs(e.clientY-pressPos.y)>12)clearPressTimer();});['pointerup','pointercancel','pointerleave'].forEach(function(evt){el.addEventListener(evt,clearPressTimer);});}
+function attachLongPress(el,consumer){el.addEventListener('pointerdown',function(e){if(!isAdmin)return;pressPos={x:e.clientX,y:e.clientY};pressCard=el;el.classList.add('pressing');pressTimer=setTimeout(function(){if(navigator.vibrate)navigator.vibrate(50);el.classList.remove('pressing');pressTimer=null;enterSelectMode(consumer.conNo);},500);});el.addEventListener('pointermove',function(e){if(!pressPos)return;if(Math.abs(e.clientX-pressPos.x)>12||Math.abs(e.clientY-pressPos.y)>12)clearPressTimer();});['pointerup','pointercancel','pointerleave'].forEach(function(evt){el.addEventListener(evt,clearPressTimer);});}
 function clearPressTimer(){clearTimeout(pressTimer);pressTimer=null;pressPos=null;if(pressCard){pressCard.classList.remove('pressing');pressCard=null;}}
 function setSync(type,txt){$('syncDot').className='sync-dot '+type;$('syncTxt').textContent=txt;}
 function setRefreshSpin(on){$('refreshBtn').classList.toggle('spin',on);}
