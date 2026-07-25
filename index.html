@@ -235,10 +235,6 @@
   .sk{border-radius:6px;background:linear-gradient(90deg,var(--inp) 25%,var(--card-b) 50%,var(--inp) 75%);background-size:200% 100%;animation:shim 1.4s infinite}
   @keyframes shim{0%{background-position:200% 0}100%{background-position:-200% 0}}
   .sk-row{display:flex;justify-content:space-between;margin-bottom:9px}
-  .list-foot{display:flex;align-items:center;justify-content:center;gap:8px;padding:14px 0;color:var(--t2);font-size:12px;font-family:var(--fb);}
-  .foot-spin{width:16px;height:16px;border:2px solid var(--card-b);border-top-color:var(--primary);border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0;}
-  .list-foot-retry{background:none;border:none;color:var(--danger);font-family:var(--fd);font-size:12px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:5px;padding:6px 10px;}
-  .list-foot-retry .material-icons-round{font-size:15px;}
   .empty-state{text-align:center;padding:56px 24px;animation:fadeUp .4s var(--ease)}
   .empty-state .material-icons-round{font-size:52px;color:var(--t2);opacity:.3}
   .empty-title{font-family:var(--fd);font-size:15px;font-weight:600;color:var(--t1);margin:12px 0 5px}
@@ -492,7 +488,7 @@
 <main class="main" id="main">
   <div id="consumerView">
     <div class="sync-row"><span class="sync-dot syncing" id="syncDot"></span><span class="sync-txt" id="syncTxt">Loading&#8230;</span><span class="cnt-txt" id="cntTxt"></span><button class="refresh-btn" id="refreshBtn" onclick="refreshData()"><span class="material-icons-round">refresh</span></button></div>
-    <div id="consumerList"></div><div id="listFooter"></div><div id="sentinel"></div>
+    <div id="consumerList"></div><div id="sentinel"></div>
     <div class="empty-state hidden" id="emptyState"><span class="material-icons-round" id="emptyIco">people_outline</span><div class="empty-title" id="emptyTtl">No consumers yet</div><div class="empty-sub" id="emptySub">Tap + to add the first consumer</div></div>
   </div>
   <div id="adminPanel" class="hidden admin-panel">
@@ -552,10 +548,6 @@ var _fieldForToggle=null;
 var _fieldBeingEdited=null;
 var _fieldForDelete=null;
 const $=id=>document.getElementById(id);
-/* Pagination (Step 13f): fetchGen guards in-flight requests -- if filters change
-   while a fetch is in progress, myGen no longer matches fetchGen on return and the
-   stale result is discarded instead of corrupting the current view. */
-let currentPage=0,totalFiltered=0,grandTotal=0,hasMorePages=true,isFetchingPage=false,fetchGen=0;
 async function init(){
   session=AN_DB.getSession();
   if(!session||!session.token){location.replace('./login.html');return;}
@@ -581,18 +573,13 @@ async function init(){
   adjustLayout();
   window.addEventListener('resize',adjustLayout);
   document.fonts.ready.then(adjustLayout);
-  new IntersectionObserver(entries=>{
-    if(!entries[0].isIntersecting)return;
-    if(displayedN<filtered.length){appendCards();return;}
-    if(navigator.onLine&&hasMorePages&&!isFetchingPage)fetchPage(currentPage+1);
-  },{threshold:0.1}).observe($('sentinel'));
+  new IntersectionObserver(entries=>{if(entries[0].isIntersecting&&displayedN<filtered.length)appendCards();},{threshold:0.1}).observe($('sentinel'));
   setupSwipeClose();
   fetchActiveCustomFields();
   masterList=await AN_DB.getAllConsumers();
-  if(masterList.length)renderOfflineFiltered();else renderSkeleton();
+  if(masterList.length)renderFilteredView();else renderSkeleton();
   hideSplash();
-  if(navigator.onLine){fetchPage(1);backgroundFullSync();}
-  else{setSync('offline','Offline - showing cached data');if(!masterList.length)showErr('No cached data. Connect and refresh.');}
+  backgroundFullSync();
 }
 async function fetchActiveCustomFields(){
   if(!session||!session.token)return;
@@ -622,17 +609,16 @@ function normalize(c){
   Object.keys(c).forEach(function(k){if(known.indexOf(k)===-1)result[k]=(c[k]!==undefined&&c[k]!==null)?String(c[k]).trim():'';});
   return result;
 }
-/* ---- Pagination (Step 13f Part A) ----
-   ONLINE: server drives search/status/area/sort/paging (fetchPage). masterList is NOT
-   the on-screen source anymore -- it is only the offline safety-net cache (IndexedDB),
-   kept fresh by backgroundFullSync (unthrottled for now; Part B adds throttling).
-   OFFLINE: computeLocalFiltered()/renderOfflineFiltered() filter masterList locally,
-   same logic the old applyFilters() used, so offline behavior is unchanged. */
-function updateChipCounts(serverAreaCounts,serverGrandTotal){
-  var counts,total;
-  if(serverAreaCounts){counts=serverAreaCounts;total=serverGrandTotal!=null?serverGrandTotal:grandTotal;}
-  else{counts={};masterList.forEach(function(c){if(c.transfCode)counts[c.transfCode]=(counts[c.transfCode]||0)+1;});total=masterList.length;}
-  document.querySelectorAll('.chip').forEach(function(chip){var a=chip.dataset.area;if(!a)return;if(a==='ALL')chip.textContent='All ('+total+')';else if(counts[a])chip.textContent=a+' · '+counts[a];else chip.textContent=a;});
+/* ---- Local-first list pipeline (Step 13f, reworked after live-test feedback) ----
+   Search/filter/sort/scroll must feel instant -- it's the most-used interaction in the
+   app and employees don't have time to wait on a network round trip for it. So filtered
+   is ALWAYS computed locally from masterList (computeLocalFiltered), online or offline --
+   same as the original pre-pagination app. The ONLY things that touch the network are
+   real data changes (add/edit/delete) and backgroundFullSync, which refreshes masterList
+   quietly in the background without blocking anything the user is doing. */
+function updateChipCounts(){
+  var counts={};masterList.forEach(function(c){if(c.transfCode)counts[c.transfCode]=(counts[c.transfCode]||0)+1;});
+  document.querySelectorAll('.chip').forEach(function(chip){var a=chip.dataset.area;if(!a)return;if(a==='ALL')chip.textContent='All ('+masterList.length+')';else if(counts[a])chip.textContent=a+' · '+counts[a];});
 }
 function computeLocalFiltered(){
   var list=masterList;
@@ -648,11 +634,10 @@ function renderEmptyState(){
   if(searchQ||activeArea!=='ALL'||activeStatus!=='ALL'){$('emptyIco').textContent='search_off';$('emptyTtl').textContent='No results';$('emptySub').textContent='Try different search, area, or status filter';}
   else{$('emptyIco').textContent='people_outline';$('emptyTtl').textContent='No consumers yet';$('emptySub').textContent='Tap + to add the first consumer';}
 }
-function renderOfflineFiltered(){
-  filtered=computeLocalFiltered();totalFiltered=filtered.length;hasMorePages=false;
-  $('cntTxt').textContent=totalFiltered?totalFiltered+' consumer'+(totalFiltered!==1?'s':''):'';
+function renderFilteredView(){
+  filtered=computeLocalFiltered();
+  $('cntTxt').textContent=filtered.length?filtered.length+' consumer'+(filtered.length!==1?'s':''):'';
   if(!filtered.length)renderEmptyState();else{$('emptyState').classList.add('hidden');displayedN=0;$('consumerList').innerHTML='';appendCards();}
-  setListFooter('');
   updateChipCounts();
 }
 function redrawList(){
@@ -660,59 +645,23 @@ function redrawList(){
   if(!filtered.length){renderEmptyState();return;}
   $('emptyState').classList.add('hidden');appendCards();
 }
-function setListFooter(state){
-  var el=$('listFooter');if(!el)return;
-  if(state==='loading')el.innerHTML='<div class="list-foot"><div class="foot-spin"></div>Loading more&#8230;</div>';
-  else if(state==='error')el.innerHTML='<div class="list-foot"><button class="list-foot-retry" onclick="retryPage()"><span class="material-icons-round">refresh</span>Couldn&#8217;t load more &#8212; tap to retry</button></div>';
-  else el.innerHTML='';
+function resetAndLoad(){renderFilteredView();}
+function adjustRowIndicesAfterDelete(deletedIndices){
+  /* Google Sheets shifts every row below a deleted row up by one. Patching this locally
+     keeps masterList's cached _rowIndex correct immediately, with no re-fetch needed, so
+     a second delete right after the first still targets the right row. */
+  if(!deletedIndices||!deletedIndices.length)return;
+  masterList.forEach(function(c){
+    var shift=0;
+    for(var i=0;i<deletedIndices.length;i++){if(deletedIndices[i]<c._rowIndex)shift++;}
+    c._rowIndex-=shift;
+  });
 }
-function retryPage(){if(!isFetchingPage)fetchPage(currentPage+1||1);}
-function resetAndLoad(){
-  fetchGen++;currentPage=0;filtered=[];displayedN=0;hasMorePages=true;
-  if(!navigator.onLine){renderOfflineFiltered();setSync('offline','Offline - showing cached data');return;}
-  fetchPage(1);
-}
-async function fetchPage(pageNum){
-  var myGen=fetchGen,isFresh=(pageNum===1),hadContent=filtered.length>0;
-  isFetchingPage=true;
-  if(isFresh){if(!hadContent)renderSkeleton();setRefreshSpin(true);setSync('syncing',hadContent?'Refreshing...':'Loading...');}
-  else setListFooter('loading');
-  try{
-    var controller=new AbortController();
-    var tid=setTimeout(function(){controller.abort();},TIMEOUT);
-    var res=await fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({action:'getConsumers',token:session.token,officeId:session.officeId,sheetName:'CONSUMER DATA ALL',page:pageNum,pageSize:PAGE_SIZE,search:searchQ.trim(),statusFilter:activeStatus,areaFilter:activeArea,sortOrder:sortOrder}),redirect:'follow',signal:controller.signal});
-    clearTimeout(tid);
-    var json=await res.json();
-    if(myGen!==fetchGen)return;
-    if(json.success&&Array.isArray(json.data)){
-      var list=json.data.map(normalize);
-      filtered=isFresh?list:filtered.concat(list);
-      currentPage=pageNum;
-      totalFiltered=json.total!=null?json.total:filtered.length;
-      if(json.grandTotal!=null)grandTotal=json.grandTotal;
-      hasMorePages=filtered.length<totalFiltered;
-      updateChipCounts(json.areaCounts,json.grandTotal);
-      $('cntTxt').textContent=totalFiltered?totalFiltered+' consumer'+(totalFiltered!==1?'s':''):'';
-      if(isFresh){if(!filtered.length)renderEmptyState();else{$('emptyState').classList.add('hidden');displayedN=0;$('consumerList').innerHTML='';appendCards();}}
-      else appendCards();
-      setListFooter('');
-      setSync('online','Synced');
-    }else if(json.code==='UNAUTHORIZED'||json.error==='SESSION_EXPIRED'){
-      localStorage.removeItem('an_bio_vault');await AN_DB.clearSession();alert('Session expired. Please log in again.');location.replace('./login.html');
-    }else{
-      if(isFresh&&!hadContent)showErr(json.message||json.error||'Failed to load.');
-      setListFooter('error');setSync('online','Failed to load');console.warn('[App]',json.message||json.error);
-    }
-  }catch(err){
-    if(myGen!==fetchGen)return;
-    if(err.name==='AbortError'){setSync('offline','Request timed out');if(isFresh)toast('Network timeout. Try again.','err');}
-    else{if(isFresh&&!hadContent)showErr('Could not connect. Check your internet.');setSync('offline','Offline - showing cached data');}
-    setListFooter('error');
-  }
-  if(myGen===fetchGen){if(isFresh)setRefreshSpin(false);isFetchingPage=false;}
-}
+var _bgSyncBusy=false,_bgSyncQueued=false;
 async function backgroundFullSync(){
-  if(!navigator.onLine)return;
+  if(_bgSyncBusy){_bgSyncQueued=true;return;}
+  _bgSyncBusy=true;setRefreshSpin(true);
+  if(!navigator.onLine){setRefreshSpin(false);_bgSyncBusy=false;setSync('offline','Offline - showing cached data');if(!masterList.length)showErr('No cached data. Connect and refresh.');return;}
   try{
     var controller=new AbortController();
     var tid=setTimeout(function(){controller.abort();},60000);
@@ -722,11 +671,18 @@ async function backgroundFullSync(){
     if(json.success&&Array.isArray(json.data)){
       var list=json.data.map(normalize);
       await AN_DB.setAllConsumers(list);await AN_DB.setLastSync(Date.now());
-      masterList=list;
-    }
-  }catch(e){/* best-effort background sync -- foreground fetchPage() has its own error handling */}
+      masterList=list;resetAndLoad();setSync('online','Synced');
+    }else if(json.code==='UNAUTHORIZED'||json.error==='SESSION_EXPIRED'){
+      localStorage.removeItem('an_bio_vault');await AN_DB.clearSession();alert('Session expired. Please log in again.');location.replace('./login.html');
+    }else{setSync('online','Loaded from cache');console.warn('[App]',json.message||json.error);}
+  }catch(err){
+    if(err.name==='AbortError'){setSync('offline','Request timed out');}
+    else{if(!masterList.length)showErr('Could not connect. Check your internet.');setSync('offline','Offline - showing cached data');}
+  }
+  setRefreshSpin(false);_bgSyncBusy=false;
+  if(_bgSyncQueued){_bgSyncQueued=false;backgroundFullSync();}
 }
-function refreshData(){resetAndLoad();backgroundFullSync();}
+function refreshData(){backgroundFullSync();}
 function appendCards(){var frag=document.createDocumentFragment();var end=Math.min(displayedN+PAGE_SIZE,filtered.length);for(var i=displayedN;i<end;i++){var card=makeCard(filtered[i]);card.style.animationDelay=((i-displayedN)*.03)+'s';frag.appendChild(card);}$('consumerList').appendChild(frag);displayedN=end;}
 function makeCard(c){
   var div=document.createElement('div');div.className='c-card';
@@ -769,7 +725,7 @@ function openDetail(c){
   $('detActions').innerHTML='<button class="det-btn det-edit" onclick="openEditForm(\''+esc(c.conNo)+'\')"><span class="material-icons-round">edit</span>Edit</button>'+delBtn;
   openSheet('detailSheet');
 }
-$('searchInp').addEventListener('input',function(e){searchQ=e.target.value;$('sClear').classList.toggle('hidden',!searchQ);clearTimeout(searchT);searchT=setTimeout(resetAndLoad,280);});
+$('searchInp').addEventListener('input',function(e){searchQ=e.target.value;$('sClear').classList.toggle('hidden',!searchQ);clearTimeout(searchT);searchT=setTimeout(resetAndLoad,120);});
 function clearSearch(){$('searchInp').value='';searchQ='';$('sClear').classList.add('hidden');resetAndLoad();}
 function setArea(el,code){activeArea=code;document.querySelectorAll('.chip').forEach(function(c){c.classList.remove('active');});el.classList.add('active');resetAndLoad();}
 function setStatus(el,status){activeStatus=status;document.querySelectorAll('.f-pill').forEach(function(p){p.classList.remove('active','active-s','inactive-s','defaulter-s');});if(status==='ALL')el.classList.add('active');else if(status==='Active')el.classList.add('active-s');else if(status==='Inactive')el.classList.add('inactive-s');else if(status==='Defaulter')el.classList.add('defaulter-s');resetAndLoad();}
@@ -795,26 +751,27 @@ function enterSelectMode(initialConNo){if(!isAdmin)return;selectMode=true;select
 function exitSelectMode(){selectMode=false;selectedSet.clear();$('selBar').classList.add('hidden');$('navbar').classList.remove('hidden');if(activeTab==='consumers')$('fabBtn').classList.remove('hidden');$('bottomNav').classList.remove('hide');$('delBar').classList.add('hidden');redrawList();}
 function toggleCard(conNo,el){if(selectedSet.has(conNo)){selectedSet.delete(conNo);el.classList.remove('selected');}else{selectedSet.add(conNo);el.classList.add('selected');}updateSelUI();}
 function toggleSelectAll(){var allSel=selectedSet.size===filtered.length;selectedSet.clear();if(!allSel)filtered.forEach(function(c){selectedSet.add(c.conNo);});document.querySelectorAll('.c-card').forEach(function(card){card.classList.toggle('selected',!allSel);});updateSelUI();}
-function updateSelUI(){var n=selectedSet.size;$('selCnt').textContent=n===0?'Tap cards to select':n+' selected';$('delBarCnt').textContent=n;$('delBar').classList.toggle('hidden',n===0);var allLbl=hasMorePages?'Select Loaded':'Select All';$('selAllBtn').textContent=(n===filtered.length&&filtered.length>0)?'Deselect All':allLbl;}
+function updateSelUI(){var n=selectedSet.size;$('selCnt').textContent=n===0?'Tap cards to select':n+' selected';$('delBarCnt').textContent=n;$('delBar').classList.toggle('hidden',n===0);$('selAllBtn').textContent=n===filtered.length?'Deselect All':'Select All';}
 function bulkDeleteConfirm(){var n=selectedSet.size;if(!n)return;$('delWho').textContent=n+' consumer'+(n!==1?'s':'')+' will be permanently deleted.';window._bulkDelete=true;openSheet('delSheet');}
 async function doDelete(){closeSheet();if(window._bulkDelete){window._bulkDelete=false;await executeBulkDelete();}else await executeSingleDelete();}
 async function executeBulkDelete(){
   var conNos=Array.from(selectedSet);if(!conNos.length)return;toast('Deleting '+conNos.length+' consumers...');
   var toDelete=conNos.map(function(cn){return filtered.find(function(c){return c.conNo===cn;});}).filter(Boolean).sort(function(a,b){return b._rowIndex-a._rowIndex;});
-  var deleted=0,failed=0;
+  var deleted=0,failed=0,deletedIdx=[];
   for(var i=0;i<toDelete.length;i++){
     var c=toDelete[i];
-    try{if(navigator.onLine){var res=await fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({action:'deleteConsumer',token:session.token,officeId:session.officeId,sheetName:'CONSUMER DATA ALL',rowIndex:c._rowIndex,conNo:c.conNo,consumerName:c.consumerName})});var json=await res.json();if(json.success){await AN_DB.deleteConsumer(c.conNo);masterList=masterList.filter(function(x){return x.conNo!==c.conNo;});deleted++;}else failed++;}
-    else{await AN_DB.deleteConsumer(c.conNo);await AN_DB.addPendingChange('deleteConsumer',{rowIndex:c._rowIndex,conNo:c.conNo},session.officeId);masterList=masterList.filter(function(x){return x.conNo!==c.conNo;});deleted++;}}catch(e){failed++;}
+    try{if(navigator.onLine){var res=await fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({action:'deleteConsumer',token:session.token,officeId:session.officeId,sheetName:'CONSUMER DATA ALL',rowIndex:c._rowIndex,conNo:c.conNo,consumerName:c.consumerName})});var json=await res.json();if(json.success){await AN_DB.deleteConsumer(c.conNo);masterList=masterList.filter(function(x){return x.conNo!==c.conNo;});deletedIdx.push(c._rowIndex);deleted++;}else failed++;}
+    else{await AN_DB.deleteConsumer(c.conNo);await AN_DB.addPendingChange('deleteConsumer',{rowIndex:c._rowIndex,conNo:c.conNo},session.officeId);masterList=masterList.filter(function(x){return x.conNo!==c.conNo;});deletedIdx.push(c._rowIndex);deleted++;}}catch(e){failed++;}
   }
+  adjustRowIndicesAfterDelete(deletedIdx);
   exitSelectMode();resetAndLoad();
   toast('Deleted '+deleted+(failed?' · '+failed+' failed':''),deleted>0?'ok':'err');
-  if(!navigator.onLine)AN_DB.requestSync();
+  if(navigator.onLine)backgroundFullSync();else AN_DB.requestSync();
 }
 function confirmDelete(rowIdx,conNo,name){closeSheet();delRowIdx=rowIdx;delConNo=conNo;delName=name;window._bulkDelete=false;$('delWho').textContent=name;setTimeout(function(){openSheet('delSheet');},150);}
 async function executeSingleDelete(){
-  try{if(navigator.onLine){var res=await fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({action:'deleteConsumer',token:session.token,officeId:session.officeId,sheetName:'CONSUMER DATA ALL',rowIndex:delRowIdx,conNo:delConNo,consumerName:delName})});var json=await res.json();if(json.success){await AN_DB.deleteConsumer(delConNo);masterList=masterList.filter(function(c){return c.conNo!==delConNo;});resetAndLoad();toast('Consumer deleted','ok');}else toast(json.error||json.message||'Delete failed','err');}
-  else{await AN_DB.deleteConsumer(delConNo);await AN_DB.addPendingChange('deleteConsumer',{rowIndex:delRowIdx,conNo:delConNo},session.officeId);masterList=masterList.filter(function(c){return c.conNo!==delConNo;});resetAndLoad();toast('Deleted offline - will sync when online');AN_DB.requestSync();}}catch(e){toast('Error deleting','err');}
+  try{if(navigator.onLine){var res=await fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({action:'deleteConsumer',token:session.token,officeId:session.officeId,sheetName:'CONSUMER DATA ALL',rowIndex:delRowIdx,conNo:delConNo,consumerName:delName})});var json=await res.json();if(json.success){await AN_DB.deleteConsumer(delConNo);masterList=masterList.filter(function(c){return c.conNo!==delConNo;});adjustRowIndicesAfterDelete([delRowIdx]);resetAndLoad();toast('Consumer deleted','ok');backgroundFullSync();}else toast(json.error||json.message||'Delete failed','err');}
+  else{await AN_DB.deleteConsumer(delConNo);await AN_DB.addPendingChange('deleteConsumer',{rowIndex:delRowIdx,conNo:delConNo},session.officeId);masterList=masterList.filter(function(c){return c.conNo!==delConNo;});adjustRowIndicesAfterDelete([delRowIdx]);resetAndLoad();toast('Deleted offline - will sync when online');AN_DB.requestSync();}}catch(e){toast('Error deleting','err');}
 }
 function toDateInput(v){if(!v)return '';try{var d=new Date(v);return isNaN(d)?'':d.toISOString().split('T')[0];}catch(e){return '';}}
 function activeFieldsList(){return _customFields.filter(function(f){return f['IsActive']===undefined||f['IsActive']==='TRUE'||f['IsActive']===true;});}
@@ -881,7 +838,7 @@ async function saveConsumer(){
     if(json.success){
       if(CF.mode==='add'){var saved=normalize(json.consumer||Object.assign({},consumerData,{_rowIndex:json.rowIndex||0,'S.No.':json.sNo||''}));try{await AN_DB.upsertConsumer(saved);}catch(e){}masterList.unshift(saved);}
       else{var updated=normalize(Object.assign({},consumerData,{_rowIndex:CF.consumer._rowIndex,'S.No.':CF.consumer.sNo,CreatedAt:CF.consumer.createdAt}));try{await AN_DB.upsertConsumer(updated);}catch(e){}var ix=masterList.findIndex(function(c){return c.conNo===CF.consumer.conNo;});if(ix!==-1)masterList[ix]=updated;}
-      closeSheet();resetAndLoad();toast(CF.mode==='add'?'Consumer added successfully':'Consumer updated successfully','ok');
+      closeSheet();resetAndLoad();toast(CF.mode==='add'?'Consumer added successfully':'Consumer updated successfully','ok');backgroundFullSync();
     }else{showCfErr(json.message||json.error||'Failed to save. Please try again.');}
   }catch(err){showCfErr(err.name==='AbortError'?'Request timed out (30s). Check connection.':'Network error. Please retry.');}
   btn.classList.remove('loading');
@@ -1092,9 +1049,9 @@ function attachLongPress(el,consumer){el.addEventListener('pointerdown',function
 function clearPressTimer(){clearTimeout(pressTimer);pressTimer=null;pressPos=null;if(pressCard){pressCard.classList.remove('pressing');pressCard=null;}}
 function setSync(type,txt){$('syncDot').className='sync-dot '+type;$('syncTxt').textContent=txt;}
 function setRefreshSpin(on){$('refreshBtn').classList.toggle('spin',on);}
-function onOnline(){setSync('syncing','Back online - syncing...');AN_DB.requestSync();setTimeout(function(){resetAndLoad();backgroundFullSync();},600);}
-function onOffline(){setSync('offline','Offline - edits save locally');resetAndLoad();}
-function onSWMsg(e){var data=e.data;if(!data)return;if(data.type==='SYNC_COMPLETE'){setSync('online',data.synced+' change'+(data.synced!==1?'s':'')+' synced');resetAndLoad();backgroundFullSync();}if(data.type==='SYNC_FAILED')setSync('pending','Sync failed - will retry');}
+function onOnline(){setSync('syncing','Back online - syncing...');AN_DB.requestSync();setTimeout(backgroundFullSync,600);}
+function onOffline(){setSync('offline','Offline - edits save locally');}
+function onSWMsg(e){var data=e.data;if(!data)return;if(data.type==='SYNC_COMPLETE'){setSync('online',data.synced+' change'+(data.synced!==1?'s':'')+' synced');backgroundFullSync();}if(data.type==='SYNC_FAILED')setSync('pending','Sync failed - will retry');}
 function showErr(msg){$('consumerList').innerHTML='<div class="err-bar"><span class="material-icons-round">warning_amber</span>'+esc(msg)+'</div>';}
 function addRipple(el,e){var r=el.getBoundingClientRect(),sz=Math.max(r.width,r.height)*1.4;var rip=document.createElement('span');rip.className='ripple';rip.style.cssText='width:'+sz+'px;height:'+sz+'px;left:'+(e.clientX-r.left-sz/2)+'px;top:'+(e.clientY-r.top-sz/2)+'px;';el.appendChild(rip);setTimeout(function(){rip.remove();},600);}
 function toast(msg,type){var el=$('toast');el.textContent=msg;el.className='show '+(type||'');clearTimeout(toastT);toastT=setTimeout(function(){el.className=type||'';},2800);}
