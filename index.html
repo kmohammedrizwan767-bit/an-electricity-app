@@ -311,6 +311,45 @@
   .act-meta{font-size:12px;color:var(--t2);display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
   .act-role{font-size:10px;font-family:var(--fd);font-weight:600;padding:2px 7px;border-radius:7px;}
   .act-details{font-size:11.5px;color:var(--t2);margin-top:5px;line-height:1.4;}
+  .det-field-link{cursor:pointer;transition:background .15s;margin:0 -4px;padding-left:4px;padding-right:4px;border-radius:8px;}
+  .det-field-link:active{background:rgba(0,82,180,.06)}
+  [data-theme=dark] .det-field-link:active{background:rgba(255,255,255,.04)}
+  .det-link-val{display:flex;align-items:center;gap:2px;color:var(--primary);font-weight:600}
+  .det-link-val .material-icons-round{font-size:16px}
+  .mr-hdr{display:flex;align-items:center;gap:8px;margin-bottom:4px}
+  .mr-back{background:none;border:none;color:var(--t2);cursor:pointer;padding:4px;display:flex;border-radius:50%;flex-shrink:0}
+  .mr-back:active{background:var(--inp)}
+  .mr-titles{flex:1;min-width:0}
+  .mr-title{font-family:var(--fd);font-size:16px;font-weight:700;color:var(--t1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .mr-sub{font-size:12px;color:var(--t2);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .mr-close{background:none;border:none;color:var(--t2);cursor:pointer;padding:4px;display:flex;border-radius:50%;flex-shrink:0}
+  .mr-close:active{background:var(--inp)}
+  .mr-add-btn{display:flex;align-items:center;justify-content:center;gap:6px;background:rgba(0,82,180,.1);color:var(--primary);border:none;border-radius:var(--rb);height:42px;font-family:var(--fd);font-size:13px;font-weight:600;cursor:pointer;width:100%;margin:14px 0}
+  [data-theme=dark] .mr-add-btn{background:rgba(25,118,210,.15)}
+  .mr-add-btn:active{opacity:.7}
+  .mr-body{min-height:100px}
+  .mr-year-row{display:flex;align-items:center;justify-content:space-between;background:var(--inp);border:1px solid var(--inp-b);border-radius:14px;padding:14px 16px;margin-bottom:8px;cursor:pointer}
+  .mr-year-row:active{opacity:.7}
+  .mr-year-label{font-family:var(--fd);font-size:15px;font-weight:700;color:var(--t1)}
+  .mr-year-count{font-size:12px;color:var(--t2)}
+  .mr-month-group{margin-bottom:14px}
+  .mr-month-label{font-size:11px;font-family:var(--fd);font-weight:700;color:var(--primary);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;padding-left:2px}
+  .mr-reading-row{display:flex;align-items:center;gap:6px;background:var(--inp);border:1px solid var(--inp-b);border-radius:14px;padding:11px 8px 11px 12px;margin-bottom:7px}
+  .mr-reading-main{flex:1;min-width:0;cursor:pointer}
+  .mr-reading-main:active{opacity:.7}
+  .mr-reading-value{font-family:var(--fd);font-size:15px;font-weight:700;color:var(--t1)}
+  .mr-reading-time{font-size:11.5px;color:var(--t2);margin-top:1px}
+  .mr-reading-flag{font-size:10px;font-family:var(--fd);font-weight:700;color:#B8860B;display:flex;align-items:center;gap:2px;margin-top:3px}
+  [data-theme=dark] .mr-reading-flag{color:var(--accent)}
+  .mr-reading-flag .material-icons-round{font-size:12px}
+  .mr-del-ico{background:none;border:none;color:var(--t2);cursor:pointer;padding:8px;display:flex;border-radius:50%;flex-shrink:0}
+  .mr-del-ico:active{color:var(--danger);background:rgba(211,47,47,.1)}
+  .mr-empty{text-align:center;padding:36px 16px}
+  .mr-empty .material-icons-round{font-size:44px;color:var(--t2);opacity:.3}
+  .mr-empty-txt{font-size:13px;color:var(--t2);margin-top:10px;line-height:1.5}
+  .mr-ocr-row{display:flex;align-items:center;justify-content:center;gap:8px;background:var(--inp);border:1.5px dashed var(--inp-b);border-radius:var(--ri);height:46px;color:var(--t2);font-family:var(--fd);font-size:13px;font-weight:600;margin-bottom:14px;cursor:pointer}
+  .mr-ocr-row:active{opacity:.7}
+  .mr-soon-badge{background:var(--accent);color:#1A1A2E;font-size:9px;font-weight:700;padding:2px 7px;border-radius:8px;margin-left:2px}
   </style>
 </head>
 <body>
@@ -453,6 +492,33 @@
   <button class="btn-del-confirm" onclick="doDeleteField()">Yes, Delete Permanently</button>
   <button class="btn-cancel" onclick="closeSheet()">Cancel</button>
 </div>
+<div class="bottom-sheet" id="readingSheet">
+  <div class="sheet-handle" id="readingHandle"></div>
+  <div class="mr-hdr">
+    <button class="mr-back hidden" id="mrBackBtn" onclick="mrGoBack()"><span class="material-icons-round">arrow_back</span></button>
+    <div class="mr-titles"><div class="mr-title" id="mrTitle">Readings</div><div class="mr-sub" id="mrSub">&#8212;</div></div>
+    <button class="mr-close" onclick="closeSheet()"><span class="material-icons-round">close</span></button>
+  </div>
+  <button class="mr-add-btn" onclick="openReadingForm(null)"><span class="material-icons-round" style="font-size:17px">add</span>Add Reading</button>
+  <div class="mr-body" id="readingBody"></div>
+</div>
+<div class="bottom-sheet" id="readingFormSheet">
+  <div class="sheet-handle" id="readingFormHandle"></div>
+  <div class="sheet-title" id="mrfTitle">Add Reading</div>
+  <div class="s-alert err" id="mrfErr"><span class="material-icons-round">error_outline</span><span id="mrfErrMsg"></span></div>
+  <div class="mr-ocr-row" onclick="ocrComingSoon()"><span class="material-icons-round">photo_camera</span>Scan Meter<span class="mr-soon-badge">SOON</span></div>
+  <div class="sf"><label class="sl" id="mrfLabel">Value</label><div class="siw"><span class="material-icons-round">bolt</span><input class="sinp" type="number" id="mrfValue" placeholder="Enter reading value" inputmode="decimal" step="0.01" autocomplete="off"></div></div>
+  <button class="btn-sh" id="mrfBtn" onclick="saveReading()"><span class="bl" id="mrfBtnLbl">Save Reading</span><div class="spin"></div></button>
+  <button class="btn-cancel" onclick="cancelReadingForm()">Cancel</button>
+</div>
+<div class="bottom-sheet" id="mrDelSheet">
+  <div class="sheet-handle" id="mrDelHandle"></div>
+  <div class="del-ico"><span class="material-icons-round">delete_forever</span></div>
+  <div class="del-ttl">Delete Reading?</div>
+  <div class="del-sub">This action cannot be undone.<span class="del-who" id="mrDelWho"></span></div>
+  <button class="btn-del-confirm" onclick="doDeleteReading()">Yes, Delete</button>
+  <button class="btn-cancel" onclick="cancelReadingDelete()">Cancel</button>
+</div>
 <div class="backdrop" id="backdrop" onclick="closeSheet()"></div>
 <div class="search-sec" id="searchSec">
   <div class="search-wrap"><span class="material-icons-round s-ico">search</span><input class="search-inp" type="search" id="searchInp" placeholder="Name, ConNo, meter, phone, address&#8230;" autocomplete="off" autocorrect="off" autocapitalize="none"><button class="s-clr hidden" id="sClear" onclick="clearSearch()"><span class="material-icons-round">close</span></button></div>
@@ -558,6 +624,7 @@ async function init(){
   window.addEventListener('online',onOnline);window.addEventListener('offline',onOffline);
   history.pushState(null,'');
   window.addEventListener('popstate',()=>{
+    if(activeSheet==='readingSheet'&&_mrLevel==='months'){mrGoBack();history.pushState(null,'');return;}
     if(activeSheet==='cfSheet'||activeSheet==='addUserSheet'||activeSheet==='rpSheet'||activeSheet==='ugSheet'||activeSheet==='afSheet'||activeSheet==='fdSheet'||activeSheet==='afeSheet'||activeSheet==='fdelSheet'){closeSheet();history.pushState(null,'');return;}
     if(activeSheet){closeSheet();history.pushState(null,'');return;}
     if(selectMode){exitSelectMode();history.pushState(null,'');return;}
@@ -594,7 +661,7 @@ function hideSplash(){const s=$('splash');s.classList.add('out');setTimeout(()=>
 async function installApp(){if(!deferredInstall)return;closeUserMenu();deferredInstall.prompt();const{outcome}=await deferredInstall.userChoice;deferredInstall=null;$('installBtn').classList.add('hidden');if(outcome==='accepted')toast('App installed!','ok');}
 function applyUpdate(){if(swReg&&swReg.waiting)swReg.waiting.postMessage({type:'SKIP_WAITING'});window.location.reload();}
 function setupSwipeClose(){
-  ['cpHandle','aboutHandle','detHandle','delHandle','cfHandle','addUserHandle','rpHandle','ugHandle','afHandle','fdHandle','afeHandle','fdelHandle'].forEach(id=>{
+  ['cpHandle','aboutHandle','detHandle','delHandle','cfHandle','addUserHandle','rpHandle','ugHandle','afHandle','fdHandle','afeHandle','fdelHandle','readingHandle','readingFormHandle','mrDelHandle'].forEach(id=>{
     const el=$(id);if(!el)return;
     let startY=0;
     el.addEventListener('touchstart',e=>{startY=e.touches[0].clientY;},{passive:true});
@@ -715,12 +782,17 @@ function openDetail(c){
   af('Passbook/SD No',esc(c.sdPassbookNo||'—'));
   af('SD Amount',c.sdAmount?'&#8377; '+esc(c.sdAmount):'—');
   af('SD Date',c.sdDate?esc(formatDate(c.sdDate)):'—');
+  fh+='<div class="det-section-hdr">Meter Readings</div>';
+  fh+='<div class="det-field det-field-link" id="detReadKwh"><span class="det-label">Reading (KWH)</span><span class="det-value det-link-val">History<span class="material-icons-round">chevron_right</span></span></div>';
+  fh+='<div class="det-field det-field-link" id="detReadKvah"><span class="det-label">Reading (KVAH)</span><span class="det-value det-link-val">History<span class="material-icons-round">chevron_right</span></span></div>';
   var cfList=activeFieldsList();
   if(cfList.length){
     fh+='<div class="det-section-hdr">Additional Details</div>';
     cfList.forEach(function(f){var lbl=f['FieldLabel']||'';af(esc(lbl),esc(c[lbl]||'—'));});
   }
   $('detFields').innerHTML=fh;
+  $('detReadKwh').addEventListener('click',function(){openReadingSheet(c.conNo,c.consumerName,'KWH');});
+  $('detReadKvah').addEventListener('click',function(){openReadingSheet(c.conNo,c.consumerName,'KVAH');});
   var delBtn=isAdmin?'<button class="det-btn det-del" onclick="confirmDelete('+c._rowIndex+',\''+esc(c.conNo)+'\',\''+esc(c.consumerName)+'\')"><span class="material-icons-round">delete</span>Delete</button>':'';
   $('detActions').innerHTML='<button class="det-btn det-edit" onclick="openEditForm(\''+esc(c.conNo)+'\')"><span class="material-icons-round">edit</span>Edit</button>'+delBtn;
   openSheet('detailSheet');
@@ -1042,7 +1114,7 @@ async function loadActivity(){$('activityList').innerHTML=Array(5).fill('<div cl
 function renderActivityList(entries){$('activityList').innerHTML='';if(!entries.length){$('activityEmpty').classList.remove('hidden');return;}$('activityEmpty').classList.add('hidden');var frag=document.createDocumentFragment();entries.forEach(function(e){frag.appendChild(makeActivityCard(e));});$('activityList').appendChild(frag);}
 function makeActivityCard(entry){var div=document.createElement('div');div.className='act-card';var action=entry.Action||entry.action||'';var meta=getActionMeta(action);var fullName=esc(entry.FullName||entry.fullName||'Unknown');var role=entry.Role||entry.role||'';var conNo=entry.ConNo||entry.conNo||'';var details=esc(entry.Details||entry.details||'');var ts=entry.Timestamp||entry.timestamp||'';var timeStr=ts?formatDateTime(ts):'';var roleClass=role==='Admin'?'role-admin':'role-emp';var conNoHtml=conNo?'<div class="act-conno">'+esc(conNo)+'</div>':'';var detailsHtml=details?'<div class="act-details">'+details+'</div>':'';div.innerHTML='<div class="act-inner"><div class="act-ico-wrap" style="background:'+meta.bg+'"><span class="material-icons-round act-ico" style="color:'+meta.color+'">'+meta.icon+'</span></div><div class="act-body"><div class="act-top"><span class="act-action">'+meta.label+'</span><span class="act-time">'+esc(timeStr)+'</span></div>'+conNoHtml+'<div class="act-meta"><span>'+fullName+'</span><span class="act-role '+roleClass+'">'+esc(role)+'</span></div>'+detailsHtml+'</div></div>';return div;}
 function switchTab(tab){if(selectMode)exitSelectMode();activeTab=tab;document.querySelectorAll('.bnav').forEach(function(b){b.classList.remove('active');});var el=document.getElementById('bnav-'+tab);if(el)el.classList.add('active');var isConsumers=tab==='consumers';var isAdminTab=tab==='admin';var isActivity=tab==='activity';var isFields=tab==='fields';$('searchSec').classList.toggle('hidden',!isConsumers);$('consumerView').classList.toggle('hidden',!isConsumers);$('adminPanel').classList.toggle('hidden',!isAdminTab);$('fieldsPanel').classList.toggle('hidden',!isFields);$('activityPanel').classList.toggle('hidden',!isActivity);$('fabBtn').classList.toggle('hidden',!isConsumers||selectMode);if(isAdminTab)loadUsers();if(isFields)loadCustomFields();if(isActivity)loadActivity();adjustLayout();var shown=isConsumers?$('consumerView'):(isAdminTab?$('adminPanel'):(isFields?$('fieldsPanel'):$('activityPanel')));shown.classList.remove('tab-anim');void shown.offsetWidth;shown.classList.add('tab-anim');}
-function openSheet(id){if(activeSheet)document.getElementById(activeSheet).classList.remove('open');activeSheet=id;document.getElementById(id).classList.add('open');$('backdrop').classList.add('show');$('backdrop').onclick=(id==='delSheet'||id==='ugSheet'||id==='fdelSheet')?null:closeSheet;}
+function openSheet(id){if(activeSheet)document.getElementById(activeSheet).classList.remove('open');activeSheet=id;document.getElementById(id).classList.add('open');$('backdrop').classList.add('show');$('backdrop').onclick=(id==='delSheet'||id==='ugSheet'||id==='fdelSheet'||id==='mrDelSheet')?null:closeSheet;}
 function closeSheet(){if(activeSheet){document.getElementById(activeSheet).classList.remove('open');activeSheet=null;}$('backdrop').classList.remove('show');$('backdrop').onclick=closeSheet;window._bulkDelete=false;requestAnimationFrame(function(){window.scrollTo(0,lastScrollY);});}
 function toggleEye(inputId,iconId){var inp=document.getElementById(inputId),icon=document.getElementById(iconId);inp.type=inp.type==='password'?'text':'password';icon.textContent=inp.type==='text'?'visibility':'visibility_off';}
 function attachLongPress(el,consumer){el.addEventListener('pointerdown',function(e){if(!isAdmin)return;pressPos={x:e.clientX,y:e.clientY};pressCard=el;el.classList.add('pressing');pressTimer=setTimeout(function(){if(navigator.vibrate)navigator.vibrate(50);el.classList.remove('pressing');pressTimer=null;enterSelectMode(consumer.conNo);},500);});el.addEventListener('pointermove',function(e){if(!pressPos)return;if(Math.abs(e.clientX-pressPos.x)>12||Math.abs(e.clientY-pressPos.y)>12)clearPressTimer();});['pointerup','pointercancel','pointerleave'].forEach(function(evt){el.addEventListener(evt,clearPressTimer);});}
@@ -1059,6 +1131,150 @@ function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'
 function formatDate(ts){if(!ts||ts==='—')return '—';try{var d=new Date(ts);if(isNaN(d))return ts;return d.toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'});}catch(e){return ts;}}
 function formatDateTime(ts){if(!ts||ts==='—')return '—';try{var d=new Date(ts);if(isNaN(d))return ts;var ds=d.toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric',timeZone:'Asia/Kolkata'});var ts2=d.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit',hour12:true,timeZone:'Asia/Kolkata'});return ds+', '+ts2;}catch(e){return ts;}}
 function timeAgo(ts){var d=Date.now()-ts;if(d<60000)return 'just now';if(d<3600000)return Math.floor(d/60000)+'m ago';return Math.floor(d/3600000)+'h ago';}
+
+/* METER READINGS - Step 14b (manual entry + Year/Month drill-down; OCR stubbed for 14c) */
+let _mrConNo=null,_mrCName='',_mrType='KWH',_mrLevel='years',_mrYear=null,_mrData=null,_mrEditing=null,_mrDeleteTarget=null;
+const MONTH_NAMES=['','January','February','March','April','May','June','July','August','September','October','November','December'];
+function openReadingSheet(conNo,cName,type){
+  _mrConNo=conNo;_mrCName=cName;_mrType=type;_mrLevel='years';_mrYear=null;_mrData=null;
+  closeSheet();
+  setTimeout(function(){
+    renderReadingSheet();openSheet('readingSheet');
+    fetchReadingDataQuiet().then(renderReadingSheet);
+  },200);
+}
+async function fetchReadingDataQuiet(){
+  if(!session||!session.token)return;
+  if(!navigator.onLine){_mrData='offline';return;}
+  try{
+    var controller=new AbortController();var tid=setTimeout(function(){controller.abort();},TIMEOUT);
+    var res=await fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({action:'getMeterReadings',token:session.token,officeId:session.officeId,conNo:_mrConNo}),redirect:'follow',signal:controller.signal});clearTimeout(tid);
+    var json=await res.json();
+    _mrData=json.success?(json.readings||{KWH:{},KVAH:{}}):'error';
+  }catch(e){_mrData='error';}
+}
+function renderReadingSheet(){
+  $('mrTitle').textContent=(_mrType==='KWH'?'KWH':'KVAH')+' Readings'+(_mrLevel==='months'?' — '+_mrYear:'');
+  $('mrSub').textContent=(_mrCName||'—')+' · '+(_mrConNo||'—');
+  $('mrBackBtn').classList.toggle('hidden',_mrLevel!=='months');
+  renderReadingBody();
+}
+function renderReadingBody(){
+  var body=$('readingBody');
+  if(_mrData===null){body.innerHTML=Array(3).fill('<div class="skeleton" style="height:56px;margin-bottom:8px"></div>').join('');return;}
+  if(_mrData==='offline'){body.innerHTML='<div class="err-bar"><span class="material-icons-round">wifi_off</span>Reading history needs an internet connection.</div>';return;}
+  if(_mrData==='error'){body.innerHTML='<div class="err-bar"><span class="material-icons-round">warning_amber</span>Could not load readings. Close and reopen to retry.</div>';return;}
+  if(_mrLevel==='years')renderYearsView(body);else renderMonthsView(body);
+  body.classList.remove('tab-anim');void body.offsetWidth;body.classList.add('tab-anim');
+}
+function renderYearsView(body){
+  var typeData=_mrData[_mrType]||{};
+  var years=Object.keys(typeData).sort(function(a,b){return b.localeCompare(a);});
+  if(!years.length){body.innerHTML='<div class="mr-empty"><span class="material-icons-round">bolt</span><div class="mr-empty-txt">No '+_mrType+' readings yet.<br>Tap "Add Reading" to log the first one.</div></div>';return;}
+  body.innerHTML='';
+  var frag=document.createDocumentFragment();
+  years.forEach(function(y){
+    var count=0;Object.keys(typeData[y]).forEach(function(m){count+=typeData[y][m].length;});
+    var row=document.createElement('div');row.className='mr-year-row';
+    row.innerHTML='<span class="mr-year-label">'+esc(y)+'</span><span class="mr-year-count">'+count+' reading'+(count!==1?'s':'')+' &#8250;</span>';
+    row.addEventListener('click',function(){showMonthsForYear(y);});
+    frag.appendChild(row);
+  });
+  body.appendChild(frag);
+}
+function showMonthsForYear(year){_mrLevel='months';_mrYear=year;renderReadingSheet();}
+function mrGoBack(){_mrLevel='years';_mrYear=null;renderReadingSheet();}
+function renderMonthsView(body){
+  var typeData=_mrData[_mrType]||{};
+  var monthsObj=typeData[_mrYear]||{};
+  var monthKeys=Object.keys(monthsObj).sort(function(a,b){return b.localeCompare(a);});
+  if(!monthKeys.length){body.innerHTML='<div class="mr-empty"><span class="material-icons-round">bolt</span><div class="mr-empty-txt">No readings found for '+esc(_mrYear)+'.</div></div>';return;}
+  body.innerHTML='';
+  var frag=document.createDocumentFragment();
+  monthKeys.forEach(function(mk){
+    var group=document.createElement('div');group.className='mr-month-group';
+    var hdr=document.createElement('div');hdr.className='mr-month-label';hdr.textContent=MONTH_NAMES[parseInt(mk,10)]||mk;
+    group.appendChild(hdr);
+    monthsObj[mk].forEach(function(r){group.appendChild(makeReadingRow(r));});
+    frag.appendChild(group);
+  });
+  body.appendChild(frag);
+}
+function makeReadingRow(r){
+  var div=document.createElement('div');div.className='mr-reading-row';
+  var flag=r.NeedsReview?'<div class="mr-reading-flag"><span class="material-icons-round">error_outline</span>Please double-check</div>':'';
+  div.innerHTML='<div class="mr-reading-main"><div class="mr-reading-value">'+esc(r.Value)+'</div><div class="mr-reading-time">'+esc(formatDateTime(r.Timestamp))+' &#183; '+esc(r.Source||'Manual')+' &#183; '+esc(r.EnteredBy||'')+'</div>'+flag+'</div><button class="mr-del-ico"><span class="material-icons-round">delete_outline</span></button>';
+  div.querySelector('.mr-reading-main').addEventListener('click',function(){openReadingForm(r);});
+  div.querySelector('.mr-del-ico').addEventListener('click',function(e){e.stopPropagation();confirmDeleteReading(r);});
+  return div;
+}
+function openReadingForm(reading){
+  _mrEditing=reading||null;
+  $('mrfTitle').textContent=(_mrEditing?'Edit ':'Add ')+_mrType+' Reading';
+  $('mrfLabel').textContent=_mrType+' Value';
+  $('mrfValue').value=_mrEditing?_mrEditing.Value:'';
+  $('mrfErr').classList.remove('show');$('mrfBtn').classList.remove('loading');
+  closeSheet();
+  setTimeout(function(){openSheet('readingFormSheet');$('mrfValue').focus();},200);
+}
+function cancelReadingForm(){
+  _mrEditing=null;
+  closeSheet();
+  setTimeout(function(){renderReadingSheet();openSheet('readingSheet');},200);
+}
+function ocrComingSoon(){toast('Camera OCR scanning is coming in a future update','');}
+async function saveReading(){
+  var val=$('mrfValue').value.trim();
+  $('mrfErr').classList.remove('show');
+  if(val===''||isNaN(parseFloat(val))){showMrfErr('Enter a valid number.');return;}
+  if(!navigator.onLine){showMrfErr('Internet connection required to save a reading.');return;}
+  var btn=$('mrfBtn');btn.classList.add('loading');
+  try{
+    var controller=new AbortController();var tid=setTimeout(function(){controller.abort();},TIMEOUT);
+    var payload=_mrEditing
+      ?{action:'updateMeterReading',token:session.token,officeId:session.officeId,rowIndex:_mrEditing._rowIndex,readingId:_mrEditing.ReadingID,value:val}
+      :{action:'addMeterReading',token:session.token,officeId:session.officeId,conNo:_mrConNo,readingType:_mrType,value:val,source:'Manual'};
+    var res=await fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify(payload),redirect:'follow',signal:controller.signal});clearTimeout(tid);
+    var json=await res.json();
+    if(json.success){
+      var wasEditing=!!_mrEditing;var jumpYear=null;
+      if(!wasEditing&&json.reading&&json.reading.timestamp)jumpYear=json.reading.timestamp.slice(0,4);
+      _mrEditing=null;
+      closeSheet();
+      toast(wasEditing?'Reading updated':'Reading recorded','ok');
+      await fetchReadingDataQuiet();
+      if(jumpYear){_mrLevel='months';_mrYear=jumpYear;}
+      renderReadingSheet();openSheet('readingSheet');
+    }else{showMrfErr(json.error||json.message||'Failed to save.');}
+  }catch(err){showMrfErr(err.name==='AbortError'?'Request timed out.':'Network error. Please retry.');}
+  btn.classList.remove('loading');
+}
+function showMrfErr(msg){$('mrfErrMsg').textContent=msg;$('mrfErr').classList.add('show');}
+function confirmDeleteReading(reading){
+  _mrDeleteTarget=reading;
+  $('mrDelWho').textContent=_mrType+' reading '+reading.Value+' &#183; '+formatDateTime(reading.Timestamp);
+  closeSheet();
+  setTimeout(function(){openSheet('mrDelSheet');},200);
+}
+function cancelReadingDelete(){
+  _mrDeleteTarget=null;
+  closeSheet();
+  setTimeout(function(){renderReadingSheet();openSheet('readingSheet');},200);
+}
+async function doDeleteReading(){
+  if(!_mrDeleteTarget)return;
+  var target=_mrDeleteTarget;_mrDeleteTarget=null;
+  closeSheet();
+  if(!navigator.onLine){toast('Internet connection required to delete.','err');setTimeout(function(){renderReadingSheet();openSheet('readingSheet');},200);return;}
+  try{
+    var controller=new AbortController();var tid=setTimeout(function(){controller.abort();},TIMEOUT);
+    var res=await fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({action:'deleteMeterReading',token:session.token,officeId:session.officeId,rowIndex:target._rowIndex,readingId:target.ReadingID}),redirect:'follow',signal:controller.signal});clearTimeout(tid);
+    var json=await res.json();
+    if(json.success)toast('Reading deleted','ok');else toast(json.error||json.message||'Failed to delete.','err');
+  }catch(err){toast(err.name==='AbortError'?'Request timed out.':'Network error.','err');}
+  await fetchReadingDataQuiet();
+  renderReadingSheet();openSheet('readingSheet');
+}
 init();
 </script>
 </body>
