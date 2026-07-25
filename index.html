@@ -348,13 +348,7 @@
   .mr-empty{text-align:center;padding:36px 16px}
   .mr-empty .material-icons-round{font-size:44px;color:var(--t2);opacity:.3}
   .mr-empty-txt{font-size:13px;color:var(--t2);margin-top:10px;line-height:1.5}
-  .mr-ocr-row{display:flex;align-items:center;justify-content:center;gap:8px;background:var(--inp);border:1.5px dashed var(--inp-b);border-radius:var(--ri);height:46px;color:var(--t2);font-family:var(--fd);font-size:13px;font-weight:600;margin-bottom:14px;cursor:pointer}
-  .mr-ocr-row:active{opacity:.7}
-  .mr-ocr-row.scanning{opacity:.65;pointer-events:none}
-  .mr-ocr-row.scanning .material-icons-round{animation:spin 1s linear infinite}
-  .mr-ocr-note{font-size:11px;color:var(--success);margin:-6px 2px 12px;display:flex;align-items:center;gap:4px}
-  .mr-ocr-note .material-icons-round{font-size:13px}
-  .mr-soon-badge{background:var(--accent);color:#1A1A2E;font-size:9px;font-weight:700;padding:2px 7px;border-radius:8px;margin-left:2px}
+  .nav-btn.scanning .material-icons-round{animation:spin 1s linear infinite}
   </style>
 </head>
 <body>
@@ -365,10 +359,12 @@
   <div class="nav-left"><span class="nav-bolt">&#9889;</span><div><span class="nav-app">A&amp;N Electricity</span><span class="nav-office" id="navOffice">Loading&#8230;</span></div></div>
   <div class="nav-right">
     <button class="nav-btn hidden" id="selectBtn" onclick="enterSelectMode()"><span class="material-icons-round">checklist</span></button>
+    <button class="nav-btn" id="navScanBtn" onclick="startIdentifyScan()"><span class="material-icons-round">document_scanner</span></button>
     <button class="nav-btn" id="themeToggle"><span class="material-icons-round" id="themeIcon">dark_mode</span></button>
     <button class="nav-btn" id="userMenuBtn"><span class="material-icons-round">account_circle</span></button>
   </div>
 </nav>
+<input type="file" accept="image/*" capture="environment" id="homeScanInput" class="hidden" onchange="handleIdentifyScanFile(event)">
 <div class="sel-bar hidden" id="selBar">
   <button class="sel-cancel" onclick="exitSelectMode()"><span class="material-icons-round">close</span></button>
   <span class="sel-cnt" id="selCnt">Tap to select</span>
@@ -511,9 +507,6 @@
   <div class="sheet-handle" id="readingFormHandle"></div>
   <div class="sheet-title" id="mrfTitle">Add Reading</div>
   <div class="s-alert err" id="mrfErr"><span class="material-icons-round">error_outline</span><span id="mrfErrMsg"></span></div>
-  <div class="mr-ocr-row" id="mrOcrRow" onclick="startMeterScan()"><span class="material-icons-round" id="mrOcrIcon">photo_camera</span><span id="mrOcrLabel">Scan Meter</span></div>
-  <input type="file" accept="image/*" capture="environment" id="mrScanInput" class="hidden" onchange="handleScanFile(event)">
-  <div class="mr-ocr-note hidden" id="mrOcrNote"><span class="material-icons-round">auto_awesome</span><span id="mrOcrNoteTxt"></span></div>
   <div class="sf"><label class="sl" id="mrfLabel">Value</label><div class="siw"><span class="material-icons-round">bolt</span><input class="sinp" type="number" id="mrfValue" placeholder="Enter reading value" inputmode="decimal" step="0.01" autocomplete="off"></div></div>
   <button class="btn-sh" id="mrfBtn" onclick="saveReading()"><span class="bl" id="mrfBtnLbl">Save Reading</span><div class="spin"></div></button>
   <button class="btn-cancel" onclick="cancelReadingForm()">Cancel</button>
@@ -1215,8 +1208,6 @@ function makeReadingRow(r){
 }
 function openReadingForm(reading){
   _mrEditing=reading||null;
-  _mrScannedValue=false;_mrScanConfidence=null;
-  $('mrOcrNote').classList.add('hidden');
   $('mrfTitle').textContent=(_mrEditing?'Edit ':'Add ')+_mrType+' Reading';
   $('mrfLabel').textContent=_mrType+' Value';
   $('mrfValue').value=_mrEditing?_mrEditing.Value:'';
@@ -1230,7 +1221,6 @@ function cancelReadingForm(){
   openSheet('readingSheet');
 }
 var _tesseractLoaded=false,_tesseractLoadPromise=null,_ocrWorker=null;
-var _mrScannedValue=false,_mrScanConfidence=null;
 function loadTesseractScript(){
   if(_tesseractLoaded)return Promise.resolve();
   if(_tesseractLoadPromise)return _tesseractLoadPromise;
@@ -1249,12 +1239,6 @@ function withTimeout(promise,ms,message){
     new Promise(function(_,reject){setTimeout(function(){reject(new Error(message));},ms);})
   ]);
 }
-function setOcrBusy(busy,label){
-  var row=$('mrOcrRow'),icon=$('mrOcrIcon'),lbl=$('mrOcrLabel');
-  row.classList.toggle('scanning',busy);
-  icon.textContent=busy?'autorenew':'photo_camera';
-  lbl.textContent=busy?(label||'Working…'):'Scan Meter';
-}
 function downscaleImageForOcr(file,maxDim){
   return new Promise(function(resolve,reject){
     var img=new Image();
@@ -1271,51 +1255,55 @@ function downscaleImageForOcr(file,maxDim){
     img.src=url;
   });
 }
-function extractReadingValue(text){
-  if(!text)return '';
-  var matches=text.match(/[0-9]+(?:\.[0-9]+)?/g);
-  if(!matches||!matches.length)return '';
-  matches.sort(function(a,b){return b.replace('.','').length-a.replace('.','').length;});
-  return matches[0];
+function setNavScanBusy(busy){$('navScanBtn').classList.toggle('scanning',busy);}
+function findConsumerByOcrText(text){
+  if(!text)return null;
+  var tokens=text.split(/[^A-Za-z0-9/]+/).filter(function(t){return t.length>=3;});
+  for(var i=0;i<tokens.length;i++){
+    var tok=tokens[i].toUpperCase();
+    var hit=masterList.find(function(c){return (c.conNo||'').toUpperCase()===tok;});
+    if(hit)return hit;
+  }
+  for(var i=0;i<tokens.length;i++){
+    var tok=tokens[i].toUpperCase();
+    var hit=masterList.find(function(c){return c.meterNo&&c.meterNo.toUpperCase()===tok;});
+    if(hit)return hit;
+  }
+  return null;
 }
-function startMeterScan(){
-  if($('mrOcrRow').classList.contains('scanning'))return;
+function startIdentifyScan(){
+  if($('navScanBtn').classList.contains('scanning'))return;
   if(!_tesseractLoaded&&!navigator.onLine){toast('Scanning needs internet the first time (downloads the OCR engine).','err');return;}
-  $('mrScanInput').click();
+  $('homeScanInput').click();
 }
-async function handleScanFile(e){
+async function handleIdentifyScanFile(e){
   var file=e.target.files&&e.target.files[0];
   e.target.value='';
   if(!file)return;
-  $('mrOcrNote').classList.add('hidden');
-  setOcrBusy(true,'Loading OCR…');
+  setNavScanBusy(true);
   try{
     await loadTesseractScript();
-    setOcrBusy(true,'Reading photo…');
     var dataUrl=await downscaleImageForOcr(file,1000);
     if(!_ocrWorker){
       var createWorker=Tesseract.createWorker;
       _ocrWorker=await createWorker('eng');
-      await _ocrWorker.setParameters({tessedit_char_whitelist:'0123456789.'});
     }
-    var result=await withTimeout(_ocrWorker.recognize(dataUrl),25000,'Scan took too long. Try a clearer or closer photo.');
-    var value=extractReadingValue(result.data.text);
-    var conf=Math.round(result.data.confidence||0);
-    if(value){
-      $('mrfValue').value=value;
-      _mrScannedValue=true;_mrScanConfidence=conf;
-      $('mrOcrNoteTxt').textContent='Detected via scan ('+conf+'% confidence) — please verify';
-      $('mrOcrNote').classList.remove('hidden');
-      $('mrfErr').classList.remove('show');
+    var result=await withTimeout(_ocrWorker.recognize(dataUrl),25000,'Scan took too long. Try a clearer, closer photo.');
+    var match=findConsumerByOcrText(result.data.text);
+    if(match){
+      toast('Found: '+match.consumerName,'ok');
+      openDetail(match);
     }else{
-      showMrfErr("Couldn't detect a number in that photo. Try again or enter it manually.");
+      toast("Couldn't match that to a consumer — search manually.",'err');
+      if(activeTab!=='consumers'){switchTab('consumers');setTimeout(function(){$('searchInp').focus();},350);}
+      else $('searchInp').focus();
     }
   }catch(err){
-    showMrfErr(err&&err.message?err.message:'Scan failed. Please enter the value manually.');
+    toast(err&&err.message?err.message:'Scan failed.','err');
   }
-  setOcrBusy(false);
+  setNavScanBusy(false);
 }
-$('mrfValue').addEventListener('input',function(){if(_mrScannedValue){_mrScannedValue=false;$('mrOcrNote').classList.add('hidden');}});
+
 async function saveReading(){
   var val=$('mrfValue').value.trim();
   $('mrfErr').classList.remove('show');
@@ -1326,7 +1314,7 @@ async function saveReading(){
     var controller=new AbortController();var tid=setTimeout(function(){controller.abort();},TIMEOUT);
     var payload=_mrEditing
       ?{action:'updateMeterReading',token:session.token,officeId:session.officeId,rowIndex:_mrEditing._rowIndex,readingId:_mrEditing.ReadingID,value:val}
-      :{action:'addMeterReading',token:session.token,officeId:session.officeId,conNo:_mrConNo,readingType:_mrType,value:val,source:_mrScannedValue?'OCR':'Manual',confidence:_mrScannedValue?_mrScanConfidence:'',needsReview:_mrScannedValue&&_mrScanConfidence<70};
+      :{action:'addMeterReading',token:session.token,officeId:session.officeId,conNo:_mrConNo,readingType:_mrType,value:val,source:'Manual'};
     var res=await fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify(payload),redirect:'follow',signal:controller.signal});clearTimeout(tid);
     var json=await res.json();
     if(json.success){
