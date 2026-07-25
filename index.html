@@ -670,9 +670,10 @@ function setupSwipeClose(){
 }
 function normalize(c){
   function get(){for(var i=0;i<arguments.length;i++){var v=c[arguments[i]];if(v!==undefined&&v!==null&&String(v).trim()!==''&&String(v).trim()!=='0')return String(v).trim();}return '';}
+  function getRaw(){for(var i=0;i<arguments.length;i++){var v=c[arguments[i]];if(v!==undefined&&v!==null&&String(v).trim()!=='')return String(v).trim();}return '';}
   var mr=c['MeterNo']||c.meterNo||c['Meter No']||'';
-  var result={_rowIndex:c._rowIndex||0,sNo:get('S.No.','sNo'),conNo:get('ConNo','conNo'),consumerName:get('ConsumerName','Consumer Name','consumerName'),address:get('Address','address'),labNo:get('LabNo','labNo','Lab No'),meterNo:mr?String(mr).trim():'',transfCode:get('TransfCode','transfCode','Transf Code','AreaCode','areaCode'),phoneNo:get('PhoneNo','phoneNo','Phone','phone'),status:get('Status','status')||'Active',lastEditedBy:get('LastEditedBy','lastEditedBy'),lastEditedAt:get('LastEditedAt','lastEditedAt'),createdAt:get('CreatedAt','createdAt'),sdPassbookNo:get('Passbook/SD No','sdPassbookNo'),sdAmount:get('SD Amount','sdAmount'),sdDate:get('SD Date','sdDate')};
-  var known=['S.No.','sNo','ConNo','conNo','ConsumerName','Consumer Name','consumerName','Address','address','LabNo','labNo','Lab No','MeterNo','meterNo','Meter No','TransfCode','transfCode','Transf Code','AreaCode','areaCode','PhoneNo','phoneNo','Phone','phone','Status','status','LastEditedBy','lastEditedBy','LastEditedAt','lastEditedAt','CreatedAt','createdAt','Passbook/SD No','sdPassbookNo','SD Amount','sdAmount','SD Date','sdDate','_rowIndex'];
+  var result={_rowIndex:c._rowIndex||0,sNo:get('S.No.','sNo'),conNo:get('ConNo','conNo'),consumerName:get('ConsumerName','Consumer Name','consumerName'),address:get('Address','address'),labNo:get('LabNo','labNo','Lab No'),meterNo:mr?String(mr).trim():'',transfCode:get('TransfCode','transfCode','Transf Code','AreaCode','areaCode'),phoneNo:get('PhoneNo','phoneNo','Phone','phone'),status:get('Status','status')||'Active',lastEditedBy:get('LastEditedBy','lastEditedBy'),lastEditedAt:get('LastEditedAt','lastEditedAt'),createdAt:get('CreatedAt','createdAt'),sdPassbookNo:get('Passbook/SD No','sdPassbookNo'),sdAmount:get('SD Amount','sdAmount'),sdDate:get('SD Date','sdDate'),latestKwh:getRaw('LatestKWH','latestKwh'),latestKwhAt:getRaw('LatestKWHAt','latestKwhAt'),latestKvah:getRaw('LatestKVAH','latestKvah'),latestKvahAt:getRaw('LatestKVAHAt','latestKvahAt')};
+  var known=['S.No.','sNo','ConNo','conNo','ConsumerName','Consumer Name','consumerName','Address','address','LabNo','labNo','Lab No','MeterNo','meterNo','Meter No','TransfCode','transfCode','Transf Code','AreaCode','areaCode','PhoneNo','phoneNo','Phone','phone','Status','status','LastEditedBy','lastEditedBy','LastEditedAt','lastEditedAt','CreatedAt','createdAt','Passbook/SD No','sdPassbookNo','SD Amount','sdAmount','SD Date','sdDate','LatestKWH','latestKwh','LatestKWHAt','latestKwhAt','LatestKVAH','latestKvah','LatestKVAHAt','latestKvahAt','_rowIndex'];
   Object.keys(c).forEach(function(k){if(known.indexOf(k)===-1)result[k]=(c[k]!==undefined&&c[k]!==null)?String(c[k]).trim():'';});
   return result;
 }
@@ -783,8 +784,8 @@ function openDetail(c){
   af('SD Amount',c.sdAmount?'&#8377; '+esc(c.sdAmount):'—');
   af('SD Date',c.sdDate?esc(formatDate(c.sdDate)):'—');
   fh+='<div class="det-section-hdr">Meter Readings</div>';
-  fh+='<div class="det-field det-field-link" id="detReadKwh"><span class="det-label">Reading (KWH)</span><span class="det-value det-link-val">History<span class="material-icons-round">chevron_right</span></span></div>';
-  fh+='<div class="det-field det-field-link" id="detReadKvah"><span class="det-label">Reading (KVAH)</span><span class="det-value det-link-val">History<span class="material-icons-round">chevron_right</span></span></div>';
+  fh+='<div class="det-field det-field-link" id="detReadKwh"><span class="det-label">Reading (KWH)</span><span class="det-value det-link-val">'+mrPreviewLabel(c.latestKwh,c.latestKwhAt)+'<span class="material-icons-round">chevron_right</span></span></div>';
+  fh+='<div class="det-field det-field-link" id="detReadKvah"><span class="det-label">Reading (KVAH)</span><span class="det-value det-link-val">'+mrPreviewLabel(c.latestKvah,c.latestKvahAt)+'<span class="material-icons-round">chevron_right</span></span></div>';
   var cfList=activeFieldsList();
   if(cfList.length){
     fh+='<div class="det-section-hdr">Additional Details</div>';
@@ -1135,6 +1136,10 @@ function timeAgo(ts){var d=Date.now()-ts;if(d<60000)return 'just now';if(d<36000
 /* METER READINGS - Step 14b (manual entry + Year/Month drill-down; OCR stubbed for 14c) */
 let _mrConNo=null,_mrCName='',_mrType='KWH',_mrLevel='years',_mrYear=null,_mrData=null,_mrEditing=null,_mrDeleteTarget=null;
 const MONTH_NAMES=['','January','February','March','April','May','June','July','August','September','October','November','December'];
+function mrPreviewLabel(value,at){
+  if(!value)return 'No readings yet';
+  return esc(value)+(at?' &#183; '+esc(formatDateTime(at)):'');
+}
 function openReadingSheet(conNo,cName,type){
   _mrConNo=conNo;_mrCName=cName;_mrType=type;_mrLevel='years';_mrYear=null;_mrData=null;
   renderReadingSheet();
