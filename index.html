@@ -360,6 +360,29 @@
   .mr-empty .material-icons-round{font-size:44px;color:var(--t2);opacity:.3}
   .mr-empty-txt{font-size:13px;color:var(--t2);margin-top:10px;line-height:1.5}
   .nav-btn.scanning .material-icons-round{animation:spin 1s linear infinite}
+
+  /* ===== RESPONSIVE: DESKTOP/WIDE-SCREEN (>=960px) =====
+     Phone layout above this breakpoint is completely untouched -- every rule
+     below only takes effect at 960px+. Bottom nav becomes a left rail, the
+     consumer list becomes a multi-column grid, bottom sheets keep the same
+     slide-up mechanic but get a capped, centered width instead of spanning
+     the full viewport. Purely additive CSS -- no JS changes needed. Admin/
+     Fields/Activity panels intentionally stay single-column this pass (their
+     cards vary too much in height for a clean auto-fill grid); only the
+     consumer list -- the primary, highest-volume view -- gets the grid. */
+  @media (min-width:960px){
+    :root{--bnav-h:0px;--rail-w:96px}
+    .main{margin-left:var(--rail-w);padding-left:24px;padding-right:24px;max-width:1400px;}
+    .search-sec{left:var(--rail-w);}
+    #consumerList{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:12px;align-items:start;}
+    #consumerList .c-card{margin-bottom:0;}
+    .bottom-nav{top:var(--nav-h);bottom:0;left:0;right:auto;width:var(--rail-w);height:auto;flex-direction:column;border-top:none;border-right:1px solid var(--card-b);padding-top:12px;}
+    .bottom-nav.hide{transform:translateX(-100%)}
+    .bnav{flex:none;padding:14px 0;}
+    .bnav.active::before{top:50%;left:0;width:3px;height:28px;transform:translateY(-50%);}
+    .bottom-sheet{left:50%;right:auto;width:100%;max-width:480px;transform:translate(-50%,100%);}
+    .bottom-sheet.open{transform:translate(-50%,0);}
+  }
   </style>
 </head>
 <body>
