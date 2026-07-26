@@ -814,6 +814,117 @@
     .light-mode .profile-dropdown { box-shadow: 0 8px 32px rgba(0,0,40,0.15); }
     .light-mode .con-card { background: #F4F7FF; }
     .light-mode .con-chip { background: #FFFFFF; }
+
+    /* ===== STEP 15: METER READINGS (SuperAdmin) ===== */
+    .mr-section {
+      margin: 4px 20px 8px;
+      padding-top: 8px;
+      border-top: 1px solid var(--card-border);
+    }
+    .mr-section-label {
+      font-size: 10px; color: var(--text-secondary);
+      text-transform: uppercase; letter-spacing: 0.5px;
+      margin: 6px 0 8px;
+    }
+    .mr-preview-row {
+      display: flex; align-items: center; gap: 12px;
+      padding: 10px 0; cursor: pointer;
+      border-bottom: 1px solid var(--card-border);
+      transition: background 0.15s;
+    }
+    .mr-preview-row:last-child { border-bottom: none; }
+    .mr-preview-row:active { background: rgba(0,82,180,0.06); }
+    .mr-preview-icon { color: var(--primary-light); font-size: 20px; flex-shrink: 0; }
+    .mr-preview-info { flex: 1; min-width: 0; }
+    .mr-preview-type {
+      font-size: 10px; color: var(--text-secondary);
+      text-transform: uppercase; letter-spacing: 0.5px;
+    }
+    .mr-preview-value { font-size: 14px; color: var(--text); font-weight: 500; margin-top: 2px; }
+    .mr-preview-arrow { color: var(--text-secondary); font-size: 20px; flex-shrink: 0; }
+
+    /* History sheet (Year/Month drill-down) */
+    .mr-hist-header {
+      display: flex; align-items: center; gap: 4px;
+      padding: 8px 12px 16px 16px;
+      border-bottom: 1px solid var(--card-border);
+    }
+    .mr-back-btn {
+      display: none; background: none; border: none; color: var(--text);
+      cursor: pointer; padding: 6px; border-radius: 50%;
+      align-items: center; flex-shrink: 0;
+    }
+    .mr-back-btn.show { display: flex; }
+    .mr-back-btn:active { background: var(--card-border); }
+    .mr-hist-title-wrap { flex: 1; min-width: 0; }
+    .mr-hist-close {
+      background: none; border: none; color: var(--text-secondary);
+      cursor: pointer; padding: 6px; border-radius: 50%;
+      display: flex; align-items: center; flex-shrink: 0;
+    }
+    .mr-hist-close:active { background: var(--card-border); }
+    .mr-hist-body { padding: 16px 20px 28px; min-height: 220px; }
+
+    .mr-add-btn {
+      display: flex; align-items: center; justify-content: center; gap: 6px;
+      width: 100%; padding: 12px;
+      background: rgba(0,82,180,0.08); color: var(--primary-light);
+      border: 1.5px dashed var(--card-border);
+      border-radius: var(--r-btn);
+      font-family: 'Poppins', sans-serif; font-size: 13px; font-weight: 600;
+      cursor: pointer; margin-bottom: 16px;
+    }
+    .mr-add-btn:active { background: rgba(0,82,180,0.16); }
+    .mr-add-btn .material-icons-round { font-size: 18px; }
+
+    .mr-year-row {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 14px 4px; cursor: pointer;
+      border-bottom: 1px solid var(--card-border);
+    }
+    .mr-year-row:last-child { border-bottom: none; }
+    .mr-year-row:active { background: rgba(0,82,180,0.06); }
+    .mr-year-label {
+      font-family: 'Poppins', sans-serif; font-size: 14px; font-weight: 600; color: var(--text);
+    }
+    .mr-year-count {
+      font-size: 12px; color: var(--text-secondary);
+      display: flex; align-items: center; gap: 2px;
+    }
+
+    .mr-month-group { margin-bottom: 6px; }
+    .mr-month-group-label {
+      font-family: 'Poppins', sans-serif; font-size: 12px; font-weight: 600;
+      color: var(--text-secondary); margin: 16px 0 4px;
+      text-transform: uppercase; letter-spacing: 0.4px;
+    }
+    .mr-month-group:first-child .mr-month-group-label { margin-top: 0; }
+
+    .mr-reading-row {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 4px; border-bottom: 1px solid var(--card-border);
+    }
+    .mr-reading-row:last-child { border-bottom: none; }
+    .mr-reading-info { flex: 1; min-width: 0; }
+    .mr-reading-value { font-size: 15px; font-weight: 600; color: var(--text); }
+    .mr-reading-date { font-size: 11px; color: var(--text-secondary); margin-top: 2px; }
+    .mr-reading-actions { display: flex; gap: 2px; flex-shrink: 0; }
+    .mr-icon-sm {
+      width: 32px; height: 32px; border: none; background: transparent;
+      color: var(--text-secondary); border-radius: 50%;
+      display: flex; align-items: center; justify-content: center; cursor: pointer;
+    }
+    .mr-icon-sm:active { background: var(--card-border); }
+    .mr-icon-sm.danger { color: var(--danger); }
+    .mr-icon-sm .material-icons-round { font-size: 17px; }
+
+    .mr-empty { text-align: center; padding: 32px 12px; color: var(--text-secondary); }
+    .mr-empty .material-icons-round { font-size: 38px; opacity: 0.4; margin-bottom: 8px; display: block; }
+    .mr-empty p { font-size: 13px; }
+    .mr-offline, .mr-error {
+      text-align: center; padding: 32px 12px; color: var(--text-secondary);
+      font-size: 13px; cursor: pointer;
+    }
   </style>
 </head>
 <body class="dark-mode">
@@ -1113,6 +1224,25 @@
   </div>
   <div class="sheet-body" style="padding-bottom:0;">
     <div id="vcd-rows"></div>
+    <div class="mr-section">
+      <div class="mr-section-label">Meter Readings</div>
+      <div class="mr-preview-row" onclick="openReadingSheet('KWH')">
+        <span class="material-icons-round mr-preview-icon">bolt</span>
+        <div class="mr-preview-info">
+          <div class="mr-preview-type">KWH</div>
+          <div class="mr-preview-value" id="vcd-mr-kwh">—</div>
+        </div>
+        <span class="material-icons-round mr-preview-arrow">chevron_right</span>
+      </div>
+      <div class="mr-preview-row" onclick="openReadingSheet('KVAH')">
+        <span class="material-icons-round mr-preview-icon">speed</span>
+        <div class="mr-preview-info">
+          <div class="mr-preview-type">KVAH</div>
+          <div class="mr-preview-value" id="vcd-mr-kvah">—</div>
+        </div>
+        <span class="material-icons-round mr-preview-arrow">chevron_right</span>
+      </div>
+    </div>
   </div>
   <div class="vc-phone-row" id="vcd-phone-row" style="display:none;">
     <a id="vcd-call-btn" class="vc-phone-btn" href="#">
@@ -1254,6 +1384,64 @@
   </div>
 </div>
 
+<!-- METER READING HISTORY (Step 15) -->
+<div class="bottom-sheet" id="sheetMRHistory">
+  <div class="sheet-handle"></div>
+  <div class="mr-hist-header">
+    <button class="mr-back-btn" id="mrBackBtn" onclick="mrGoBack()">
+      <span class="material-icons-round">arrow_back</span>
+    </button>
+    <div class="mr-hist-title-wrap">
+      <div class="sheet-title" id="mrHistTitle">Readings</div>
+      <div class="sheet-subtitle" id="mrHistSub"></div>
+    </div>
+    <button class="mr-hist-close" onclick="hideSheet('sheetMRHistory')">
+      <span class="material-icons-round">close</span>
+    </button>
+  </div>
+  <div class="mr-hist-body" id="mrHistBody"></div>
+</div>
+
+<!-- ADD/EDIT READING (Step 15) -->
+<div class="bottom-sheet" id="sheetMRForm">
+  <div class="sheet-handle"></div>
+  <div class="sheet-header">
+    <div class="sheet-title" id="mrFormTitle">Add Reading</div>
+    <div class="sheet-subtitle" id="mrFormSub"></div>
+  </div>
+  <div class="sheet-body">
+    <div class="form-group">
+      <label class="form-label">Reading Value</label>
+      <input type="number" inputmode="decimal" class="form-input" id="mrFormValue" placeholder="Enter meter value" />
+    </div>
+    <button class="btn-primary" id="mrFormSaveBtn" onclick="saveReading()">
+      <span class="material-icons-round">save</span>
+      Save Reading
+    </button>
+    <button class="btn-secondary" onclick="cancelReadingForm()">Cancel</button>
+  </div>
+</div>
+
+<!-- DELETE READING CONFIRM (Step 15) -->
+<div class="bottom-sheet" id="sheetMRDel">
+  <div class="sheet-handle"></div>
+  <div class="sheet-header">
+    <div class="sheet-title">Delete Reading</div>
+    <div class="sheet-subtitle">This cannot be undone</div>
+  </div>
+  <div class="sheet-body">
+    <div class="del-info-box">
+      <div class="dib-name" id="mrDelValue"></div>
+      <div class="dib-sub"  id="mrDelSub"></div>
+    </div>
+    <button class="btn-danger-full" id="mrDelBtn" onclick="doDeleteReading()">
+      <span class="material-icons-round">delete_forever</span>
+      Yes, Delete Reading
+    </button>
+    <button class="btn-secondary" onclick="cancelReadingDelete()">Cancel</button>
+  </div>
+</div>
+
 <!-- OFFICE TOGGLE CONFIRM -->
 <div class="bottom-sheet" id="sheetOfficeTog">
   <div class="sheet-handle"></div>
@@ -1289,7 +1477,7 @@
 const API_URL = 'https://script.google.com/macros/s/AKfycbyeO7pIZrT1WKPHHuR8LKxhPKgf4uELmkSkIgUefNwT88JdCBiAoTAfgKTyCBKEMmBowQ/exec';
 
 // All bottom sheet IDs — keep in sync when adding new sheets
-const ALL_SHEETS = ['sheetAddOffice','sheetApproveReq','sheetChangePwd','sheetViewConsumers','sheetVCDetail','sheetVCEdit','sheetVCDel','sheetVCBulkDel','sheetOfficeTog'];
+const ALL_SHEETS = ['sheetAddOffice','sheetApproveReq','sheetChangePwd','sheetViewConsumers','sheetVCDetail','sheetVCEdit','sheetVCDel','sheetVCBulkDel','sheetOfficeTog','sheetMRHistory','sheetMRForm','sheetMRDel'];
 
 let session         = null;
 let allOffices      = [];
@@ -1799,6 +1987,16 @@ let _vcDetailC    = null;     // consumer open in detail sheet
 let _vcDelC       = null;     // consumer being single-deleted
 let _vcOfficeTog  = { officeId:'', officeName:'', makeActive:false };
 
+// Step 15: Meter Readings (SuperAdmin) — reuses _vcDetailC / _vc.sheetId for context
+let _mrType      = 'KWH';
+let _mrLevel     = 'years';   // 'years' | 'months'
+let _mrYear      = null;
+let _mrData      = null;      // {KWH:{year:{month:[...]}}, KVAH:{...}} | 'offline' | 'error'
+let _mrEditing   = null;      // reading object being edited, or null when adding
+let _mrDeleteTarget = null;
+let _mrRowLookup = {};        // ReadingID -> reading object, rebuilt each render (safe lookup, no serialized onclick args)
+const MONTH_NAMES = ['','January','February','March','April','May','June','July','August','September','October','November','December'];
+
 /** Called by the inline onclick on the office card button */
 function openVCFromBtn(btn) {
   // dataset.name is HTML-decoded by the browser automatically
@@ -1952,10 +2150,19 @@ function setupEyeButtons() {
    ANDROID BACK BUTTON
    ============================================= */
 window.addEventListener('popstate', () => {
-  const openSheet = ALL_SHEETS
-    .find(id => document.getElementById(id)?.classList.contains('open'));
-  if (openSheet) {
-    hideSheet(openSheet);
+  // Reading history: step back from months to years before closing anything
+  if (document.getElementById('sheetMRHistory')?.classList.contains('open') && _mrLevel === 'months') {
+    mrGoBack();
+    history.pushState(null, '');
+    return;
+  }
+  // ALL_SHEETS order matches DOM/visual-stacking order (sheets layer on top of
+  // each other rather than replacing one another) — take the LAST open match,
+  // i.e. the visually topmost sheet, not the first one found.
+  const openIds = ALL_SHEETS.filter(id => document.getElementById(id)?.classList.contains('open'));
+  const topSheet = openIds[openIds.length - 1];
+  if (topSheet) {
+    hideSheet(topSheet);
     history.pushState(null, '');
   }
 });
@@ -2052,6 +2259,10 @@ function openVCDetail(c) {
   } else {
     prow.style.display = 'none';
   }
+
+  document.getElementById('vcd-mr-kwh').textContent  = mrPreviewLabel(c['LatestKWH'],  c['LatestKWHAt']);
+  document.getElementById('vcd-mr-kvah').textContent = mrPreviewLabel(c['LatestKVAH'], c['LatestKVAHAt']);
+
   showSheet('sheetVCDetail');
 }
 
@@ -2285,6 +2496,312 @@ async function handleOfficeToggle() {
     const icon = makeActive ? 'toggle_on' : 'toggle_off';
     const text = makeActive ? 'Activate Office' : 'Deactivate Office';
     btn.innerHTML = '<span class="material-icons-round">' + icon + '</span> ' + text;
+  }
+}
+
+/* =============================================
+   STEP 15 — METER READINGS (SuperAdmin)
+   Full parity with Employee: Year/Month drill-down,
+   add/edit/delete. No role gate on any endpoint —
+   every call just adds officeSheetId: _vc.sheetId.
+   ============================================= */
+
+function mrPreviewLabel(value, at) {
+  if (value === '' || value == null) return 'No readings yet';
+  const d = fmtDate(at);
+  return value + (d !== '—' ? ' · ' + d : '');
+}
+
+function mrSkeleton() {
+  return `<div class="skeleton" style="border-radius:14px;">
+    <div class="sk-line w50"></div>
+    <div class="sk-line w70"></div>
+    <div class="sk-line w30"></div>
+  </div>`;
+}
+
+/* ── Open history sheet — shows skeleton immediately, fetches in parallel ── */
+function openReadingSheet(type) {
+  _mrType  = type;
+  _mrLevel = 'years';
+  _mrYear  = null;
+  _mrData  = null;
+  document.getElementById('mrBackBtn').classList.remove('show');
+  document.getElementById('mrHistTitle').textContent = type + ' Readings';
+  document.getElementById('mrHistSub').textContent   = _vcDetailC ? (_vcDetailC['ConsumerName'] || '') : '';
+  document.getElementById('mrHistBody').innerHTML    = mrSkeleton();
+  showSheet('sheetMRHistory');       // sheetVCDetail stays open underneath — existing layering convention
+  fetchReadingDataQuiet();
+}
+
+async function fetchReadingDataQuiet() {
+  if (!_vcDetailC) return;
+  try {
+    const res = await api({
+      action:        'getMeterReadings',
+      token:         session.token,
+      conNo:         _vcDetailC['ConNo'],
+      officeSheetId: _vc.sheetId
+    });
+    if (checkUnauthorized(res)) return;
+    _mrData = res.success ? (res.data || { KWH:{}, KVAH:{} }) : 'error';
+  } catch (err) {
+    _mrData = 'offline';
+  }
+  renderMRBody();
+}
+
+function renderMRBody() {
+  const body = document.getElementById('mrHistBody');
+  if (_mrData === null) { body.innerHTML = mrSkeleton(); return; }
+  if (_mrData === 'offline') {
+    body.innerHTML = `<div class="mr-offline" onclick="fetchReadingDataQuiet()">
+      <span class="material-icons-round" style="font-size:32px;opacity:.4;display:block;margin-bottom:8px;">wifi_off</span>
+      Reading history needs an internet connection.<br><span style="text-decoration:underline;">Tap to retry</span>
+    </div>`;
+    return;
+  }
+  if (_mrData === 'error') {
+    body.innerHTML = `<div class="mr-error" onclick="fetchReadingDataQuiet()">
+      <span class="material-icons-round" style="font-size:32px;opacity:.4;display:block;margin-bottom:8px;">error_outline</span>
+      Couldn't load readings.<br><span style="text-decoration:underline;">Tap to retry</span>
+    </div>`;
+    return;
+  }
+  if (_mrLevel === 'months') renderMRMonthsView();
+  else renderMRYearsView();
+}
+
+/* ── Years view ─────────────────────────────────── */
+function renderMRYearsView() {
+  document.getElementById('mrBackBtn').classList.remove('show');
+  document.getElementById('mrHistTitle').textContent = _mrType + ' Readings';
+  const yearsObj = (_mrData && _mrData[_mrType]) || {};
+  const years = Object.keys(yearsObj).sort((a, b) => b - a);
+
+  let html = `<button class="mr-add-btn" onclick="openReadingForm(null)">
+    <span class="material-icons-round">add</span> Add Reading
+  </button>`;
+
+  if (!years.length) {
+    html += `<div class="mr-empty">
+      <span class="material-icons-round">history</span>
+      <p>No readings yet. Tap Add Reading to log the first one.</p>
+    </div>`;
+  } else {
+    html += years.map(y => {
+      const count = Object.values(yearsObj[y]).reduce((s, arr) => s + arr.length, 0);
+      return `<div class="mr-year-row" onclick="showMRMonthsForYear('${esc(y)}')">
+        <span class="mr-year-label">${esc(y)}</span>
+        <span class="mr-year-count">${count} reading${count !== 1 ? 's' : ''}
+          <span class="material-icons-round" style="font-size:16px;">chevron_right</span>
+        </span>
+      </div>`;
+    }).join('');
+  }
+  document.getElementById('mrHistBody').innerHTML = html;
+}
+
+function showMRMonthsForYear(year) {
+  _mrYear  = year;
+  _mrLevel = 'months';
+  renderMRMonthsView();
+}
+
+function mrGoBack() {
+  _mrLevel = 'years';
+  _mrYear  = null;
+  renderMRYearsView();
+}
+
+/* ── Months view — readings grouped by month, shown directly (2-level drill-down) ── */
+function renderMRMonthsView() {
+  document.getElementById('mrBackBtn').classList.add('show');
+  document.getElementById('mrHistTitle').textContent = _mrYear;
+  const monthsObj = (_mrData[_mrType] && _mrData[_mrType][_mrYear]) || {};
+  const months = Object.keys(monthsObj).sort((a, b) => b - a);
+
+  if (!months.length) {
+    document.getElementById('mrHistBody').innerHTML = `<div class="mr-empty">
+      <span class="material-icons-round">event_busy</span>
+      <p>No readings in ${esc(_mrYear)}.</p>
+    </div>`;
+    return;
+  }
+
+  _mrRowLookup = {};
+  document.getElementById('mrHistBody').innerHTML = months.map(m => {
+    const readings = monthsObj[m].slice()
+      .sort((a, b) => new Date(b.Timestamp) - new Date(a.Timestamp));
+    return `<div class="mr-month-group">
+      <div class="mr-month-group-label">${esc(MONTH_NAMES[parseInt(m, 10)] || m)}</div>
+      ${readings.map(r => makeReadingRow(r)).join('')}
+    </div>`;
+  }).join('');
+}
+
+/* ── Reading row — only a UUID goes into the DOM attribute; the actual  ── */
+/* ── reading object is looked up from _mrRowLookup on click (safe        ── */
+/* ── pattern — no values serialized into inline onclick args)            ── */
+function makeReadingRow(r) {
+  _mrRowLookup[r.ReadingID] = r;
+  const d = new Date(r.Timestamp);
+  const dateStr = isNaN(d) ? '' : d.toLocaleDateString('en-IN', { day:'2-digit', month:'short', year:'numeric' });
+  return `<div class="mr-reading-row">
+    <div class="mr-reading-info">
+      <div class="mr-reading-value">${esc(r.Value)}</div>
+      <div class="mr-reading-date">${esc(dateStr)}${r.EnteredBy ? ' · ' + esc(r.EnteredBy) : ''}</div>
+    </div>
+    <div class="mr-reading-actions">
+      <button class="mr-icon-sm" data-rid="${esc(r.ReadingID)}" onclick="mrEditClick(this)">
+        <span class="material-icons-round">edit</span>
+      </button>
+      <button class="mr-icon-sm danger" data-rid="${esc(r.ReadingID)}" onclick="mrDeleteClick(this)">
+        <span class="material-icons-round">delete</span>
+      </button>
+    </div>
+  </div>`;
+}
+
+function mrEditClick(btn)   { openReadingForm(_mrRowLookup[btn.dataset.rid]); }
+function mrDeleteClick(btn) { confirmDeleteReading(_mrRowLookup[btn.dataset.rid]); }
+
+/* ── Add / Edit form ────────────────────────────── */
+function openReadingForm(reading) {
+  _mrEditing = reading || null;
+  document.getElementById('mrFormTitle').textContent = reading ? 'Edit Reading' : 'Add Reading';
+  document.getElementById('mrFormSub').textContent   = _mrType + (reading ? ' · ' + fmtDate(reading.Timestamp) : ' · Logged as now');
+  document.getElementById('mrFormValue').value        = reading ? reading.Value : '';
+  showSheet('sheetMRForm');           // sheetMRHistory stays open underneath
+}
+
+function cancelReadingForm() {
+  hideSheet('sheetMRForm');
+}
+
+async function saveReading() {
+  const valStr = document.getElementById('mrFormValue').value.trim();
+  if (valStr === '' || isNaN(Number(valStr))) {
+    showToast('Enter a valid number', 'error');
+    return;
+  }
+  const value = Number(valStr);
+  const btn = document.getElementById('mrFormSaveBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<div class="btn-spin"></div> Saving...';
+  try {
+    const res = _mrEditing
+      ? await api({
+          action:        'updateMeterReading',
+          token:         session.token,
+          rowIndex:      _mrEditing._rowIndex ?? _mrEditing.rowIndex,
+          readingId:     _mrEditing.ReadingID,
+          value,
+          officeSheetId: _vc.sheetId
+        })
+      : await api({
+          action:        'addMeterReading',
+          token:         session.token,
+          conNo:         _vcDetailC['ConNo'],
+          readingType:   _mrType,
+          value,
+          source:        'Manual',
+          officeSheetId: _vc.sheetId
+        });
+    if (checkUnauthorized(res)) return;
+    if (res.success) {
+      showToast(_mrEditing ? 'Reading updated' : 'Reading added', 'success');
+      hideSheet('sheetMRForm');
+      await fetchReadingDataQuiet();      // refetch fresh, THEN re-render — avoids a stale flash
+      _mrLevel === 'months' ? renderMRMonthsView() : renderMRYearsView();
+      refreshDetailPreview();
+    } else {
+      showToast(res.message || 'Save failed', 'error');
+    }
+  } catch (err) {
+    showToast('Error: ' + err.message, 'error');
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '<span class="material-icons-round">save</span> Save Reading';
+  }
+}
+
+/* ── Delete ─────────────────────────────────────── */
+function confirmDeleteReading(reading) {
+  if (!reading) return;
+  _mrDeleteTarget = reading;
+  document.getElementById('mrDelValue').textContent = _mrType + ': ' + reading.Value;
+  document.getElementById('mrDelSub').textContent   = fmtDate(reading.Timestamp);
+  const btn = document.getElementById('mrDelBtn');
+  btn.disabled = false;
+  btn.innerHTML = '<span class="material-icons-round">delete_forever</span> Yes, Delete Reading';
+  showSheet('sheetMRDel');            // sheetMRHistory stays open underneath
+}
+
+function cancelReadingDelete() {
+  hideSheet('sheetMRDel');
+}
+
+async function doDeleteReading() {
+  const r = _mrDeleteTarget;
+  if (!r) return;
+  const btn = document.getElementById('mrDelBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<div class="btn-spin"></div> Deleting...';
+  try {
+    const res = await api({
+      action:        'deleteMeterReading',
+      token:         session.token,
+      rowIndex:      r._rowIndex ?? r.rowIndex,
+      readingId:     r.ReadingID,
+      officeSheetId: _vc.sheetId
+    });
+    if (checkUnauthorized(res)) return;
+    if (res.success) {
+      showToast('Reading deleted', 'success');
+      hideSheet('sheetMRDel');
+      await fetchReadingDataQuiet();
+      _mrLevel === 'months' ? renderMRMonthsView() : renderMRYearsView();
+      refreshDetailPreview();
+    } else {
+      showToast(res.message || 'Delete failed', 'error');
+    }
+  } catch (err) {
+    showToast('Error: ' + err.message, 'error');
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '<span class="material-icons-round">delete_forever</span> Yes, Delete Reading';
+  }
+}
+
+/* ── Keep the detail-sheet preview badges in sync after any change ─────────── */
+/* ── Recomputes "latest" client-side from freshly-fetched _mrData — zero      ── */
+/* ── extra API call — and mutates _vcDetailC in place (same object reference  ── */
+/* ── as the entry in _vc.all/_vc.filtered) so the underlying list stays fresh ── */
+function mrLatestFromData(type) {
+  const yearsObj = (_mrData && typeof _mrData === 'object') ? _mrData[type] : null;
+  if (!yearsObj) return { value:'', at:'' };
+  const years = Object.keys(yearsObj).sort((a, b) => b - a);
+  for (const y of years) {
+    const months = Object.keys(yearsObj[y]).sort((a, b) => b - a);
+    for (const m of months) {
+      const readings = yearsObj[y][m].slice()
+        .sort((a, b) => new Date(b.Timestamp) - new Date(a.Timestamp));
+      if (readings.length) return { value: readings[0].Value, at: readings[0].Timestamp };
+    }
+  }
+  return { value:'', at:'' };
+}
+
+function refreshDetailPreview() {
+  if (_mrData === 'offline' || _mrData === 'error' || !_mrData) return;
+  const latest = mrLatestFromData(_mrType);
+  const elId = _mrType === 'KWH' ? 'vcd-mr-kwh' : 'vcd-mr-kvah';
+  const el = document.getElementById(elId);
+  if (el) el.textContent = mrPreviewLabel(latest.value, latest.at);
+  if (_vcDetailC) {
+    _vcDetailC[_mrType === 'KWH' ? 'LatestKWH'   : 'LatestKVAH']   = latest.value;
+    _vcDetailC[_mrType === 'KWH' ? 'LatestKWHAt' : 'LatestKVAHAt'] = latest.at;
   }
 }
 
