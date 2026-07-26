@@ -117,6 +117,9 @@
       font-size: 11px; color: var(--accent);
       font-weight: 500; letter-spacing: 0.5px;
     }
+    .header-brand h1 .material-icons-round {
+      font-size: 16px; vertical-align: -3px; color: var(--accent);
+    }
     .header-actions { display: flex; align-items: center; gap: 4px; flex-shrink: 0; }
 
     .icon-btn {
@@ -165,6 +168,9 @@
     }
     .profile-dropdown-header .role {
       font-size: 11px; color: var(--accent); margin-top: 2px;
+    }
+    .profile-dropdown-header .role .material-icons-round {
+      font-size: 12px; vertical-align: -2px;
     }
     .profile-menu-item {
       width: 100%; border: none; background: transparent;
@@ -220,7 +226,11 @@
       border-radius: 16px;
       padding: 14px 10px; text-align: center;
     }
-    .stat-icon { font-size: 20px; margin-bottom: 6px; }
+    .stat-icon { margin-bottom: 6px; }
+    .stat-icon .material-icons-round { font-size: 20px; }
+    .stat-icon-offices .material-icons-round { color: var(--primary-light); }
+    .stat-icon-active .material-icons-round { color: #4CAF50; }
+    .stat-icon-requests .material-icons-round { color: var(--accent); }
     .stat-value {
       font-family: 'Poppins', sans-serif;
       font-size: 24px; font-weight: 700;
@@ -485,6 +495,7 @@
       background: rgba(211,47,47,0.12); color: #EF5350;
       border: 1px solid rgba(211,47,47,0.3);
     }
+    .request-status .material-icons-round { font-size: 13px; }
     .approve-btn {
       width: 100%; padding: 10px; border: none;
       background: var(--primary); color: white;
@@ -614,6 +625,7 @@
       background: rgba(255,193,7,0.06);
       border-radius: 8px; border-left: 3px solid var(--accent);
     }
+    .form-note-icon { display: flex; align-items: flex-start; gap: 6px; }
 
     .btn-primary {
       width: 100%; padding: 14px;
@@ -952,7 +964,7 @@
   <!-- HEADER -->
   <header class="header">
     <div class="header-brand">
-      <h1>&#9889; A&amp;N Electricity</h1>
+      <h1><span class="material-icons-round">bolt</span> A&amp;N Electricity</h1>
       <p>SUPER ADMIN</p>
     </div>
     <div class="header-actions">
@@ -964,7 +976,7 @@
         <div class="profile-dropdown" id="profileDropdown">
           <div class="profile-dropdown-header">
             <div class="name" id="profileName">Super Admin</div>
-            <div class="role">&#11088; SuperAdmin</div>
+            <div class="role"><span class="material-icons-round">star</span> SuperAdmin</div>
           </div>
           <button class="profile-menu-item" id="changePwdMenuBtn">
             <span class="material-icons-round">lock_reset</span>
@@ -997,17 +1009,17 @@
     <!-- STATS -->
     <div class="stats-grid">
       <div class="stat-card">
-        <div class="stat-icon">&#127970;</div>
+        <div class="stat-icon stat-icon-offices"><span class="material-icons-round">business</span></div>
         <div class="stat-value" id="statTotal">&#8212;</div>
         <div class="stat-label">Offices</div>
       </div>
       <div class="stat-card">
-        <div class="stat-icon">&#9989;</div>
+        <div class="stat-icon stat-icon-active"><span class="material-icons-round">check_circle</span></div>
         <div class="stat-value" id="statActive">&#8212;</div>
         <div class="stat-label">Active</div>
       </div>
       <div class="stat-card">
-        <div class="stat-icon">&#128276;</div>
+        <div class="stat-icon stat-icon-requests"><span class="material-icons-round">inbox</span></div>
         <div class="stat-value" id="statRequests">&#8212;</div>
         <div class="stat-label">Requests</div>
       </div>
@@ -1085,8 +1097,9 @@
         </button>
       </div>
     </div>
-    <div class="form-note">
-      &#9888; Admin must change password on first login. The office Google Sheet is created automatically.
+    <div class="form-note form-note-icon">
+      <span class="material-icons-round" style="font-size:14px;flex-shrink:0;margin-top:1px;color:var(--accent)">info</span>
+      <span>Admin must change password on first login. The office Google Sheet is created automatically.</span>
     </div>
     <button class="btn-primary" id="submitAddOffice">
       <span class="material-icons-round">add_business</span>
@@ -1124,8 +1137,9 @@
         </button>
       </div>
     </div>
-    <div class="form-note">
-      &#9888; Approving creates the office and sets admin credentials. Admin must change password on first login.
+    <div class="form-note form-note-icon">
+      <span class="material-icons-round" style="font-size:14px;flex-shrink:0;margin-top:1px;color:var(--accent)">info</span>
+      <span>Approving creates the office and sets admin credentials. Admin must change password on first login.</span>
     </div>
     <button class="btn-primary" id="submitApproveReq">
       <span class="material-icons-round">check_circle</span>
@@ -1725,17 +1739,19 @@ function renderRequests(list) {
     const created  = fmtDate(r.createdAt || r.CreatedAt);
     const rid      = esc(r.requestId   || r.RequestID   || '');
     const notes    = esc(r.notes || r.Notes || '');
-    const statusLabel = status === 'approved' ? '&#9989; Approved'
-                      : status === 'rejected' ? '&#10060; Rejected' : '&#9203; Pending';
+    const statusIcon = status === 'approved' ? 'check_circle'
+                      : status === 'rejected' ? 'cancel' : 'schedule';
+    const statusLabel = status === 'approved' ? 'Approved'
+                      : status === 'rejected' ? 'Rejected' : 'Pending';
     return `
       <div class="request-card ${status}">
         <div class="request-card-top">
           <div>
             <div class="request-office-name">${name}</div>
             <div class="request-meta">Requested by: ${by}${email ? ' &middot; ' + email : ''}</div>
-            <div class="request-meta">&#128197; ${created}${notes ? ' &middot; ' + notes : ''}</div>
+            <div class="request-meta"><span class="material-icons-round" style="font-size:13px;vertical-align:-2px">calendar_today</span> ${created}${notes ? ' &middot; ' + notes : ''}</div>
           </div>
-          <div class="request-status ${status}">${statusLabel}</div>
+          <div class="request-status ${status}"><span class="material-icons-round">${statusIcon}</span>${statusLabel}</div>
         </div>
         ${status === 'pending' ? `
           <button class="approve-btn"
@@ -1855,7 +1871,7 @@ async function handleAddOffice() {
     });
 
     if (res.success) {
-      showToast('&#9989; Office created successfully!', 'success', 4000);
+      showToast('Office created successfully!', 'success', 4000);
       hideSheet('sheetAddOffice');
       ['newOfficeName','newAdminFullName','newAdminUsername','newAdminPwd']
         .forEach(id => { document.getElementById(id).value = ''; });
@@ -1919,7 +1935,7 @@ async function handleApproveRequest() {
     });
 
     if (res.success) {
-      showToast('&#9989; Office approved and created!', 'success', 4000);
+      showToast('Office approved and created!', 'success', 4000);
       hideSheet('sheetApproveReq');
       pendingRequestId = null;
       loadData();
@@ -1962,7 +1978,7 @@ async function handleChangePwd() {
     });
 
     if (res.success) {
-      showToast('&#9989; Password updated', 'success');
+      showToast('Password updated', 'success');
       hideSheet('sheetChangePwd');
       ['currPwd','newPwd','confirmPwd'].forEach(id => {
         document.getElementById(id).value = '';

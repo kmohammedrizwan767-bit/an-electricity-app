@@ -25,7 +25,8 @@
   .navbar,.search-sec,.bottom-nav,.c-card,.skeleton,.user-menu,.bottom-sheet,.search-wrap,.chip,.f-pill{transition:background-color var(--d) var(--ease),border-color var(--d) var(--ease),color var(--d) var(--ease);}
   .splash{position:fixed;inset:0;background:#080F1E;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;z-index:9999;transition:opacity .35s var(--ease);}
   .splash.out{opacity:0;pointer-events:none}
-  .splash-bolt{font-size:52px;animation:bolt .9s ease-in-out infinite alternate}
+  .splash-bolt{animation:bolt .9s ease-in-out infinite alternate}
+  .splash-bolt .material-icons-round{font-size:52px;color:var(--accent)}
   @keyframes bolt{from{transform:scale(.92)}to{transform:scale(1.06)}}
   .splash-name{font-family:var(--fd);font-size:20px;font-weight:700;color:#fff}
   .splash-sub{font-size:12px;color:rgba(255,255,255,.45)}
@@ -76,7 +77,8 @@
   [data-theme=light] input[type=date].sinp{color-scheme:light;}
   .cf-section-hdr{font-size:10px;font-family:var(--fd);font-weight:700;color:var(--primary);text-transform:uppercase;letter-spacing:.6px;padding:14px 0 4px;border-top:1px solid var(--card-b);margin-top:4px;}
   .det-section-hdr{font-size:10px;font-family:var(--fd);font-weight:700;color:var(--primary);text-transform:uppercase;letter-spacing:.6px;padding:14px 0 4px;border-top:1px solid var(--card-b);margin-top:4px;}
-  .ab-logo{text-align:center;font-size:48px;margin-bottom:8px}
+  .ab-logo{text-align:center;margin-bottom:8px}
+  .ab-logo .material-icons-round{font-size:48px;color:var(--accent)}
   .ab-name{text-align:center;font-family:var(--fd);font-size:17px;font-weight:700;color:var(--t1);margin-bottom:3px}
   .ab-ver{text-align:center;font-size:12px;color:var(--t2);margin-bottom:18px}
   .ab-row{display:flex;gap:12px;padding:12px 0;border-bottom:1px solid var(--card-b);align-items:flex-start}
@@ -124,7 +126,8 @@
   [data-theme=dark] .det-del{background:rgba(211,47,47,.15)}
   .navbar{position:fixed;top:0;left:0;right:0;height:var(--nav-h);background:var(--primary);display:flex;align-items:center;justify-content:space-between;padding:0 12px;z-index:100;box-shadow:0 2px 10px rgba(0,0,0,.2);}
   .nav-left{display:flex;align-items:center;gap:10px}
-  .nav-bolt{font-size:22px;line-height:1}
+  .nav-bolt{line-height:1}
+  .nav-bolt .material-icons-round{font-size:22px;color:var(--accent)}
   .nav-app{font-family:var(--fd);font-size:15px;font-weight:700;color:#fff;line-height:1.2}
   .nav-office{font-size:11px;color:rgba(255,255,255,.7);display:block;line-height:1.2;max-width:160px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .nav-right{display:flex;gap:4px}
@@ -162,7 +165,14 @@
   .s-clr .material-icons-round{font-size:18px}
   .f-row{display:flex;align-items:center;gap:6px;padding:8px 0 4px;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;scroll-behavior:smooth}
   .f-row::-webkit-scrollbar{display:none}
-  .f-pill{flex-shrink:0;background:var(--inp);border:1.5px solid var(--inp-b);border-radius:20px;padding:3px 12px;font-size:11.5px;font-family:var(--fd);font-weight:500;color:var(--t2);cursor:pointer;transition:all .15s;}
+  .f-pill{flex-shrink:0;background:var(--inp);border:1.5px solid var(--inp-b);border-radius:20px;padding:3px 12px;font-size:11.5px;font-family:var(--fd);font-weight:500;color:var(--t2);cursor:pointer;transition:all .15s;display:inline-flex;align-items:center;gap:4px;}
+  .f-pill .material-icons-round{font-size:13px}
+  .stat-dot-active{color:#2E7D32}
+  .stat-dot-inactive{color:#757575}
+  .stat-dot-defaulter{color:var(--danger)}
+  [data-theme=dark] .stat-dot-active{color:#66BB6A}
+  [data-theme=dark] .stat-dot-inactive{color:#BDBDBD}
+  [data-theme=dark] .stat-dot-defaulter{color:#EF9A9A}
   .f-pill.active{background:var(--primary);border-color:var(--primary);color:#fff}
   .f-pill.active-s{background:rgba(46,125,50,.15);border-color:rgba(46,125,50,.3);color:#2E7D32}
   .f-pill.inactive-s{background:rgba(120,120,120,.12);border-color:rgba(120,120,120,.2);color:#757575}
@@ -353,11 +363,11 @@
   </style>
 </head>
 <body>
-<div id="splash" class="splash"><div class="splash-bolt">&#9889;</div><div class="splash-name">A&amp;N Electricity</div><div class="splash-sub">Consumer Manager</div></div>
+<div id="splash" class="splash"><div class="splash-bolt"><span class="material-icons-round">bolt</span></div><div class="splash-name">A&amp;N Electricity</div><div class="splash-sub">Consumer Manager</div></div>
 <div class="logout-ov hidden" id="logoutOv"><div class="logout-spin"></div><div class="logout-txt">Signing out...</div></div>
-<div class="update-banner hidden" id="updateBanner"><span>&#128260; New version available</span><button class="upd-btn" onclick="applyUpdate()">Update Now</button></div>
+<div class="update-banner hidden" id="updateBanner"><span style="display:flex;align-items:center;gap:6px"><span class="material-icons-round" style="font-size:16px">system_update</span>New version available</span><button class="upd-btn" onclick="applyUpdate()">Update Now</button></div>
 <nav class="navbar" id="navbar">
-  <div class="nav-left"><span class="nav-bolt">&#9889;</span><div><span class="nav-app">A&amp;N Electricity</span><span class="nav-office" id="navOffice">Loading&#8230;</span></div></div>
+  <div class="nav-left"><span class="nav-bolt"><span class="material-icons-round">bolt</span></span><div><span class="nav-app">A&amp;N Electricity</span><span class="nav-office" id="navOffice">Loading&#8230;</span></div></div>
   <div class="nav-right">
     <button class="nav-btn hidden" id="selectBtn" onclick="enterSelectMode()"><span class="material-icons-round">checklist</span></button>
     <button class="nav-btn" id="navScanBtn" onclick="startIdentifyScan()"><span class="material-icons-round">document_scanner</span></button>
@@ -393,7 +403,7 @@
 </div>
 <div class="bottom-sheet" id="aboutSheet">
   <div class="sheet-handle" id="aboutHandle"></div>
-  <div class="ab-logo">&#9889;</div><div class="ab-name">A&amp;N Electricity</div><div class="ab-ver">Consumer Manager v1.0.0</div>
+  <div class="ab-logo"><span class="material-icons-round">bolt</span></div><div class="ab-name">A&amp;N Electricity</div><div class="ab-ver">Consumer Manager v1.0.0</div>
   <div class="ab-row"><span class="material-icons-round">business</span><div><div class="ab-key">Department</div><div class="ab-val">A&amp;N Islands Electricity Department</div></div></div>
   <div class="ab-row"><span class="material-icons-round">location_on</span><div><div class="ab-key">Office</div><div class="ab-val" id="aboutOffice">&#8212;</div></div></div>
   <div class="ab-row"><span class="material-icons-round">storage</span><div><div class="ab-key">Data</div><div class="ab-val">Google Sheets &#183; Private &amp; Secure</div></div></div>
@@ -525,9 +535,9 @@
   <div class="search-wrap"><span class="material-icons-round s-ico">search</span><input class="search-inp" type="search" id="searchInp" placeholder="Name, ConNo, meter, phone, address&#8230;" autocomplete="off" autocorrect="off" autocapitalize="none"><button class="s-clr hidden" id="sClear" onclick="clearSearch()"><span class="material-icons-round">close</span></button></div>
   <div class="f-row">
     <button class="f-pill active" onclick="setStatus(this,'ALL')">All Status</button>
-    <button class="f-pill" onclick="setStatus(this,'Active')">&#128994; Active</button>
-    <button class="f-pill" onclick="setStatus(this,'Inactive')">&#9899; Inactive</button>
-    <button class="f-pill" onclick="setStatus(this,'Defaulter')">&#128308; Defaulter</button>
+    <button class="f-pill" onclick="setStatus(this,'Active')"><span class="material-icons-round stat-dot-active">circle</span>Active</button>
+    <button class="f-pill" onclick="setStatus(this,'Inactive')"><span class="material-icons-round stat-dot-inactive">circle</span>Inactive</button>
+    <button class="f-pill" onclick="setStatus(this,'Defaulter')"><span class="material-icons-round stat-dot-defaulter">circle</span>Defaulter</button>
     <div class="f-sep"></div>
     <button class="sort-btn" id="sortBtn" onclick="cycleSort()"><span class="material-icons-round">sort</span><span id="sortLbl">A-Z</span></button>
   </div>
@@ -1270,7 +1280,7 @@ function renderYearsView(body){
   years.forEach(function(y){
     var count=0;Object.keys(typeData[y]).forEach(function(m){count+=typeData[y][m].length;});
     var row=document.createElement('div');row.className='mr-year-row';
-    row.innerHTML='<span class="mr-year-label">'+esc(y)+'</span><span class="mr-year-count">'+count+' reading'+(count!==1?'s':'')+' &#8250;</span>';
+    row.innerHTML='<span class="mr-year-label">'+esc(y)+'</span><span class="mr-year-count">'+count+' reading'+(count!==1?'s':'')+' <span class="material-icons-round" style="font-size:16px;">chevron_right</span></span>';
     row.addEventListener('click',function(){showMonthsForYear(y);});
     frag.appendChild(row);
   });
