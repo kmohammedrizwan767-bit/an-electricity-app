@@ -35,7 +35,7 @@
       --card: #FFFFFF;
       --card-border: #C5D5F0;
       --text: #0A1628;
-      --text-secondary: #3A5A8A;
+      --text-secondary: #3C4A60;
     }
 
     /* ===== RESET ===== */
@@ -547,10 +547,6 @@
     /* ===== OVERLAY ===== */
     .sheet-overlay {
       display: none; position: fixed; inset: 0;
-      /* Step 16b: backdrop-filter: blur(3px) removed — flagged as the one
-         genuinely heavy CSS effect on low-end Android. Compensated with a
-         darker flat background instead of the blur, so the visual weight
-         behind an open sheet is similar without the compositing cost. */
       background: rgba(0,0,0,0.7);
       z-index: 300;
     }
@@ -569,7 +565,6 @@
       transition: transform 0.3s cubic-bezier(0.32, 0.72, 0, 1);
     }
     .bottom-sheet.open { display: block; transform: translateY(0); }
-    /* Consumer view sheet gets more height */
     #sheetViewConsumers { max-height: 95vh; }
     .sheet-handle {
       width: 40px; height: 4px; background: var(--card-border);
@@ -942,14 +937,7 @@
       font-size: 13px; cursor: pointer;
     }
 
-    /* ===== RESPONSIVE: DESKTOP/WIDE-SCREEN (>=960px) =====
-       Same breakpoint and philosophy as index.html: purely additive, no JS
-       changes, phone layout untouched below 960px. Unlike index.html's
-       bottom-nav, .tabs-bar is normal in-flow content here (not fixed), so
-       becoming a rail means position:fixed + offsetting .main-content by the
-       same width -- same net result, different starting point. Rail is wider
-       than index.html's (220px vs 96px) because these buttons carry full text
-       labels ("Offices", "Requests"), not just an icon + tiny caption. */
+    /* ===== RESPONSIVE: DESKTOP/WIDE-SCREEN (>=960px) ===== */
     @media (min-width:960px){
       :root{--rail-w:220px}
       .main-content{margin-left:var(--rail-w);max-width:1400px;}
@@ -1216,7 +1204,6 @@
     <div class="sheet-title" id="vcOfficeName">Consumers</div>
     <div class="sheet-subtitle" id="vcSubtitle">Loading...</div>
   </div>
-  <!-- Select bar — appears on 500ms long press -->
   <div class="vc-select-bar" id="vcSelectBar">
     <button class="vc-select-close" onclick="vcExitSelect()">
       <span class="material-icons-round">close</span>
@@ -1227,7 +1214,6 @@
       Delete
     </button>
   </div>
-  <!-- Search bar — sticky inside the sheet scroll container -->
   <div class="vc-search-wrap">
     <div class="vc-search-inner">
       <span class="material-icons-round search-icon">search</span>
@@ -1235,9 +1221,7 @@
         placeholder="Search by name, ConNo or meter no..." autocomplete="off" />
     </div>
   </div>
-  <!-- Record count -->
   <div class="vc-count-bar" id="vcCountBar"></div>
-  <!-- Consumer list -->
   <div class="vc-list" id="vcList"></div>
 </div>
 
@@ -1513,7 +1497,6 @@
    ============================================= */
 const API_URL = 'https://script.google.com/macros/s/AKfycbyeO7pIZrT1WKPHHuR8LKxhPKgf4uELmkSkIgUefNwT88JdCBiAoTAfgKTyCBKEMmBowQ/exec';
 
-// All bottom sheet IDs — keep in sync when adding new sheets
 const ALL_SHEETS = ['sheetAddOffice','sheetApproveReq','sheetChangePwd','sheetViewConsumers','sheetVCDetail','sheetVCEdit','sheetVCDel','sheetVCBulkDel','sheetOfficeTog','sheetMRHistory','sheetMRForm','sheetMRDel'];
 
 let session         = null;
@@ -1523,9 +1506,6 @@ let pendingRequestId = null;
 let toastTimer      = null;
 let isDark          = true;
 
-/* =============================================
-   UTILITIES
-   ============================================= */
 function esc(v) {
   if (v == null) return '';
   return String(v)
@@ -1570,14 +1550,11 @@ function ripple(btn, e) {
   sp.addEventListener('animationend', () => sp.remove());
 }
 
-/* =============================================
-   SHEET HELPERS
-   ============================================= */
 function showSheet(id) {
   document.getElementById('overlay').classList.add('open');
   const el = document.getElementById(id);
   el.style.display = 'block';
-  el.offsetHeight; // force reflow so CSS transition plays
+  el.offsetHeight;
   el.classList.add('open');
 }
 
@@ -1601,9 +1578,6 @@ function hideAllSheets() {
   document.getElementById('overlay').classList.remove('open');
 }
 
-/* =============================================
-   THEME
-   ============================================= */
 function applyTheme(dark) {
   isDark = dark;
   document.body.className = dark ? 'dark-mode' : 'light-mode';
@@ -1611,9 +1585,6 @@ function applyTheme(dark) {
   localStorage.setItem('an_theme', dark ? 'dark' : 'light');
 }
 
-/* =============================================
-   TABS
-   ============================================= */
 function switchTab(name) {
   document.querySelectorAll('.tab-btn').forEach(b =>
     b.classList.toggle('active', b.dataset.tab === name));
@@ -1621,9 +1592,6 @@ function switchTab(name) {
     el.classList.toggle('active', el.id === 'tab-' + name));
 }
 
-/* =============================================
-   API CALL
-   ============================================= */
 async function api(body) {
   const ctrl = new AbortController();
   const t = setTimeout(() => ctrl.abort(), 30000);
@@ -1641,9 +1609,6 @@ async function api(body) {
   }
 }
 
-/* =============================================
-   SKELETONS
-   ============================================= */
 function skeletons(containerId, n = 3) {
   document.getElementById(containerId).innerHTML =
     Array.from({length: n}, () => `
@@ -1655,7 +1620,6 @@ function skeletons(containerId, n = 3) {
 }
 
 function vcSkeletons(n) {
-  // Smaller skeleton for consumer cards inside the vc sheet
   return Array.from({length: n}, () => `
     <div class="skeleton" style="border-radius:14px;padding:12px 14px;margin-bottom:10px;">
       <div class="sk-line w30"></div>
@@ -1664,9 +1628,6 @@ function vcSkeletons(n) {
     </div>`).join('');
 }
 
-/* =============================================
-   RENDER OFFICES
-   ============================================= */
 function renderOffices(list) {
   const el = document.getElementById('officesList');
   if (!list?.length) {
@@ -1736,9 +1697,6 @@ function renderOffices(list) {
   }).join('');
 }
 
-/* =============================================
-   RENDER REQUESTS
-   ============================================= */
 function renderRequests(list) {
   const el = document.getElementById('requestsList');
   if (!list?.length) {
@@ -1782,9 +1740,6 @@ function renderRequests(list) {
   }).join('');
 }
 
-/* =============================================
-   LOAD DASHBOARD DATA
-   ============================================= */
 async function loadData() {
   const dot      = document.getElementById('syncDot');
   const syncText = document.getElementById('syncText');
@@ -1799,7 +1754,6 @@ async function loadData() {
       api({ action: 'getOfficeRequests', token: session.token })
     ]);
 
-    // Session expired — clear vault and redirect to login
     if (checkUnauthorized(offRes)) return;
 
     if (offRes.success) {
@@ -1854,9 +1808,6 @@ async function loadData() {
   }
 }
 
-/* =============================================
-   ADD OFFICE
-   ============================================= */
 async function handleAddOffice() {
   const officeName    = document.getElementById('newOfficeName').value.trim();
   const adminFullName = document.getElementById('newAdminFullName').value.trim();
@@ -1906,9 +1857,6 @@ async function handleAddOffice() {
   }
 }
 
-/* =============================================
-   APPROVE REQUEST
-   ============================================= */
 function openApproveSheet(requestId, officeName) {
   pendingRequestId = requestId;
   document.getElementById('approveSubtitle').textContent =
@@ -1969,9 +1917,6 @@ async function handleApproveRequest() {
   }
 }
 
-/* =============================================
-   CHANGE PASSWORD
-   ============================================= */
 async function handleChangePwd() {
   const curr    = document.getElementById('currPwd').value;
   const newP    = document.getElementById('newPwd').value;
@@ -2013,32 +1958,25 @@ async function handleChangePwd() {
   }
 }
 
-/* =============================================
-   CONSUMER VIEW — SuperAdmin read-only
-   ============================================= */
 let _vc = { sheetId:'', officeName:'', all:[], filtered:[] };
-// Step 11 state
 let _vcSelectMode = false;
 let _vcSelected   = new Set();
-let _vcLongJust   = false;    // prevents click after long press
+let _vcLongJust   = false;
 let vcPressT      = null;
-let _vcDetailC    = null;     // consumer open in detail sheet
-let _vcDelC       = null;     // consumer being single-deleted
+let _vcDetailC    = null;
+let _vcDelC       = null;
 let _vcOfficeTog  = { officeId:'', officeName:'', makeActive:false };
 
-// Step 15: Meter Readings (SuperAdmin) — reuses _vcDetailC / _vc.sheetId for context
 let _mrType      = 'KWH';
-let _mrLevel     = 'years';   // 'years' | 'months'
+let _mrLevel     = 'years';
 let _mrYear      = null;
-let _mrData      = null;      // {KWH:{year:{month:[...]}}, KVAH:{...}} | 'offline' | 'error'
-let _mrEditing   = null;      // reading object being edited, or null when adding
+let _mrData      = null;
+let _mrEditing   = null;
 let _mrDeleteTarget = null;
-let _mrRowLookup = {};        // ReadingID -> reading object, rebuilt each render (safe lookup, no serialized onclick args)
+let _mrRowLookup = {};
 const MONTH_NAMES = ['','January','February','March','April','May','June','July','August','September','October','November','December'];
 
-/** Called by the inline onclick on the office card button */
 function openVCFromBtn(btn) {
-  // dataset.name is HTML-decoded by the browser automatically
   openViewConsumers(btn.dataset.sid, btn.dataset.name);
 }
 
@@ -2047,7 +1985,7 @@ function openViewConsumers(sheetId, officeName) {
     showToast('No sheet linked to this office', 'error');
     return;
   }
-  vcExitSelect(); // reset any active select mode
+  vcExitSelect();
   _vc = { sheetId, officeName, all:[], filtered:[] };
   document.getElementById('vcOfficeName').textContent = officeName;
   document.getElementById('vcSubtitle').textContent   = 'Loading...';
@@ -2064,7 +2002,7 @@ async function fetchOfficeConsumers() {
       action:        'getConsumers',
       token:         session.token,
       sheetName:     'CONSUMER DATA ALL',
-      officeSheetId: _vc.sheetId          // SuperAdmin explicit sheet override
+      officeSheetId: _vc.sheetId
     });
 
     if (checkUnauthorized(res)) return;
@@ -2093,15 +2031,10 @@ async function fetchOfficeConsumers() {
   }
 }
 
-/**
- * Render consumer cards in the view-consumers sheet.
- * Displays up to 200 at a time; search filters the full list.
- */
 function renderVC(list) {
   const total = _vc.all.length;
   const shown = list.length;
 
-  // Update header subtitle + count bar
   document.getElementById('vcSubtitle').textContent =
     total ? `${total} consumers · Read-only` : 'No consumers found';
   document.getElementById('vcCountBar').textContent =
@@ -2159,9 +2092,6 @@ function renderVC(list) {
   }
 }
 
-/* =============================================
-   LOGOUT
-   ============================================= */
 async function handleLogout() {
   try { await api({ action: 'logout', token: session.token }); } catch (_) {}
   AN_DB.clearSession();
@@ -2169,9 +2099,6 @@ async function handleLogout() {
   window.location.replace('./login.html');
 }
 
-/* =============================================
-   PASSWORD EYE TOGGLE
-   ============================================= */
 function setupEyeButtons() {
   document.querySelectorAll('.eye-btn').forEach(btn => {
     btn.addEventListener('click', () => {
@@ -2185,19 +2112,12 @@ function setupEyeButtons() {
   });
 }
 
-/* =============================================
-   ANDROID BACK BUTTON
-   ============================================= */
 window.addEventListener('popstate', () => {
-  // Reading history: step back from months to years before closing anything
   if (document.getElementById('sheetMRHistory')?.classList.contains('open') && _mrLevel === 'months') {
     mrGoBack();
     history.pushState(null, '');
     return;
   }
-  // ALL_SHEETS order matches DOM/visual-stacking order (sheets layer on top of
-  // each other rather than replacing one another) — take the LAST open match,
-  // i.e. the visually topmost sheet, not the first one found.
   const openIds = ALL_SHEETS.filter(id => document.getElementById(id)?.classList.contains('open'));
   const topSheet = openIds[openIds.length - 1];
   if (topSheet) {
@@ -2206,20 +2126,14 @@ window.addEventListener('popstate', () => {
   }
 });
 
-/* =============================================
-   STEP 11 — CONSUMER CRUD + SELECT + OFFICE TOGGLE
-   ============================================= */
-
-/* ── Card click / long press ───────────────────── */
 function onVCCardClick(card) {
-  if (_vcLongJust) { _vcLongJust = false; return; } // long press just fired, skip
+  if (_vcLongJust) { _vcLongJust = false; return; }
   if (_vcSelectMode) { vcToggleSelect(card); return; }
   const idx = parseInt(card.dataset.idx);
   const c = _vc.filtered[idx];
   if (c) openVCDetail(c);
 }
 
-/* ── Select mode ────────────────────────────────── */
 function vcToggleSelect(card) {
   const idx = parseInt(card.dataset.idx);
   if (_vcSelected.has(idx)) {
@@ -2249,7 +2163,6 @@ function vcExitSelect() {
   document.querySelectorAll('#vcList .con-card').forEach(c => c.classList.remove('vc-selected'));
 }
 
-/* ── Consumer detail ────────────────────────────── */
 function openVCDetail(c) {
   _vcDetailC = c;
   document.getElementById('vcd-name').textContent  = c['ConsumerName'] || '—';
@@ -2305,7 +2218,6 @@ function openVCDetail(c) {
   showSheet('sheetVCDetail');
 }
 
-/* ── Consumer edit ──────────────────────────────── */
 function openVCEdit() {
   const c = _vcDetailC;
   if (!c) return;
@@ -2360,11 +2272,11 @@ async function handleVCUpdate() {
     });
     if (checkUnauthorized(res)) return;
     if (res.success) {
-      Object.assign(c, updated); // update in local list
+      Object.assign(c, updated);
       showToast('Consumer updated', 'success');
       hideSheet('sheetVCEdit');
-      openVCDetail(c);           // refresh detail view
-      renderVC(_vc.filtered);    // refresh list
+      openVCDetail(c);
+      renderVC(_vc.filtered);
     } else {
       showToast(res.message || 'Update failed', 'error');
     }
@@ -2375,7 +2287,6 @@ async function handleVCUpdate() {
   }
 }
 
-/* ── Single delete ──────────────────────────────── */
 function openVCDelConfirm() {
   const c = _vcDetailC;
   if (!c) return;
@@ -2419,7 +2330,6 @@ async function handleVCDelete() {
   }
 }
 
-/* ── Bulk delete ────────────────────────────────── */
 function openVCBulkDelete() {
   const n = _vcSelected.size;
   if (!n) return;
@@ -2436,7 +2346,6 @@ function openVCBulkDelete() {
 }
 
 async function handleVCBulkDelete() {
-  // Sort selected indices DESC by _rowIndex to avoid row drift
   const selArr = Array.from(_vcSelected).sort((a, b) => {
     const ca = _vc.filtered[a], cb = _vc.filtered[b];
     return ((cb && cb['_rowIndex']) || 0) - ((ca && ca['_rowIndex']) || 0);
@@ -2488,7 +2397,6 @@ async function handleVCBulkDelete() {
   showToast(msg, failed > 0 ? 'error' : 'success', 4000);
 }
 
-/* ── Office toggle ──────────────────────────────── */
 function openOfficeToggleFromBtn(btn) {
   openOfficeToggle(btn.dataset.oid, btn.dataset.name, btn.dataset.active === 'true');
 }
@@ -2538,13 +2446,6 @@ async function handleOfficeToggle() {
   }
 }
 
-/* =============================================
-   STEP 15 — METER READINGS (SuperAdmin)
-   Full parity with Employee: Year/Month drill-down,
-   add/edit/delete. No role gate on any endpoint —
-   every call just adds officeSheetId: _vc.sheetId.
-   ============================================= */
-
 function mrPreviewLabel(value, at) {
   if (value === '' || value == null) return 'No readings yet';
   const d = fmtDate(at);
@@ -2559,7 +2460,6 @@ function mrSkeleton() {
   </div>`;
 }
 
-/* ── Open history sheet — shows skeleton immediately, fetches in parallel ── */
 function openReadingSheet(type) {
   _mrType  = type;
   _mrLevel = 'years';
@@ -2569,7 +2469,7 @@ function openReadingSheet(type) {
   document.getElementById('mrHistTitle').textContent = type + ' Readings';
   document.getElementById('mrHistSub').textContent   = _vcDetailC ? (_vcDetailC['ConsumerName'] || '') : '';
   document.getElementById('mrHistBody').innerHTML    = mrSkeleton();
-  showSheet('sheetMRHistory');       // sheetVCDetail stays open underneath — existing layering convention
+  showSheet('sheetMRHistory');
   fetchReadingDataQuiet();
 }
 
@@ -2611,7 +2511,6 @@ function renderMRBody() {
   else renderMRYearsView();
 }
 
-/* ── Years view ─────────────────────────────────── */
 function renderMRYearsView() {
   document.getElementById('mrBackBtn').classList.remove('show');
   document.getElementById('mrHistTitle').textContent = _mrType + ' Readings';
@@ -2653,7 +2552,6 @@ function mrGoBack() {
   renderMRYearsView();
 }
 
-/* ── Months view — readings grouped by month, shown directly (2-level drill-down) ── */
 function renderMRMonthsView() {
   document.getElementById('mrBackBtn').classList.add('show');
   document.getElementById('mrHistTitle').textContent = _mrYear;
@@ -2679,9 +2577,6 @@ function renderMRMonthsView() {
   }).join('');
 }
 
-/* ── Reading row — only a UUID goes into the DOM attribute; the actual  ── */
-/* ── reading object is looked up from _mrRowLookup on click (safe        ── */
-/* ── pattern — no values serialized into inline onclick args)            ── */
 function makeReadingRow(r) {
   _mrRowLookup[r.ReadingID] = r;
   const d = new Date(r.Timestamp);
@@ -2705,13 +2600,12 @@ function makeReadingRow(r) {
 function mrEditClick(btn)   { openReadingForm(_mrRowLookup[btn.dataset.rid]); }
 function mrDeleteClick(btn) { confirmDeleteReading(_mrRowLookup[btn.dataset.rid]); }
 
-/* ── Add / Edit form ────────────────────────────── */
 function openReadingForm(reading) {
   _mrEditing = reading || null;
   document.getElementById('mrFormTitle').textContent = reading ? 'Edit Reading' : 'Add Reading';
   document.getElementById('mrFormSub').textContent   = _mrType + (reading ? ' · ' + fmtDate(reading.Timestamp) : ' · Logged as now');
   document.getElementById('mrFormValue').value        = reading ? reading.Value : '';
-  showSheet('sheetMRForm');           // sheetMRHistory stays open underneath
+  showSheet('sheetMRForm');
 }
 
 function cancelReadingForm() {
@@ -2751,7 +2645,7 @@ async function saveReading() {
     if (res.success) {
       showToast(_mrEditing ? 'Reading updated' : 'Reading added', 'success');
       hideSheet('sheetMRForm');
-      await fetchReadingDataQuiet();      // refetch fresh, THEN re-render — avoids a stale flash
+      await fetchReadingDataQuiet();
       _mrLevel === 'months' ? renderMRMonthsView() : renderMRYearsView();
       refreshDetailPreview();
     } else {
@@ -2765,7 +2659,6 @@ async function saveReading() {
   }
 }
 
-/* ── Delete ─────────────────────────────────────── */
 function confirmDeleteReading(reading) {
   if (!reading) return;
   _mrDeleteTarget = reading;
@@ -2774,7 +2667,7 @@ function confirmDeleteReading(reading) {
   const btn = document.getElementById('mrDelBtn');
   btn.disabled = false;
   btn.innerHTML = '<span class="material-icons-round">delete_forever</span> Yes, Delete Reading';
-  showSheet('sheetMRDel');            // sheetMRHistory stays open underneath
+  showSheet('sheetMRDel');
 }
 
 function cancelReadingDelete() {
@@ -2813,10 +2706,6 @@ async function doDeleteReading() {
   }
 }
 
-/* ── Keep the detail-sheet preview badges in sync after any change ─────────── */
-/* ── Recomputes "latest" client-side from freshly-fetched _mrData — zero      ── */
-/* ── extra API call — and mutates _vcDetailC in place (same object reference  ── */
-/* ── as the entry in _vc.all/_vc.filtered) so the underlying list stays fresh ── */
 function mrLatestFromData(type) {
   const yearsObj = (_mrData && typeof _mrData === 'object') ? _mrData[type] : null;
   if (!yearsObj) return { value:'', at:'' };
@@ -2844,11 +2733,6 @@ function refreshDetailPreview() {
   }
 }
 
-/* =============================================
-   UNAUTHORIZED HANDLER
-   Clears vault + session and redirects to login
-   Called whenever any API returns UNAUTHORIZED
-   ============================================= */
 function checkUnauthorized(res) {
   if (!res) return false;
   if (res.code === 'UNAUTHORIZED' ||
@@ -2863,14 +2747,9 @@ function checkUnauthorized(res) {
   return false;
 }
 
-/* =============================================
-   INIT
-   ============================================= */
 async function init() {
-  // Theme
   applyTheme(localStorage.getItem('an_theme') !== 'light');
 
-  // Session check — SuperAdmin only
   session = AN_DB.getSession();
   if (!session?.token) {
     window.location.replace('./login.html'); return;
@@ -2879,14 +2758,12 @@ async function init() {
     window.location.replace('./index.html'); return;
   }
 
-  // Profile UI
   const initials = (session.fullName || 'SA')
     .split(' ').map(n => n[0]).join('').substring(0,2).toUpperCase();
   document.getElementById('profileAvatar').textContent = initials;
   document.getElementById('profileName').textContent   =
     session.fullName || 'Super Admin';
 
-  // Show app, hide splash
   setTimeout(() => {
     document.getElementById('splash').classList.add('hide');
     setTimeout(() => {
@@ -2898,12 +2775,8 @@ async function init() {
   setTimeout(loadData, 950);
   history.pushState(null, '');
 
-  /* ---- Event Listeners ---- */
-
-  // Theme
   document.getElementById('themeToggle').addEventListener('click', () => applyTheme(!isDark));
 
-  // Profile dropdown
   document.getElementById('profileAvatar').addEventListener('click', e => {
     e.stopPropagation();
     document.getElementById('profileDropdown').classList.toggle('open');
@@ -2912,39 +2785,31 @@ async function init() {
     document.getElementById('profileDropdown').classList.remove('open');
   });
 
-  // Profile menu items
   document.getElementById('changePwdMenuBtn').addEventListener('click', () => {
     document.getElementById('profileDropdown').classList.remove('open');
     showSheet('sheetChangePwd');
   });
   document.getElementById('logoutBtn').addEventListener('click', handleLogout);
 
-  // Add office
   document.getElementById('addOfficeBtn').addEventListener('click', () =>
     showSheet('sheetAddOffice'));
   document.getElementById('submitAddOffice').addEventListener('click', handleAddOffice);
 
-  // Approve request
   document.getElementById('submitApproveReq').addEventListener('click', handleApproveRequest);
 
-  // Change password
   document.getElementById('submitChangePwd').addEventListener('click', handleChangePwd);
 
-  // Tabs
   document.querySelectorAll('.tab-btn').forEach(btn =>
     btn.addEventListener('click', () => switchTab(btn.dataset.tab)));
 
-  // Overlay click → close all sheets
   document.getElementById('overlay').addEventListener('click', hideAllSheets);
 
-  // Sync refresh
   const refreshBtn = document.getElementById('syncRefreshBtn');
   refreshBtn.addEventListener('click', () => {
     refreshBtn.classList.add('spinning');
     loadData().finally(() => refreshBtn.classList.remove('spinning'));
   });
 
-  // Consumer view search (live filter)
   document.getElementById('vcSearch').addEventListener('input', function() {
     const q = this.value.trim().toLowerCase();
     _vc.filtered = q
@@ -2956,10 +2821,9 @@ async function init() {
     renderVC(_vc.filtered);
   });
 
-  // ── Step 11: Long press detection on consumer list (event delegation) ────────
   const vcListEl = document.getElementById('vcList');
   vcListEl.addEventListener('touchstart', function(e) {
-    if (_vcSelectMode) return; // already in select mode
+    if (_vcSelectMode) return;
     const card = e.target.closest('.con-card');
     if (!card) return;
     vcPressT = setTimeout(() => {
@@ -2975,21 +2839,16 @@ async function init() {
   vcListEl.addEventListener('touchend',  () => { clearTimeout(vcPressT); vcPressT = null; }, { passive: true });
   vcListEl.addEventListener('touchmove', () => { clearTimeout(vcPressT); vcPressT = null; }, { passive: true });
 
-  // ── Step 11: Consumer detail actions ────────────────────────────────────────
   document.getElementById('vcd-edit-btn').addEventListener('click', openVCEdit);
   document.getElementById('vcd-del-btn').addEventListener('click', openVCDelConfirm);
 
-  // ── Step 11: Edit save ───────────────────────────────────────────────────────
   document.getElementById('vce-save-btn').addEventListener('click', handleVCUpdate);
 
-  // ── Step 11: Delete confirmations ────────────────────────────────────────────
   document.getElementById('vcdel-btn').addEventListener('click', handleVCDelete);
   document.getElementById('vcbdel-btn').addEventListener('click', handleVCBulkDelete);
 
-  // ── Step 11: Office toggle confirm ───────────────────────────────────────────
   document.getElementById('otog-btn').addEventListener('click', handleOfficeToggle);
 
-  // Eye buttons (password fields)
   setupEyeButtons();
 }
 
