@@ -536,8 +536,12 @@
     /* ===== OVERLAY ===== */
     .sheet-overlay {
       display: none; position: fixed; inset: 0;
-      background: rgba(0,0,0,0.6);
-      z-index: 300; backdrop-filter: blur(3px);
+      /* Step 16b: backdrop-filter: blur(3px) removed — flagged as the one
+         genuinely heavy CSS effect on low-end Android. Compensated with a
+         darker flat background instead of the blur, so the visual weight
+         behind an open sheet is similar without the compositing cost. */
+      background: rgba(0,0,0,0.7);
+      z-index: 300;
     }
     .sheet-overlay.open { display: block; }
 
