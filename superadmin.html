@@ -941,6 +941,25 @@
       text-align: center; padding: 32px 12px; color: var(--text-secondary);
       font-size: 13px; cursor: pointer;
     }
+
+    /* ===== RESPONSIVE: DESKTOP/WIDE-SCREEN (>=960px) =====
+       Same breakpoint and philosophy as index.html: purely additive, no JS
+       changes, phone layout untouched below 960px. Unlike index.html's
+       bottom-nav, .tabs-bar is normal in-flow content here (not fixed), so
+       becoming a rail means position:fixed + offsetting .main-content by the
+       same width -- same net result, different starting point. Rail is wider
+       than index.html's (220px vs 96px) because these buttons carry full text
+       labels ("Offices", "Requests"), not just an icon + tiny caption. */
+    @media (min-width:960px){
+      :root{--rail-w:220px}
+      .main-content{margin-left:var(--rail-w);max-width:1400px;}
+      .tabs-bar{position:fixed;top:56px;left:0;bottom:0;width:var(--rail-w);flex-direction:column;border-radius:0;border:none;border-right:1px solid var(--card-border);padding:16px 8px;z-index:50;}
+      .tab-btn{flex:none;justify-content:flex-start;padding:10px 14px;}
+      #officesList,#requestsList{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:12px;align-items:start;}
+      #officesList .office-card,#requestsList .request-card{margin-bottom:0;}
+      .bottom-sheet{left:50%;right:auto;width:100%;max-width:480px;transform:translate(-50%,100%);}
+      .bottom-sheet.open{transform:translate(-50%,0);}
+    }
   </style>
 </head>
 <body class="dark-mode">
