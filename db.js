@@ -1,6 +1,6 @@
 /**
  * A&N Electricity Consumer Manager — IndexedDB Wrapper (db.js)
- * Version: 1.0.0
+ * Version: 1.1.0
  *
  * Database : an_elect_db  (version 1)
  * Stores   :
@@ -160,6 +160,11 @@ const AN_DB = (() => {
    * Uses a single transaction: clears old data then inserts all new records atomically.
    * Call after a successful full fetch from Google Sheets.
    *
+   * NOTE (Step 13 Phase 2): backgroundFullSync no longer calls this — it calls
+   * mergeLiteConsumers() instead, so a lite sync can't wipe out previously-cached
+   * full detail. Left in place, unused, in case a future "hard refresh" needs a
+   * true full replace.
+   *
    * @param {Array<object>} consumers  Array of consumer objects (must have .conNo)
    * @returns {Promise<number>}        Count of records written
    */
@@ -181,6 +186,71 @@ const AN_DB = (() => {
       };
       tx.onerror  = () => reject(tx.error);
       tx.onabort  = () => reject(new Error('setAllConsumers: transaction aborted'));
+    });
+  }
+
+  /**
+   * Fields returned by the server's "lite" getConsumers mode — exactly what
+   * search/filter/sort/list-display/bulk-actions/OCR-match need. Kept as a
+   * single list so the merge logic below and the sync caller can't drift apart.
+   */
+  const LITE_FIELDS = ['conNo', 'consumerName', 'address', 'meterNo', 'transfCode', 'phoneNo', 'status', 'sdPassbookNo', '_rowIndex'];
+
+  /**
+   * Merge a fresh "lite" server list into the local cache WITHOUT discarding
+   * previously-fetched full detail (SD amount/date, lab no, audit fields,
+   * custom field values, latest readings) for records that haven't changed.
+   *
+   * For each incoming record:
+   *   - New record (never cached before)  → stored lite-only, _full: false
+   *   - Cached, lite fields unchanged     → full detail kept, _full stays as-is
+   *   - Cached, a lite field DID change   → full detail fields kept in the cache,
+   *                                         but _full is forced to false — something
+   *                                         changed server-side, safest to refetch
+   *                                         full detail next time it's opened
+   *
+   * Records no longer present in the incoming list (deleted elsewhere) are dropped.
+   * Same single-transaction clear+rewrite pattern as setAllConsumers.
+   *
+   * @param {Array<object>} liteList  Normalized lite consumer objects
+   * @returns {Promise<number>}       Count of records now cached
+   */
+  async function mergeLiteConsumers(liteList) {
+    await open();
+    const existing = await getAllConsumers();
+    const byConNo = {};
+    existing.forEach(c => { byConNo[c.conNo] = c; });
+
+    const incoming = new Set();
+    const merged = liteList.map(liteC => {
+      incoming.add(liteC.conNo);
+      const prev = byConNo[liteC.conNo];
+
+      if (!prev) {
+        const fresh = { _full: false };
+        LITE_FIELDS.forEach(k => { fresh[k] = liteC[k]; });
+        return fresh;
+      }
+
+      const changed = LITE_FIELDS.some(k => k !== '_rowIndex' && prev[k] !== liteC[k]);
+      const base = Object.assign({}, prev, changed ? { _full: false } : null);
+      LITE_FIELDS.forEach(k => { base[k] = liteC[k]; });
+      return base;
+    });
+
+    const finalList = merged.filter(c => incoming.has(c.conNo));
+
+    return new Promise((resolve, reject) => {
+      const tx  = _db.transaction('consumers', 'readwrite');
+      const idb = tx.objectStore('consumers');
+      idb.clear();
+      for (const c of finalList) idb.put(c);
+      tx.oncomplete = () => {
+        console.log(`[DB] Merged ${finalList.length} lite consumers`);
+        resolve(finalList.length);
+      };
+      tx.onerror = () => reject(tx.error);
+      tx.onabort = () => reject(new Error('mergeLiteConsumers: transaction aborted'));
     });
   }
 
@@ -420,6 +490,7 @@ const AN_DB = (() => {
 
     // Consumers
     setAllConsumers,
+    mergeLiteConsumers,
     getAllConsumers,
     getConsumer,
     upsertConsumer,

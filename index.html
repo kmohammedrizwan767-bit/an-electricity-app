@@ -116,6 +116,7 @@
   .det-actions{display:flex;gap:10px;margin-top:16px}
   .det-btn{flex:1;height:46px;border-radius:var(--rb);border:none;font-family:var(--fd);font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;transition:opacity .2s}
   .det-btn:active{opacity:.7}
+  .det-btn:disabled{opacity:.55;cursor:not-allowed;}
   .det-btn .material-icons-round{font-size:16px}
   .det-edit{background:rgba(0,82,180,.1);color:var(--primary)}
   [data-theme=dark] .det-edit{background:rgba(25,118,210,.15)}
@@ -668,11 +669,11 @@ function setupSwipeClose(){
     el.addEventListener('touchmove',e=>{if(e.touches[0].clientY-startY>70)closeSheet();},{passive:true});
   });
 }
-function normalize(c){
+function normalize(c,isFull){
   function get(){for(var i=0;i<arguments.length;i++){var v=c[arguments[i]];if(v!==undefined&&v!==null&&String(v).trim()!==''&&String(v).trim()!=='0')return String(v).trim();}return '';}
   function getRaw(){for(var i=0;i<arguments.length;i++){var v=c[arguments[i]];if(v!==undefined&&v!==null&&String(v).trim()!=='')return String(v).trim();}return '';}
   var mr=c['MeterNo']||c.meterNo||c['Meter No']||'';
-  var result={_rowIndex:c._rowIndex||0,sNo:get('S.No.','sNo'),conNo:get('ConNo','conNo'),consumerName:get('ConsumerName','Consumer Name','consumerName'),address:get('Address','address'),labNo:get('LabNo','labNo','Lab No'),meterNo:mr?String(mr).trim():'',transfCode:get('TransfCode','transfCode','Transf Code','AreaCode','areaCode'),phoneNo:get('PhoneNo','phoneNo','Phone','phone'),status:get('Status','status')||'Active',lastEditedBy:get('LastEditedBy','lastEditedBy'),lastEditedAt:get('LastEditedAt','lastEditedAt'),createdAt:get('CreatedAt','createdAt'),sdPassbookNo:get('Passbook/SD No','sdPassbookNo'),sdAmount:get('SD Amount','sdAmount'),sdDate:get('SD Date','sdDate'),latestKwh:getRaw('LatestKWH','latestKwh'),latestKwhAt:getRaw('LatestKWHAt','latestKwhAt'),latestKvah:getRaw('LatestKVAH','latestKvah'),latestKvahAt:getRaw('LatestKVAHAt','latestKvahAt')};
+  var result={_rowIndex:c._rowIndex||0,_full:isFull===true,sNo:get('S.No.','sNo'),conNo:get('ConNo','conNo'),consumerName:get('ConsumerName','Consumer Name','consumerName'),address:get('Address','address'),labNo:get('LabNo','labNo','Lab No'),meterNo:mr?String(mr).trim():'',transfCode:get('TransfCode','transfCode','Transf Code','AreaCode','areaCode'),phoneNo:get('PhoneNo','phoneNo','Phone','phone'),status:get('Status','status')||'Active',lastEditedBy:get('LastEditedBy','lastEditedBy'),lastEditedAt:get('LastEditedAt','lastEditedAt'),createdAt:get('CreatedAt','createdAt'),sdPassbookNo:get('Passbook/SD No','sdPassbookNo'),sdAmount:get('SD Amount','sdAmount'),sdDate:get('SD Date','sdDate'),latestKwh:getRaw('LatestKWH','latestKwh'),latestKwhAt:getRaw('LatestKWHAt','latestKwhAt'),latestKvah:getRaw('LatestKVAH','latestKvah'),latestKvahAt:getRaw('LatestKVAHAt','latestKvahAt')};
   var known=['S.No.','sNo','ConNo','conNo','ConsumerName','Consumer Name','consumerName','Address','address','LabNo','labNo','Lab No','MeterNo','meterNo','Meter No','TransfCode','transfCode','Transf Code','AreaCode','areaCode','PhoneNo','phoneNo','Phone','phone','Status','status','LastEditedBy','lastEditedBy','LastEditedAt','lastEditedAt','CreatedAt','createdAt','Passbook/SD No','sdPassbookNo','SD Amount','sdAmount','SD Date','sdDate','LatestKWH','latestKwh','LatestKWHAt','latestKwhAt','LatestKVAH','latestKvah','LatestKVAHAt','latestKvahAt','_rowIndex'];
   Object.keys(c).forEach(function(k){if(known.indexOf(k)===-1)result[k]=(c[k]!==undefined&&c[k]!==null)?String(c[k]).trim():'';});
   return result;
@@ -733,13 +734,13 @@ async function backgroundFullSync(){
   try{
     var controller=new AbortController();
     var tid=setTimeout(function(){controller.abort();},60000);
-    var res=await fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({action:'getConsumers',token:session.token,officeId:session.officeId,sheetName:'CONSUMER DATA ALL'}),redirect:'follow',signal:controller.signal});
+    var res=await fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({action:'getConsumers',token:session.token,officeId:session.officeId,sheetName:'CONSUMER DATA ALL',lite:true}),redirect:'follow',signal:controller.signal});
     clearTimeout(tid);
     var json=await res.json();
     if(json.success&&Array.isArray(json.data)){
-      var list=json.data.map(normalize);
-      await AN_DB.setAllConsumers(list);await AN_DB.setLastSync(Date.now());
-      masterList=list;resetAndLoad();setSync('online','Synced');
+      var list=json.data.map(function(c){return normalize(c,false);});
+      await AN_DB.mergeLiteConsumers(list);await AN_DB.setLastSync(Date.now());
+      masterList=await AN_DB.getAllConsumers();resetAndLoad();setSync('online','Synced');
     }else if(json.code==='UNAUTHORIZED'||json.error==='SESSION_EXPIRED'){
       localStorage.removeItem('an_bio_vault');await AN_DB.clearSession();alert('Session expired. Please log in again.');location.replace('./login.html');
     }else{setSync('online','Loaded from cache');console.warn('[App]',json.message||json.error);}
@@ -768,35 +769,72 @@ function makeCard(c){
   return div;
 }
 function renderSkeleton(){$('emptyState').classList.add('hidden');$('consumerList').innerHTML=Array(6).fill('<div class="skeleton"><div class="sk-row"><div class="sk" style="width:30%;height:11px"></div><div class="sk" style="width:18%;height:11px"></div></div><div class="sk" style="width:62%;height:14px;margin-bottom:8px"></div><div class="sk" style="width:42%;height:11px"></div></div>').join('');}
-function openDetail(c){
-  lastScrollY=window.scrollY;
-  $('detName').textContent=c.consumerName||'—';
-  $('detConno').textContent='Consumer No: '+(c.conNo||'—');
+let _detailOpenConNo=null;
+/* Renders the detFields body from whatever c currently has — called once
+   immediately on open (lite data, full-only rows show "…"), and again if a
+   background hydration fetch fills in the rest while the sheet is still open. */
+function renderDetailFields(c){
   var fh='';
   function af(lbl,val){fh+='<div class="det-field"><span class="det-label">'+lbl+'</span><span class="det-value">'+val+'</span></div>';}
-  af('Serial No',esc(c.sNo||'—'));af('Meter No',esc(c.meterNo||'—'));af('Area Code',esc(c.transfCode||'—'));af('Address',esc(c.address||'—'));af('Lab No',esc(c.labNo||'—'));
+  af('Serial No',c.sNo?esc(c.sNo):(c._full?'—':'…'));
+  af('Meter No',esc(c.meterNo||'—'));af('Area Code',esc(c.transfCode||'—'));af('Address',esc(c.address||'—'));
+  af('Lab No',c.labNo?esc(c.labNo):(c._full?'—':'…'));
   if(c.phoneNo){var cl=c.phoneNo.replace(/[^0-9]/g,'');fh+='<div class="det-field"><span class="det-label">Phone</span><div class="det-phone-row"><span class="det-phone-num">'+esc(c.phoneNo)+'</span><a href="tel:'+esc(c.phoneNo)+'" class="det-phone-btn call"><span class="material-icons-round">call</span>Call</a>'+(cl.length>=10?'<a href="https://wa.me/91'+cl.slice(-10)+'" target="_blank" rel="noopener" class="det-phone-btn wa"><span class="material-icons-round">message</span>WA</a>':'')+'</div></div>';}
   else af('Phone','—');
   var st=(c.status||'Active').toLowerCase();fh+='<div class="det-field"><span class="det-label">Status</span><span class="det-badge '+st+'">'+esc(c.status||'Active')+'</span></div>';
-  af('Last Edited By',esc(c.lastEditedBy||'—'));af('Created',esc(formatDate(c.createdAt)));
+  af('Last Edited By',c.lastEditedBy?esc(c.lastEditedBy):(c._full?'—':'…'));
+  af('Created',c._full?esc(formatDate(c.createdAt)):'…');
   fh+='<div class="det-section-hdr">Security Deposit</div>';
   af('Passbook/SD No',esc(c.sdPassbookNo||'—'));
-  af('SD Amount',c.sdAmount?'&#8377; '+esc(c.sdAmount):'—');
-  af('SD Date',c.sdDate?esc(formatDate(c.sdDate)):'—');
+  af('SD Amount',c._full?(c.sdAmount?'&#8377; '+esc(c.sdAmount):'—'):'…');
+  af('SD Date',c._full?(c.sdDate?esc(formatDate(c.sdDate)):'—'):'…');
   fh+='<div class="det-section-hdr">Meter Readings</div>';
-  fh+='<div class="det-field det-field-link" id="detReadKwh"><span class="det-label">Reading (KWH)</span><span class="det-value det-link-val">'+mrPreviewLabel(c.latestKwh,c.latestKwhAt)+'<span class="material-icons-round">chevron_right</span></span></div>';
-  fh+='<div class="det-field det-field-link" id="detReadKvah"><span class="det-label">Reading (KVAH)</span><span class="det-value det-link-val">'+mrPreviewLabel(c.latestKvah,c.latestKvahAt)+'<span class="material-icons-round">chevron_right</span></span></div>';
-  var cfList=activeFieldsList();
-  if(cfList.length){
-    fh+='<div class="det-section-hdr">Additional Details</div>';
-    cfList.forEach(function(f){var lbl=f['FieldLabel']||'';af(esc(lbl),esc(c[lbl]||'—'));});
+  fh+='<div class="det-field det-field-link" id="detReadKwh"><span class="det-label">Reading (KWH)</span><span class="det-value det-link-val">'+(c._full?mrPreviewLabel(c.latestKwh,c.latestKwhAt):'…')+'<span class="material-icons-round">chevron_right</span></span></div>';
+  fh+='<div class="det-field det-field-link" id="detReadKvah"><span class="det-label">Reading (KVAH)</span><span class="det-value det-link-val">'+(c._full?mrPreviewLabel(c.latestKvah,c.latestKvahAt):'…')+'<span class="material-icons-round">chevron_right</span></span></div>';
+  if(c._full){
+    var cfList=activeFieldsList();
+    if(cfList.length){
+      fh+='<div class="det-section-hdr">Additional Details</div>';
+      cfList.forEach(function(f){var lbl=f['FieldLabel']||'';af(esc(lbl),esc(c[lbl]||'—'));});
+    }
   }
   $('detFields').innerHTML=fh;
   $('detReadKwh').addEventListener('click',function(){openReadingSheet(c.conNo,c.consumerName,'KWH');});
   $('detReadKvah').addEventListener('click',function(){openReadingSheet(c.conNo,c.consumerName,'KVAH');});
+}
+/* Fetches ONE consumer's full record (getConsumerDetail), updates masterList/
+   filtered/IndexedDB in place, and returns it (or null on failure). Shared by
+   the detail sheet's quiet background hydration and Edit's blocking fetch. */
+async function fetchAndHydrateConsumer(conNo){
+  if(!session||!session.token)return null;
+  try{
+    var controller=new AbortController();var tid=setTimeout(function(){controller.abort();},TIMEOUT);
+    var res=await fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({action:'getConsumerDetail',token:session.token,officeId:session.officeId,conNo:conNo}),redirect:'follow',signal:controller.signal});clearTimeout(tid);
+    var json=await res.json();
+    if(!json.success||!json.consumer)return null;
+    var full=normalize(json.consumer,true);
+    var idx=masterList.findIndex(function(x){return x.conNo===conNo;});
+    if(idx!==-1)masterList[idx]=full;else masterList.push(full);
+    var fidx=filtered.findIndex(function(x){return x.conNo===conNo;});
+    if(fidx!==-1)filtered[fidx]=full;
+    try{await AN_DB.upsertConsumer(full);}catch(e){}
+    return full;
+  }catch(e){return null;}
+}
+function openDetail(c){
+  lastScrollY=window.scrollY;
+  _detailOpenConNo=c.conNo;
+  $('detName').textContent=c.consumerName||'—';
+  $('detConno').textContent='Consumer No: '+(c.conNo||'—');
+  renderDetailFields(c);
   var delBtn=isAdmin?'<button class="det-btn det-del" onclick="confirmDelete('+c._rowIndex+',\''+esc(c.conNo)+'\',\''+esc(c.consumerName)+'\')"><span class="material-icons-round">delete</span>Delete</button>':'';
   $('detActions').innerHTML='<button class="det-btn det-edit" onclick="openEditForm(\''+esc(c.conNo)+'\')"><span class="material-icons-round">edit</span>Edit</button>'+delBtn;
   openSheet('detailSheet');
+  if(!c._full&&navigator.onLine){
+    fetchAndHydrateConsumer(c.conNo).then(function(full){
+      if(full&&_detailOpenConNo===c.conNo&&activeSheet==='detailSheet')renderDetailFields(full);
+    });
+  }
 }
 $('searchInp').addEventListener('input',function(e){searchQ=e.target.value;$('sClear').classList.toggle('hidden',!searchQ);clearTimeout(searchT);searchT=setTimeout(resetAndLoad,120);});
 function clearSearch(){$('searchInp').value='';searchQ='';$('sClear').classList.add('hidden');resetAndLoad();}
@@ -876,10 +914,20 @@ function openAddForm(){
   $('cfErr').classList.remove('show');$('cfErrMsg').textContent='';$('cfBtn').classList.remove('loading');
   openSheet('cfSheet');setTimeout(function(){$('cfConNo').focus();},380);
 }
-function openEditForm(conNo){
-  var c=filtered.find(function(x){return x.conNo===conNo;});
+async function openEditForm(conNo){
+  var c=filtered.find(function(x){return x.conNo===conNo;})||masterList.find(function(x){return x.conNo===conNo;});
   if(!c){toast('Consumer not found. Please reload.','err');return;}
   if(!c._rowIndex){toast('Row index missing. Please reload app.','err');return;}
+  if(c._full){closeSheet();setTimeout(function(){openEditFormWithData(c);},200);return;}
+  if(!navigator.onLine){toast('Connect to the internet to edit this consumer.','err');return;}
+  var editBtn=document.querySelector('#detActions .det-edit');
+  if(editBtn)editBtn.disabled=true;
+  var full=await fetchAndHydrateConsumer(conNo);
+  if(editBtn)editBtn.disabled=false;
+  if(!full){toast('Could not load consumer details. Please try again.','err');return;}
+  closeSheet();setTimeout(function(){openEditFormWithData(full);},200);
+}
+function openEditFormWithData(c){
   CF.mode='edit';CF.consumer=c;
   $('cfTitle').textContent='Edit Consumer';$('cfBtnLbl').textContent='Save Changes';
   $('cfConNo').value=c.conNo||'';$('cfConNo').disabled=true;
@@ -887,7 +935,7 @@ function openEditForm(conNo){
   $('cfSdNo').value=c.sdPassbookNo||'';$('cfSdAmt').value=c.sdAmount||'';$('cfSdDate').value=toDateInput(c.sdDate);
   renderCustomFieldInputs(c);
   $('cfErr').classList.remove('show');$('cfErrMsg').textContent='';$('cfBtn').classList.remove('loading');
-  closeSheet();setTimeout(function(){openSheet('cfSheet');},200);
+  openSheet('cfSheet');
 }
 async function saveConsumer(){
   var conNo=$('cfConNo').value.trim(),cName=$('cfCName').value.trim(),addr=$('cfAddr').value.trim(),labNo=$('cfLabNo').value.trim(),meter=$('cfMeter').value.trim(),transf=$('cfTransf').value,phone=$('cfPhone').value.trim(),status=$('cfStatus').value,sdNo=$('cfSdNo').value.trim(),sdAmt=$('cfSdAmt').value.trim(),sdDate=$('cfSdDate').value;
@@ -899,8 +947,8 @@ async function saveConsumer(){
   var consumerData={ConNo:conNo,ConsumerName:cName,Address:addr,LabNo:labNo,MeterNo:meter,TransfCode:transf,PhoneNo:phone,Status:status,'Passbook/SD No':sdNo,'SD Amount':sdAmt,'SD Date':sdDate};
   document.querySelectorAll('#cfCustomFields [data-field-label]').forEach(function(el){consumerData[el.getAttribute('data-field-label')]=el.value.trim();});
   if(!navigator.onLine){
-    try{if(CF.mode==='add'){await AN_DB.addPendingChange('addConsumer',consumerData,session.officeId);var tmp=normalize(Object.assign({},consumerData,{_rowIndex:-1}));await AN_DB.upsertConsumer(tmp);masterList.unshift(tmp);}
-    else{await AN_DB.addPendingChange('updateConsumer',{rowIndex:CF.consumer._rowIndex,consumer:consumerData},session.officeId);var upd=normalize(Object.assign({},consumerData,{_rowIndex:CF.consumer._rowIndex}));await AN_DB.upsertConsumer(upd);var idx=masterList.findIndex(function(c){return c.conNo===CF.consumer.conNo;});if(idx!==-1)masterList[idx]=upd;}}catch(e){console.warn('CF offline:',e);}
+    try{if(CF.mode==='add'){await AN_DB.addPendingChange('addConsumer',consumerData,session.officeId);var tmp=normalize(Object.assign({},consumerData,{_rowIndex:-1}),true);await AN_DB.upsertConsumer(tmp);masterList.unshift(tmp);}
+    else{await AN_DB.addPendingChange('updateConsumer',{rowIndex:CF.consumer._rowIndex,consumer:consumerData},session.officeId);var upd=normalize(Object.assign({},consumerData,{_rowIndex:CF.consumer._rowIndex}),true);await AN_DB.upsertConsumer(upd);var idx=masterList.findIndex(function(c){return c.conNo===CF.consumer.conNo;});if(idx!==-1)masterList[idx]=upd;}}catch(e){console.warn('CF offline:',e);}
     closeSheet();resetAndLoad();toast(CF.mode==='add'?'Saved offline - will sync when connected':'Updated offline - will sync','');AN_DB.requestSync();btn.classList.remove('loading');return;
   }
   try{
@@ -909,8 +957,8 @@ async function saveConsumer(){
     var res=await fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify(payload),redirect:'follow',signal:controller.signal});clearTimeout(tid);
     var json=await res.json();
     if(json.success){
-      if(CF.mode==='add'){var saved=normalize(json.consumer||Object.assign({},consumerData,{_rowIndex:json.rowIndex||0,'S.No.':json.sNo||''}));try{await AN_DB.upsertConsumer(saved);}catch(e){}masterList.unshift(saved);}
-      else{var updated=normalize(Object.assign({},consumerData,{_rowIndex:CF.consumer._rowIndex,'S.No.':CF.consumer.sNo,CreatedAt:CF.consumer.createdAt}));try{await AN_DB.upsertConsumer(updated);}catch(e){}var ix=masterList.findIndex(function(c){return c.conNo===CF.consumer.conNo;});if(ix!==-1)masterList[ix]=updated;}
+      if(CF.mode==='add'){var saved=normalize(json.consumer||Object.assign({},consumerData,{_rowIndex:json.rowIndex||0,'S.No.':json.sNo||''}),true);try{await AN_DB.upsertConsumer(saved);}catch(e){}masterList.unshift(saved);}
+      else{var updated=normalize(Object.assign({},consumerData,{_rowIndex:CF.consumer._rowIndex,'S.No.':CF.consumer.sNo,CreatedAt:CF.consumer.createdAt}),true);try{await AN_DB.upsertConsumer(updated);}catch(e){}var ix=masterList.findIndex(function(c){return c.conNo===CF.consumer.conNo;});if(ix!==-1)masterList[ix]=updated;}
       closeSheet();resetAndLoad();toast(CF.mode==='add'?'Consumer added successfully':'Consumer updated successfully','ok');backgroundFullSync();
     }else{showCfErr(json.message||json.error||'Failed to save. Please try again.');}
   }catch(err){showCfErr(err.name==='AbortError'?'Request timed out (30s). Check connection.':'Network error. Please retry.');}
