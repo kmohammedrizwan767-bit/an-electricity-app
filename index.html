@@ -703,10 +703,27 @@ function renderEmptyState(){
   if(searchQ||activeArea!=='ALL'||activeStatus!=='ALL'){$('emptyIco').textContent='search_off';$('emptyTtl').textContent='No results';$('emptySub').textContent='Try different search, area, or status filter';}
   else{$('emptyIco').textContent='people_outline';$('emptyTtl').textContent='No consumers yet';$('emptySub').textContent='Tap + to add the first consumer';}
 }
-function renderFilteredView(){
+function renderFilteredView(preserveScroll){
+  /* Step 16b: preserveScroll=true is used only by backgroundFullSync, only when
+     a sync found a real change. It rebuilds up to the previous scroll depth
+     (instead of just page 1) and restores scrollY, so a background sync landing
+     while the user is mid-scroll doesn't yank them back to the top. Every other
+     caller (search/filter/sort/manual add-edit-delete) calls this with no
+     argument and gets the exact original top-of-list, staggered-fade behavior. */
+  var prevDisplayedN=displayedN,prevScrollY=window.scrollY;
   filtered=computeLocalFiltered();
   $('cntTxt').textContent=filtered.length?filtered.length+' consumer'+(filtered.length!==1?'s':''):'';
-  if(!filtered.length)renderEmptyState();else{$('emptyState').classList.add('hidden');displayedN=0;$('consumerList').innerHTML='';appendCards();}
+  if(!filtered.length){
+    renderEmptyState();
+  }else{
+    $('emptyState').classList.add('hidden');
+    var keepN=preserveScroll?Math.min(Math.max(PAGE_SIZE,prevDisplayedN),filtered.length):Math.min(PAGE_SIZE,filtered.length);
+    displayedN=0;$('consumerList').innerHTML='';
+    var frag=document.createDocumentFragment();
+    for(var i=0;i<keepN;i++){var card=makeCard(filtered[i]);if(!preserveScroll)card.style.animationDelay=(i*.03)+'s';frag.appendChild(card);}
+    $('consumerList').appendChild(frag);displayedN=keepN;
+    if(preserveScroll)requestAnimationFrame(function(){window.scrollTo(0,prevScrollY);});
+  }
   updateChipCounts();
 }
 function redrawList(){
@@ -739,8 +756,10 @@ async function backgroundFullSync(){
     var json=await res.json();
     if(json.success&&Array.isArray(json.data)){
       var list=json.data.map(function(c){return normalize(c,false);});
-      await AN_DB.mergeLiteConsumers(list);await AN_DB.setLastSync(Date.now());
-      masterList=await AN_DB.getAllConsumers();resetAndLoad();setSync('online','Synced');
+      var mergeResult=await AN_DB.mergeLiteConsumers(list);await AN_DB.setLastSync(Date.now());
+      masterList=await AN_DB.getAllConsumers();
+      if(mergeResult&&mergeResult.changed){renderFilteredView(true);}
+      setSync('online','Synced');
     }else if(json.code==='UNAUTHORIZED'||json.error==='SESSION_EXPIRED'){
       localStorage.removeItem('an_bio_vault');await AN_DB.clearSession();alert('Session expired. Please log in again.');location.replace('./login.html');
     }else{setSync('online','Loaded from cache');console.warn('[App]',json.message||json.error);}

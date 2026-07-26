@@ -213,7 +213,15 @@ const AN_DB = (() => {
    * Same single-transaction clear+rewrite pattern as setAllConsumers.
    *
    * @param {Array<object>} liteList  Normalized lite consumer objects
-   * @returns {Promise<number>}       Count of records now cached
+   * @returns {Promise<{count:number, changed:boolean}>}
+   *   `changed` is Step 16b's addition: true if anything a re-render would
+   *   need to reflect is different — a new/removed consumer, a lite field
+   *   value, OR a pure row-position shift (another session deleting a row
+   *   above this one). Row position is included even though it doesn't
+   *   invalidate `_full` (see `rowMoved` below): the in-memory `filtered`
+   *   array's `_rowIndex` is sent verbatim on the next Edit/Delete call, so a
+   *   stale one there is a data-safety risk, not just a cosmetic one, and
+   *   must still trigger a refresh.
    */
   async function mergeLiteConsumers(liteList) {
     await open();
@@ -222,18 +230,28 @@ const AN_DB = (() => {
     existing.forEach(c => { byConNo[c.conNo] = c; });
 
     const incoming = new Set();
+    let anyChanged = existing.length !== liteList.length;
+
     const merged = liteList.map(liteC => {
       incoming.add(liteC.conNo);
       const prev = byConNo[liteC.conNo];
 
       if (!prev) {
+        anyChanged = true;
         const fresh = { _full: false };
         LITE_FIELDS.forEach(k => { fresh[k] = liteC[k]; });
         return fresh;
       }
 
-      const changed = LITE_FIELDS.some(k => k !== '_rowIndex' && prev[k] !== liteC[k]);
-      const base = Object.assign({}, prev, changed ? { _full: false } : null);
+      // dataChanged (excludes _rowIndex) still controls _full invalidation,
+      // exactly as before. rowMoved is tracked separately so a pure row-shift
+      // still counts toward `anyChanged` without needlessly invalidating
+      // already-cached full detail for a record whose data didn't change.
+      const dataChanged = LITE_FIELDS.some(k => k !== '_rowIndex' && prev[k] !== liteC[k]);
+      const rowMoved     = prev._rowIndex !== liteC._rowIndex;
+      if (dataChanged || rowMoved) anyChanged = true;
+
+      const base = Object.assign({}, prev, dataChanged ? { _full: false } : null);
       LITE_FIELDS.forEach(k => { base[k] = liteC[k]; });
       return base;
     });
@@ -246,8 +264,8 @@ const AN_DB = (() => {
       idb.clear();
       for (const c of finalList) idb.put(c);
       tx.oncomplete = () => {
-        console.log(`[DB] Merged ${finalList.length} lite consumers`);
-        resolve(finalList.length);
+        console.log(`[DB] Merged ${finalList.length} lite consumers (changed: ${anyChanged})`);
+        resolve({ count: finalList.length, changed: anyChanged });
       };
       tx.onerror = () => reject(tx.error);
       tx.onabort = () => reject(new Error('mergeLiteConsumers: transaction aborted'));
