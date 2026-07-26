@@ -360,6 +360,13 @@
   .mr-empty .material-icons-round{font-size:44px;color:var(--t2);opacity:.3}
   .mr-empty-txt{font-size:13px;color:var(--t2);margin-top:10px;line-height:1.5}
   .nav-btn.scanning .material-icons-round{animation:spin 1s linear infinite}
+  .qkwh-result{display:flex;align-items:center;justify-content:space-between;gap:8px;background:var(--inp);border:1px solid var(--inp-b);border-radius:14px;padding:12px 14px;margin-bottom:8px;cursor:pointer;transition:opacity .15s}
+  .qkwh-result:active{opacity:.7}
+  .qkwh-result-name{font-family:var(--fd);font-weight:600;font-size:13px;color:var(--t1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .qkwh-result-meta{font-size:11px;color:var(--t2);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .qkwh-empty{text-align:center;padding:28px 12px;color:var(--t2);font-size:13px}
+  .qkwh-change-btn{background:var(--inp);border:1px solid var(--inp-b);border-radius:10px;height:36px;padding:0 14px;font-family:var(--fd);font-size:12px;font-weight:600;color:var(--t1);cursor:pointer;flex-shrink:0}
+  .qkwh-change-btn:active{opacity:.7}
 
   /* ===== RESPONSIVE: DESKTOP/WIDE-SCREEN (>=960px) =====
      Phone layout above this breakpoint is completely untouched -- every rule
@@ -394,6 +401,7 @@
   <div class="nav-right">
     <button class="nav-btn hidden" id="selectBtn" onclick="enterSelectMode()"><span class="material-icons-round">checklist</span></button>
     <button class="nav-btn" id="navScanBtn" onclick="startIdentifyScan()"><span class="material-icons-round">document_scanner</span></button>
+    <button class="nav-btn" id="navQkwhBtn" onclick="openQuickKwh()"><span class="material-icons-round">electric_meter</span></button>
     <button class="nav-btn" id="themeToggle"><span class="material-icons-round" id="themeIcon">dark_mode</span></button>
     <button class="nav-btn" id="userMenuBtn"><span class="material-icons-round">account_circle</span></button>
   </div>
@@ -553,6 +561,30 @@
   <button class="btn-del-confirm" id="mrDelConfirmBtn" onclick="doDeleteReading()">Yes, Delete</button>
   <button class="btn-cancel" onclick="cancelReadingDelete()">Cancel</button>
 </div>
+<div class="bottom-sheet" id="qkwhSheet">
+  <div class="sheet-handle" id="qkwhHandle"></div>
+  <div class="sheet-title">Quick KWH Entry</div>
+  <div id="qkwhSearchStep">
+    <div class="siw" style="margin-bottom:12px">
+      <span class="material-icons-round">search</span>
+      <input class="sinp" type="search" id="qkwhSearchInp" placeholder="Name, ConNo, or meter no&#8230;" autocomplete="off" autocorrect="off" autocapitalize="none">
+    </div>
+    <div id="qkwhResults"></div>
+  </div>
+  <div id="qkwhEntryStep" class="hidden">
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:16px;">
+      <div style="flex:1;min-width:0;">
+        <div class="det-name" id="qkwhName" style="margin-bottom:2px;">&#8212;</div>
+        <div class="det-conno" id="qkwhConno" style="margin-bottom:0;">&#8212;</div>
+      </div>
+      <button class="qkwh-change-btn" onclick="qkwhBackToSearch()">Change</button>
+    </div>
+    <div class="s-alert err" id="qkwhErr"><span class="material-icons-round">error_outline</span><span id="qkwhErrMsg"></span></div>
+    <div class="sf"><label class="sl">KWH Reading</label><div class="siw"><span class="material-icons-round">bolt</span><input class="sinp" type="number" id="qkwhValue" placeholder="Enter KWH value" inputmode="decimal" step="0.01" autocomplete="off"></div></div>
+    <button class="btn-sh" id="qkwhSaveBtn" onclick="qkwhSave()"><span class="bl">Save &amp; Next</span><div class="spin"></div></button>
+  </div>
+  <button class="btn-cancel" onclick="closeSheet()">Close</button>
+</div>
 <div class="backdrop" id="backdrop" onclick="closeSheet()"></div>
 <div class="search-sec" id="searchSec">
   <div class="search-wrap"><span class="material-icons-round s-ico">search</span><input class="search-inp" type="search" id="searchInp" placeholder="Name, ConNo, meter, phone, address&#8230;" autocomplete="off" autocorrect="off" autocapitalize="none"><button class="s-clr hidden" id="sClear" onclick="clearSearch()"><span class="material-icons-round">close</span></button></div>
@@ -659,6 +691,7 @@ async function init(){
   history.pushState(null,'');
   window.addEventListener('popstate',()=>{
     if(activeSheet==='readingSheet'&&_mrLevel==='months'){mrGoBack();history.pushState(null,'');return;}
+    if(activeSheet==='qkwhSheet'&&_qkwhConsumer){qkwhBackToSearch();history.pushState(null,'');return;}
     if(activeSheet==='cfSheet'||activeSheet==='addUserSheet'||activeSheet==='rpSheet'||activeSheet==='ugSheet'||activeSheet==='afSheet'||activeSheet==='fdSheet'||activeSheet==='afeSheet'||activeSheet==='fdelSheet'){closeSheet();history.pushState(null,'');return;}
     if(activeSheet){closeSheet();history.pushState(null,'');return;}
     if(selectMode){exitSelectMode();history.pushState(null,'');return;}
@@ -695,7 +728,7 @@ function hideSplash(){const s=$('splash');s.classList.add('out');setTimeout(()=>
 async function installApp(){if(!deferredInstall)return;closeUserMenu();deferredInstall.prompt();const{outcome}=await deferredInstall.userChoice;deferredInstall=null;$('installBtn').classList.add('hidden');if(outcome==='accepted')toast('App installed!','ok');}
 function applyUpdate(){if(swReg&&swReg.waiting)swReg.waiting.postMessage({type:'SKIP_WAITING'});window.location.reload();}
 function setupSwipeClose(){
-  ['cpHandle','aboutHandle','detHandle','delHandle','cfHandle','addUserHandle','rpHandle','ugHandle','afHandle','fdHandle','afeHandle','fdelHandle','readingHandle','readingFormHandle','mrDelHandle'].forEach(id=>{
+  ['cpHandle','aboutHandle','detHandle','delHandle','cfHandle','addUserHandle','rpHandle','ugHandle','afHandle','fdHandle','afeHandle','fdelHandle','readingHandle','readingFormHandle','mrDelHandle','qkwhHandle'].forEach(id=>{
     const el=$(id);if(!el)return;
     let startY=0;
     el.addEventListener('touchstart',e=>{startY=e.touches[0].clientY;},{passive:true});
@@ -1451,6 +1484,87 @@ async function doDeleteReading(){
   await fetchReadingDataQuiet();
   renderReadingSheet();openSheet('readingSheet');
 }
+/* QUICK KWH ENTRY — search a consumer, enter one KWH value, save, loop back to search.
+   Deliberately bypasses the detail sheet / Meter Readings drill-down entirely — built for
+   walking a route and logging many readings back-to-back with minimum taps per consumer.
+   Reuses the exact same addMeterReading action the full Meter Readings module already
+   uses (readingType:'KWH', source:'Manual') — zero backend changes. Searches masterList
+   locally, same as the main search bar — works on lite records since it only ever needs
+   conNo/consumerName, both always-present lite fields (see normalize()). Online-only, same
+   as the rest of the meter-readings module — no offline queue for the same reason. */
+var _qkwhConsumer=null,_qkwhSearchT=null;
+function openQuickKwh(){
+  _qkwhConsumer=null;
+  $('qkwhSearchInp').value='';
+  $('qkwhResults').innerHTML='';
+  $('qkwhSearchStep').classList.remove('hidden');
+  $('qkwhEntryStep').classList.add('hidden');
+  openSheet('qkwhSheet');
+  setTimeout(function(){$('qkwhSearchInp').focus();},380);
+}
+function qkwhSearch(q){
+  q=(q||'').toLowerCase().trim();
+  var el=$('qkwhResults');
+  if(!q){el.innerHTML='';return;}
+  var list=masterList.filter(function(c){
+    return(c.consumerName||'').toLowerCase().indexOf(q)>=0||(c.conNo||'').toLowerCase().indexOf(q)>=0||(c.meterNo||'').indexOf(q)>=0||(c.phoneNo||'').indexOf(q)>=0;
+  });
+  qkwhRenderResults(list);
+}
+function qkwhRenderResults(list){
+  var el=$('qkwhResults');
+  if(!list.length){el.innerHTML='<div class="qkwh-empty">No matching consumers</div>';return;}
+  var frag=document.createDocumentFragment();
+  list.slice(0,20).forEach(function(c){
+    var row=document.createElement('div');row.className='qkwh-result';
+    row.innerHTML='<div style="min-width:0;flex:1;"><div class="qkwh-result-name">'+esc(c.consumerName||'—')+'</div><div class="qkwh-result-meta">'+esc(c.conNo||'—')+(c.meterNo?' &#183; '+esc(c.meterNo):'')+'</div></div><span class="material-icons-round" style="color:var(--t2);font-size:18px;flex-shrink:0;">chevron_right</span>';
+    row.addEventListener('click',function(){qkwhSelectConsumer(c.conNo);});
+    frag.appendChild(row);
+  });
+  el.innerHTML='';el.appendChild(frag);
+}
+function qkwhSelectConsumer(conNo){
+  var c=masterList.find(function(x){return x.conNo===conNo;});
+  if(!c)return;
+  _qkwhConsumer=c;
+  $('qkwhName').textContent=c.consumerName||'—';
+  $('qkwhConno').textContent='Consumer No: '+(c.conNo||'—');
+  $('qkwhValue').value='';
+  $('qkwhErr').classList.remove('show');
+  $('qkwhSearchStep').classList.add('hidden');
+  $('qkwhEntryStep').classList.remove('hidden');
+  setTimeout(function(){$('qkwhValue').focus();},200);
+}
+function qkwhBackToSearch(){
+  _qkwhConsumer=null;
+  $('qkwhEntryStep').classList.add('hidden');
+  $('qkwhSearchStep').classList.remove('hidden');
+  setTimeout(function(){$('qkwhSearchInp').focus();},200);
+}
+function showQkwhErr(msg){$('qkwhErrMsg').textContent=msg;$('qkwhErr').classList.add('show');}
+async function qkwhSave(){
+  if(!_qkwhConsumer)return;
+  var val=$('qkwhValue').value.trim();
+  $('qkwhErr').classList.remove('show');
+  if(val===''||isNaN(parseFloat(val))){showQkwhErr('Enter a valid number.');return;}
+  if(!session||!session.token){location.replace('./login.html');return;}
+  if(!navigator.onLine){showQkwhErr('Internet connection required to save.');return;}
+  var btn=$('qkwhSaveBtn');btn.classList.add('loading');
+  try{
+    var controller=new AbortController();var tid=setTimeout(function(){controller.abort();},TIMEOUT);
+    var res=await fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({action:'addMeterReading',token:session.token,officeId:session.officeId,conNo:_qkwhConsumer.conNo,readingType:'KWH',value:val,source:'Manual'}),redirect:'follow',signal:controller.signal});clearTimeout(tid);
+    var json=await res.json();
+    if(json.success){
+      var idx=masterList.findIndex(function(x){return x.conNo===_qkwhConsumer.conNo;});
+      if(idx!==-1){masterList[idx].latestKwh=val;masterList[idx].latestKwhAt=(json.reading&&json.reading.timestamp)?json.reading.timestamp:new Date().toISOString();}
+      toast('KWH saved for '+_qkwhConsumer.consumerName,'ok');
+      qkwhBackToSearch();
+      $('qkwhSearchInp').value='';$('qkwhResults').innerHTML='';
+    }else{showQkwhErr(json.error||json.message||'Failed to save.');}
+  }catch(err){showQkwhErr(err.name==='AbortError'?'Request timed out.':'Network error. Please retry.');}
+  btn.classList.remove('loading');
+}
+$('qkwhSearchInp').addEventListener('input',function(e){var q=e.target.value;clearTimeout(_qkwhSearchT);_qkwhSearchT=setTimeout(function(){qkwhSearch(q);},120);});
 init();
 </script>
 </body>
