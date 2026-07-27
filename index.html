@@ -1429,7 +1429,7 @@ async function handleIdentifyScanFile(e){
   setNavScanBusy(true);
   toast('Scanning photo\u2026');
   try{
-    var dataUrl=await downscaleImageForOcr(file,1000);
+    var dataUrl=await downscaleImageForOcr(file,800);
     var base64Data=dataUrl.split(',')[1];
     var controller=new AbortController();var tid=setTimeout(function(){controller.abort();},TIMEOUT);
     var res=await fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({action:'identifyMeterPhoto',token:session.token,image:base64Data,mimeType:'image/jpeg'}),redirect:'follow',signal:controller.signal});clearTimeout(tid);
