@@ -771,9 +771,25 @@ function computeLocalFiltered(){
   var list=masterList;
   if(activeArea!=='ALL')list=list.filter(function(c){return c.transfCode===activeArea;});
   if(activeStatus!=='ALL')list=list.filter(function(c){return(c.status||'Active').toLowerCase()===activeStatus.toLowerCase();});
-  if(searchQ.trim()){var q=searchQ.toLowerCase().trim();list=list.filter(function(c){return(c.consumerName||'').toLowerCase().indexOf(q)>=0||(c.conNo||'').toLowerCase().indexOf(q)>=0||(c.meterNo||'').indexOf(q)>=0||(c.phoneNo||'').indexOf(q)>=0||(c.address||'').toLowerCase().indexOf(q)>=0||(c.sdPassbookNo||'').toLowerCase().indexOf(q)>=0;});}
+  var q=searchQ.toLowerCase().trim();
+  if(q){list=list.filter(function(c){return(c.consumerName||'').toLowerCase().indexOf(q)>=0||(c.conNo||'').toLowerCase().indexOf(q)>=0||(c.meterNo||'').indexOf(q)>=0||(c.phoneNo||'').indexOf(q)>=0||(c.address||'').toLowerCase().indexOf(q)>=0||(c.sdPassbookNo||'').toLowerCase().indexOf(q)>=0;});}
   if(sortOrder==='asc')list=list.slice().sort(function(a,b){return(a.consumerName||'').localeCompare(b.consumerName||'');});
   else if(sortOrder==='desc')list=list.slice().sort(function(a,b){return(b.consumerName||'').localeCompare(a.consumerName||'');});
+  /* Step 16f: an exact ConNo/MeterNo match is almost always the one specific
+     consumer being looked for -- e.g. searching "E/1" was surfacing E/12,
+     E/13, E/14... ahead of the actual E/1 purely because of alphabetical
+     order. Stable-sorts any exact match to the very top regardless of sort
+     order, without hiding anything -- partial matches still show right
+     below, same as before, just no longer first. */
+  if(q){
+    list=list.slice().sort(function(a,b){
+      var aExact=(a.conNo||'').toLowerCase()===q||(a.meterNo||'')===q;
+      var bExact=(b.conNo||'').toLowerCase()===q||(b.meterNo||'')===q;
+      if(aExact&&!bExact)return -1;
+      if(bExact&&!aExact)return 1;
+      return 0;
+    });
+  }
   return list;
 }
 function renderEmptyState(){
@@ -1513,6 +1529,17 @@ function qkwhSearch(q){
   if(!q){el.innerHTML='';return;}
   var list=masterList.filter(function(c){
     return(c.consumerName||'').toLowerCase().indexOf(q)>=0||(c.conNo||'').toLowerCase().indexOf(q)>=0||(c.meterNo||'').indexOf(q)>=0||(c.phoneNo||'').indexOf(q)>=0;
+  });
+  /* Step 16f: same exact-match-first priority as the main list's
+     computeLocalFiltered -- matters even more here, since results are
+     capped to the first 20 in qkwhRenderResults; without this, an exact
+     match could get pushed past that cap by unrelated partial matches. */
+  list=list.slice().sort(function(a,b){
+    var aExact=(a.conNo||'').toLowerCase()===q||(a.meterNo||'')===q;
+    var bExact=(b.conNo||'').toLowerCase()===q||(b.meterNo||'')===q;
+    if(aExact&&!bExact)return -1;
+    if(bExact&&!aExact)return 1;
+    return 0;
   });
   qkwhRenderResults(list);
 }
