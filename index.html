@@ -1427,6 +1427,7 @@ async function handleIdentifyScanFile(e){
   e.target.value='';
   if(!file)return;
   setNavScanBusy(true);
+  toast('Scanning photo\u2026');
   try{
     var dataUrl=await downscaleImageForOcr(file,1000);
     var base64Data=dataUrl.split(',')[1];
