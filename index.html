@@ -12,7 +12,6 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="preconnect" href="https://script.google.com">
   <link rel="preconnect" href="https://script.googleusercontent.com">
-  <link rel="preconnect" href="https://cdn.jsdelivr.net">
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
   <style>
@@ -585,6 +584,19 @@
   </div>
   <button class="btn-cancel" onclick="closeSheet()">Close</button>
 </div>
+<div class="bottom-sheet" id="qkwhRecheckSheet">
+  <div class="sheet-handle" id="qkwhRecheckHandle"></div>
+  <div class="del-ico" style="margin-bottom:6px;"><span class="material-icons-round" style="color:var(--accent);">visibility</span></div>
+  <div class="del-ttl">Double-Check This Scan</div>
+  <div class="del-sub">The photo wasn't fully clear — please verify against the actual meter before continuing.</div>
+  <div style="background:var(--inp);border:1px solid var(--inp-b);border-radius:14px;padding:14px 16px;margin:4px 0 18px;">
+    <div class="det-name" id="qkwhRecheckName" style="margin-bottom:2px;">&#8212;</div>
+    <div class="det-conno" id="qkwhRecheckConno" style="margin-bottom:10px;">&#8212;</div>
+    <div style="font-family:var(--fd);font-weight:700;font-size:15px;color:var(--t1);" id="qkwhRecheckReading">KWH: &#8212;</div>
+  </div>
+  <button class="btn-sh" onclick="qkwhRecheckConfirm()"><span class="bl">Looks Right, Continue</span></button>
+  <button class="btn-cancel" onclick="qkwhRecheckRescan()">Scan Again</button>
+</div>
 <div class="backdrop" id="backdrop" onclick="closeSheet()"></div>
 <div class="search-sec" id="searchSec">
   <div class="search-wrap"><span class="material-icons-round s-ico">search</span><input class="search-inp" type="search" id="searchInp" placeholder="Name, ConNo, meter, phone, address&#8230;" autocomplete="off" autocorrect="off" autocapitalize="none"><button class="s-clr hidden" id="sClear" onclick="clearSearch()"><span class="material-icons-round">close</span></button></div>
@@ -728,7 +740,7 @@ function hideSplash(){const s=$('splash');s.classList.add('out');setTimeout(()=>
 async function installApp(){if(!deferredInstall)return;closeUserMenu();deferredInstall.prompt();const{outcome}=await deferredInstall.userChoice;deferredInstall=null;$('installBtn').classList.add('hidden');if(outcome==='accepted')toast('App installed!','ok');}
 function applyUpdate(){if(swReg&&swReg.waiting)swReg.waiting.postMessage({type:'SKIP_WAITING'});window.location.reload();}
 function setupSwipeClose(){
-  ['cpHandle','aboutHandle','detHandle','delHandle','cfHandle','addUserHandle','rpHandle','ugHandle','afHandle','fdHandle','afeHandle','fdelHandle','readingHandle','readingFormHandle','mrDelHandle','qkwhHandle'].forEach(id=>{
+  ['cpHandle','aboutHandle','detHandle','delHandle','cfHandle','addUserHandle','rpHandle','ugHandle','afHandle','fdHandle','afeHandle','fdelHandle','readingHandle','readingFormHandle','mrDelHandle','qkwhHandle','qkwhRecheckHandle'].forEach(id=>{
     const el=$(id);if(!el)return;
     let startY=0;
     el.addEventListener('touchstart',e=>{startY=e.touches[0].clientY;},{passive:true});
@@ -1350,25 +1362,6 @@ function cancelReadingForm(){
   renderReadingSheet();
   openSheet('readingSheet');
 }
-var _tesseractLoaded=false,_tesseractLoadPromise=null,_ocrWorker=null;
-function loadTesseractScript(){
-  if(_tesseractLoaded)return Promise.resolve();
-  if(_tesseractLoadPromise)return _tesseractLoadPromise;
-  _tesseractLoadPromise=new Promise(function(resolve,reject){
-    var s=document.createElement('script');
-    s.src='https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js';
-    s.onload=function(){_tesseractLoaded=true;resolve();};
-    s.onerror=function(){_tesseractLoadPromise=null;reject(new Error('Could not load the OCR library.'));};
-    document.head.appendChild(s);
-  });
-  return _tesseractLoadPromise;
-}
-function withTimeout(promise,ms,message){
-  return Promise.race([
-    promise,
-    new Promise(function(_,reject){setTimeout(function(){reject(new Error(message));},ms);})
-  ]);
-}
 function downscaleImageForOcr(file,maxDim){
   return new Promise(function(resolve,reject){
     var img=new Image();
@@ -1386,50 +1379,62 @@ function downscaleImageForOcr(file,maxDim){
   });
 }
 function setNavScanBusy(busy){$('navScanBtn').classList.toggle('scanning',busy);}
-function findConsumerByOcrText(text){
-  if(!text)return null;
-  var tokens=text.split(/[^A-Za-z0-9/]+/).filter(function(t){return t.length>=3;});
-  for(var i=0;i<tokens.length;i++){
-    var tok=tokens[i].toUpperCase();
-    var hit=masterList.find(function(c){return (c.conNo||'').toUpperCase()===tok;});
-    if(hit)return hit;
+/* Step 16d: matches Gemini's structured extraction against masterList -- ConNo
+   checked first (primary identifier), MeterNo as fallback. Exact-text match
+   only, same rule as the old OCR path: one misread character means no
+   match, never a wrong match. */
+function findConsumerByScan(conNo,meterNo){
+  if(conNo){
+    var byConNo=masterList.find(function(c){return c.conNo&&c.conNo.toUpperCase()===String(conNo).toUpperCase();});
+    if(byConNo)return byConNo;
   }
-  for(var i=0;i<tokens.length;i++){
-    var tok=tokens[i].toUpperCase();
-    var hit=masterList.find(function(c){return c.meterNo&&c.meterNo.toUpperCase()===tok;});
-    if(hit)return hit;
+  if(meterNo){
+    var byMeter=masterList.find(function(c){return c.meterNo&&c.meterNo.toUpperCase()===String(meterNo).toUpperCase();});
+    if(byMeter)return byMeter;
   }
   return null;
 }
 function startIdentifyScan(){
   if($('navScanBtn').classList.contains('scanning'))return;
-  if(!_tesseractLoaded&&!navigator.onLine){toast('Scanning needs internet the first time (downloads the OCR engine).','err');return;}
+  if(!navigator.onLine){toast('AI scan needs an internet connection. Use Quick KWH search instead.','err');return;}
   $('homeScanInput').click();
 }
+/* Step 16d: replaces the old Tesseract path entirely -- one photo, one AI
+   call, returns ConNo/MeterNo (to identify who) AND the KWH reading (if
+   visible) together. Always online-only -- no offline path exists for this
+   at all, unlike the old Tesseract version -- consistent with the rest of
+   the meter-readings module already being online-only by design. Never
+   auto-saves anything: opens straight into Quick KWH's entry step with the
+   reading pre-filled, same confirm-before-save path as typing it by hand. */
 async function handleIdentifyScanFile(e){
   var file=e.target.files&&e.target.files[0];
   e.target.value='';
   if(!file)return;
   setNavScanBusy(true);
   try{
-    await loadTesseractScript();
     var dataUrl=await downscaleImageForOcr(file,1000);
-    if(!_ocrWorker){
-      var createWorker=Tesseract.createWorker;
-      _ocrWorker=await createWorker('eng');
-    }
-    var result=await withTimeout(_ocrWorker.recognize(dataUrl),25000,'Scan took too long. Try a clearer, closer photo.');
-    var match=findConsumerByOcrText(result.data.text);
-    if(match){
-      toast('Found: '+match.consumerName,'ok');
-      openDetail(match);
+    var base64Data=dataUrl.split(',')[1];
+    var controller=new AbortController();var tid=setTimeout(function(){controller.abort();},TIMEOUT);
+    var res=await fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({action:'identifyMeterPhoto',token:session.token,image:base64Data,mimeType:'image/jpeg'}),redirect:'follow',signal:controller.signal});clearTimeout(tid);
+    var json=await res.json();
+    if(!json.success){
+      toast(json.error||'AI scan failed.','err');
     }else{
-      toast("Couldn't match that to a consumer — search manually.",'err');
-      if(activeTab!=='consumers'){switchTab('consumers');setTimeout(function(){$('searchInp').focus();},350);}
-      else $('searchInp').focus();
+      var match=findConsumerByScan(json.conNo,json.meterNo);
+      if(match){
+        if(json.lowConfidence){
+          qkwhOpenRecheck(match,json.kwhReading);
+        }else{
+          toast('Found: '+match.consumerName,'ok');
+          qkwhOpenForConsumer(match.conNo,json.kwhReading);
+        }
+      }else{
+        toast("Couldn't match that to a consumer — search manually.",'err');
+        openQuickKwh();
+      }
     }
   }catch(err){
-    toast(err&&err.message?err.message:'Scan failed.','err');
+    toast(err&&err.name==='AbortError'?'Scan timed out. Try again.':(err&&err.message?err.message:'Scan failed.'),'err');
   }
   setNavScanBusy(false);
 }
@@ -1523,17 +1528,60 @@ function qkwhRenderResults(list){
   });
   el.innerHTML='';el.appendChild(frag);
 }
-function qkwhSelectConsumer(conNo){
-  var c=masterList.find(function(x){return x.conNo===conNo;});
-  if(!c)return;
+function qkwhShowEntryFor(c,prefilledValue){
   _qkwhConsumer=c;
   $('qkwhName').textContent=c.consumerName||'—';
   $('qkwhConno').textContent='Consumer No: '+(c.conNo||'—');
-  $('qkwhValue').value='';
+  $('qkwhValue').value=prefilledValue||'';
   $('qkwhErr').classList.remove('show');
   $('qkwhSearchStep').classList.add('hidden');
   $('qkwhEntryStep').classList.remove('hidden');
+}
+function qkwhSelectConsumer(conNo){
+  var c=masterList.find(function(x){return x.conNo===conNo;});
+  if(!c)return;
+  qkwhShowEntryFor(c,'');
   setTimeout(function(){$('qkwhValue').focus();},200);
+}
+/* Step 16d: opens the sheet directly into the entry step for an already-
+   identified consumer (from the AI scan), skipping the search step
+   entirely. Separate from qkwhSelectConsumer (which switches steps inside
+   an already-open sheet) because this one also has to open the sheet
+   itself -- a longer focus delay (380ms, matching every other openSheet
+   call in this file) so it waits out the slide-up animation instead of
+   racing it. */
+function qkwhOpenForConsumer(conNo,prefilledValue){
+  var c=masterList.find(function(x){return x.conNo===conNo;});
+  if(!c)return false;
+  qkwhShowEntryFor(c,prefilledValue);
+  openSheet('qkwhSheet');
+  setTimeout(function(){$('qkwhValue').focus();},380);
+  return true;
+}
+/* Step 16d: the recheck gate. Shown instead of going straight to the entry
+   screen when Gemini itself flags lowConfidence -- e.g. a blurry photo,
+   messy handwriting, an ambiguous digit. Surfaces exactly what the scan
+   found (who it matched, what it read) so the employee can eyeball it
+   against the real meter before deciding to proceed. Confirming still lands
+   on the normal, editable entry screen -- this is an extra checkpoint
+   before that, not a replacement for it. */
+var _qkwhRecheckConsumer=null,_qkwhRecheckValue='';
+function qkwhOpenRecheck(c,prefilledValue){
+  _qkwhRecheckConsumer=c;
+  _qkwhRecheckValue=prefilledValue||'';
+  $('qkwhRecheckName').textContent=c.consumerName||'—';
+  $('qkwhRecheckConno').textContent='Consumer No: '+(c.conNo||'—');
+  $('qkwhRecheckReading').textContent=_qkwhRecheckValue?('KWH: '+_qkwhRecheckValue):'KWH: not read — enter manually';
+  openSheet('qkwhRecheckSheet');
+}
+function qkwhRecheckConfirm(){
+  var c=_qkwhRecheckConsumer,val=_qkwhRecheckValue;
+  closeSheet();
+  setTimeout(function(){qkwhOpenForConsumer(c.conNo,val);},250);
+}
+function qkwhRecheckRescan(){
+  closeSheet();
+  setTimeout(function(){startIdentifyScan();},250);
 }
 function qkwhBackToSearch(){
   _qkwhConsumer=null;
