@@ -601,6 +601,7 @@
   </div>
   <button class="btn-sh" onclick="qkwhRecheckConfirm()"><span class="bl">Looks Right, Continue</span></button>
   <button class="btn-cancel" onclick="qkwhRecheckRescan()">Scan Again</button>
+  <button class="btn-cancel" onclick="qkwhRecheckSearchInstead()">Search Manually Instead</button>
 </div>
 <div class="bottom-sheet" id="myrSheet">
   <div class="sheet-handle" id="myrHandle"></div>
@@ -1415,13 +1416,22 @@ function setNavScanBusy(busy){$('navScanBtn').classList.toggle('scanning',busy);
    checked first (primary identifier), MeterNo as fallback. Exact-text match
    only, same rule as the old OCR path: one misread character means no
    match, never a wrong match. */
+/* Strips a leading "GP" (any case, optional space) from a meter number
+   before comparing -- makes matching correct whether the sheet stores
+   "GP7408202" or "7408202" for the same meter, without needing to know
+   which format is actually in use. Applied to both sides of the
+   comparison in findConsumerByScan below. */
+function stripGpPrefix(v){
+  return String(v||'').replace(/^\s*GP\s*(?=\d)/i,'').trim();
+}
 function findConsumerByScan(conNo,meterNo){
   if(conNo){
     var byConNo=masterList.find(function(c){return c.conNo&&c.conNo.toUpperCase()===String(conNo).toUpperCase();});
     if(byConNo)return byConNo;
   }
   if(meterNo){
-    var byMeter=masterList.find(function(c){return c.meterNo&&c.meterNo.toUpperCase()===String(meterNo).toUpperCase();});
+    var mNorm=stripGpPrefix(meterNo).toUpperCase();
+    var byMeter=masterList.find(function(c){return c.meterNo&&stripGpPrefix(c.meterNo).toUpperCase()===mNorm;});
     if(byMeter)return byMeter;
   }
   return null;
@@ -1634,6 +1644,10 @@ function qkwhRecheckRescan(){
   closeSheet();
   setTimeout(function(){startIdentifyScan();},250);
 }
+function qkwhRecheckSearchInstead(){
+  closeSheet();
+  setTimeout(function(){openQuickKwh();},250);
+}
 function qkwhBackToSearch(){
   _qkwhConsumer=null;
   $('qkwhEntryStep').classList.add('hidden');
@@ -1675,6 +1689,15 @@ $('qkwhSearchInp').addEventListener('input',function(e){var q=e.target.value;cle
    even for an employee with thousands of readings. Online-only, same as the
    rest of the meter-readings module. */
 var _myrData=null,_myrYear=null,_myrEmployee='',_myrIsAdminView=false;
+/* Single source of truth for "whose data is this" -- used in the subtitle,
+   the download filename, and the title printed inside the file. Fixes a
+   real bug: Admin viewing the unfiltered "all employees" view was
+   incorrectly labelled with the Admin's own name in 3 separate places
+   before this was consolidated. */
+function myrEmployeeLabel(){
+  if(!_myrIsAdminView)return session.fullName||session.username||'—';
+  return _myrEmployee||'All Employees';
+}
 function openMyReadings(){
   closeUserMenu();
   _myrData=null;_myrYear=null;_myrEmployee='';
@@ -1703,6 +1726,7 @@ async function myrFetchSummary(){
       $('myrEmpWrap').classList.remove('hidden');
       $('myrTitle').textContent='KWH Readings';
     }
+    $('myrSub').textContent=myrEmployeeLabel();
     myrRender();
   }catch(err){
     $('myrBody').innerHTML='<div class="err-bar"><span class="material-icons-round">warning_amber</span>'+(err.name==='AbortError'?'Request timed out.':'Network error.')+'</div>';
@@ -1711,7 +1735,7 @@ async function myrFetchSummary(){
 function myrEmployeeChanged(){
   _myrEmployee=$('myrEmpSel').value;
   _myrYear=null;
-  $('myrSub').textContent=_myrEmployee||'All employees';
+  $('myrSub').textContent=myrEmployeeLabel();
   $('myrBackBtn').classList.add('hidden');
   $('myrBody').innerHTML=Array(3).fill('<div class="skeleton" style="height:56px;margin-bottom:8px"></div>').join('');
   myrFetchSummary();
@@ -1727,6 +1751,12 @@ function myrRender(){
   body.innerHTML='';
   var frag=document.createDocumentFragment();
   if(!_myrYear){
+    var grandTotal=years.reduce(function(s,y){return s+_myrData[y].total;},0);
+    var allBtn=document.createElement('button');
+    allBtn.className='mr-add-btn';
+    allBtn.innerHTML='<span class="material-icons-round" style="font-size:17px">download</span>Download All ('+grandTotal+' reading'+(grandTotal!==1?'s':'')+')';
+    allBtn.addEventListener('click',function(){myrDownload(null,null);});
+    frag.appendChild(allBtn);
     years.forEach(function(y){
       var info=_myrData[y];
       var row=document.createElement('div');row.className='mr-year-row';
@@ -1754,15 +1784,15 @@ function myrRender(){
    internal quotes doubled -- consumer names and addresses routinely contain
    commas, which would otherwise shift columns. */
 function myrToCsv(rows){
-  var out='Date,Time,Consumer No,Consumer Name,KWH Reading,Entered By\n';
-  rows.forEach(function(r){
+  var out='S.No,Date,Time,Consumer No,Consumer Name,KWH Reading,Entered By\n';
+  rows.forEach(function(r,i){
     var c=masterList.find(function(x){return x.conNo===r.ConNo;});
     var name=c?(c.consumerName||''):'';
     var d=new Date(r.Timestamp);
     var dateStr=isNaN(d)?String(r.Timestamp||''):d.toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'});
     var timeStr=isNaN(d)?'':d.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit',hour12:true});
     function q(v){return '"'+String(v==null?'':v).replace(/"/g,'""')+'"';}
-    out+=[q(dateStr),q(timeStr),q(r.ConNo),q(name),q(r.Value),q(r.EnteredBy)].join(',')+'\n';
+    out+=[i+1,q(dateStr),q(timeStr),q(r.ConNo),q(name),q(r.Value),q(r.EnteredBy)].join(',')+'\n';
   });
   return out;
 }
@@ -1793,22 +1823,22 @@ function myrBuildStyledSheet(rows,title){
   var titleFont={bold:true,sz:14,color:{rgb:'0052B4'}};
   var thin={style:'thin',color:{rgb:'C5D0E8'}};
   var cellBorder={top:thin,bottom:thin,left:thin,right:thin};
-  var cols=['A','B','C','D','E','F'];
+  var cols=['A','B','C','D','E','F','G'];
 
-  var aoa=[[title],[],['Date','Time','Consumer No','Consumer Name','KWH Reading','Entered By']];
-  rows.forEach(function(r){
+  var aoa=[[title],[],['S.No','Date','Time','Consumer No','Consumer Name','KWH Reading','Entered By']];
+  rows.forEach(function(r,i){
     var c=masterList.find(function(x){return x.conNo===r.ConNo;});
     var name=c?(c.consumerName||''):'';
     var d=new Date(r.Timestamp);
     var dateStr=isNaN(d)?String(r.Timestamp||''):d.toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'});
     var timeStr=isNaN(d)?'':d.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit',hour12:true});
     var val=parseFloat(r.Value);
-    aoa.push([dateStr,timeStr,r.ConNo,name,isNaN(val)?r.Value:val,r.EnteredBy]);
+    aoa.push([i+1,dateStr,timeStr,r.ConNo,name,isNaN(val)?r.Value:val,r.EnteredBy]);
   });
 
   var ws=XLSX.utils.aoa_to_sheet(aoa);
-  ws['!cols']=[{wch:12},{wch:10},{wch:12},{wch:26},{wch:13},{wch:20}];
-  ws['!merges']=[{s:{r:0,c:0},e:{r:0,c:5}}];
+  ws['!cols']=[{wch:7},{wch:12},{wch:10},{wch:12},{wch:26},{wch:13},{wch:20}];
+  ws['!merges']=[{s:{r:0,c:0},e:{r:0,c:6}}];
   if(ws['A1'])ws['A1'].s={font:titleFont};
   cols.forEach(function(col){
     var ref=col+'3';
@@ -1817,7 +1847,7 @@ function myrBuildStyledSheet(rows,title){
   for(var r=4;r<=aoa.length;r++){
     cols.forEach(function(col){
       var ref=col+r;
-      if(ws[ref])ws[ref].s={border:cellBorder};
+      if(ws[ref])ws[ref].s={border:cellBorder,alignment:col==='A'?{horizontal:'center'}:undefined};
     });
   }
   var wb=XLSX.utils.book_new();
@@ -1829,15 +1859,15 @@ async function myrDownload(year,month){
   toast('Preparing download…');
   try{
     var controller=new AbortController();var tid=setTimeout(function(){controller.abort();},TIMEOUT);
-    var res=await fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({action:'getMyReadings',token:session.token,mode:'export',year:year,month:month||'',employee:_myrEmployee}),redirect:'follow',signal:controller.signal});clearTimeout(tid);
+    var res=await fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({action:'getMyReadings',token:session.token,mode:'export',year:year||'',month:month||'',employee:_myrEmployee}),redirect:'follow',signal:controller.signal});clearTimeout(tid);
     var json=await res.json();
     if(!json.success){toast(json.error||'Download failed.','err');return;}
     var rows=json.rows||[];
     if(!rows.length){toast('No readings to download.','err');return;}
-    var who=_myrEmployee||session.fullName||'Employee';
+    var who=myrEmployeeLabel();
     var whoSafe=who.replace(/[^A-Za-z0-9]+/g,'_');
-    var periodLabel=month?((MONTH_NAMES[parseInt(month,10)]||month)+' '+year):String(year);
-    var periodSafe=month?(year+'-'+month):String(year);
+    var periodLabel=month?((MONTH_NAMES[parseInt(month,10)]||month)+' '+year):(year?String(year):'Complete History');
+    var periodSafe=month?(year+'-'+month):(year?String(year):'All');
     var title='A&N Electricity \u2014 KWH Readings \u2014 '+who+' \u2014 '+periodLabel;
     try{
       await loadXlsxStyleScript();
