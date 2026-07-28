@@ -12,6 +12,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="preconnect" href="https://script.google.com">
   <link rel="preconnect" href="https://script.googleusercontent.com">
+  <link rel="preconnect" href="https://cdn.jsdelivr.net">
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
   <style>
@@ -366,6 +367,9 @@
   .qkwh-empty{text-align:center;padding:28px 12px;color:var(--t2);font-size:13px}
   .qkwh-change-btn{background:var(--inp);border:1px solid var(--inp-b);border-radius:10px;height:36px;padding:0 14px;font-family:var(--fd);font-size:12px;font-weight:600;color:var(--t1);cursor:pointer;flex-shrink:0}
   .qkwh-change-btn:active{opacity:.7}
+  .myr-dl{background:none;border:none;color:var(--t2);cursor:pointer;padding:8px;display:flex;border-radius:50%;flex-shrink:0}
+  .myr-dl:active{color:var(--primary);background:rgba(0,82,180,.1)}
+  .myr-row-right{display:flex;align-items:center;gap:2px}
 
   /* ===== RESPONSIVE: DESKTOP/WIDE-SCREEN (>=960px) =====
      Phone layout above this breakpoint is completely untouched -- every rule
@@ -417,6 +421,7 @@
   <div class="menu-div"></div>
   <button class="mi install hidden" id="installBtn" onclick="installApp()"><span class="material-icons-round">install_mobile</span>Install App</button>
   <button class="mi" onclick="openChangePass()"><span class="material-icons-round">lock_reset</span>Change Password</button>
+  <button class="mi" onclick="openMyReadings()"><span class="material-icons-round">download</span>My Readings</button>
   <button class="mi" onclick="openAbout()"><span class="material-icons-round">info_outline</span>About</button>
   <div class="menu-div"></div>
   <button class="mi danger" onclick="handleLogout()"><span class="material-icons-round">logout</span>Sign Out</button>
@@ -597,6 +602,16 @@
   <button class="btn-sh" onclick="qkwhRecheckConfirm()"><span class="bl">Looks Right, Continue</span></button>
   <button class="btn-cancel" onclick="qkwhRecheckRescan()">Scan Again</button>
 </div>
+<div class="bottom-sheet" id="myrSheet">
+  <div class="sheet-handle" id="myrHandle"></div>
+  <div class="mr-hdr">
+    <button class="mr-back hidden" id="myrBackBtn" onclick="myrBack()"><span class="material-icons-round">arrow_back</span></button>
+    <div class="mr-titles"><div class="mr-title" id="myrTitle">My KWH Readings</div><div class="mr-sub" id="myrSub">&#8212;</div></div>
+    <button class="mr-close" onclick="closeSheet()"><span class="material-icons-round">close</span></button>
+  </div>
+  <div class="sf hidden" id="myrEmpWrap" style="margin:6px 0 12px"><label class="sl">Employee</label><div class="cf-sel-wrap"><select class="cf-sel" id="myrEmpSel" onchange="myrEmployeeChanged()"><option value="">All Employees</option></select><span class="material-icons-round cf-sel-ico">expand_more</span></div></div>
+  <div class="mr-body" id="myrBody"></div>
+</div>
 <div class="backdrop" id="backdrop" onclick="closeSheet()"></div>
 <div class="search-sec" id="searchSec">
   <div class="search-wrap"><span class="material-icons-round s-ico">search</span><input class="search-inp" type="search" id="searchInp" placeholder="Name, ConNo, meter, phone, address&#8230;" autocomplete="off" autocorrect="off" autocapitalize="none"><button class="s-clr hidden" id="sClear" onclick="clearSearch()"><span class="material-icons-round">close</span></button></div>
@@ -703,6 +718,7 @@ async function init(){
   history.pushState(null,'');
   window.addEventListener('popstate',()=>{
     if(activeSheet==='readingSheet'&&_mrLevel==='months'){mrGoBack();history.pushState(null,'');return;}
+    if(activeSheet==='myrSheet'&&_myrYear){myrBack();history.pushState(null,'');return;}
     if(activeSheet==='qkwhSheet'&&_qkwhConsumer){qkwhBackToSearch();history.pushState(null,'');return;}
     if(activeSheet==='cfSheet'||activeSheet==='addUserSheet'||activeSheet==='rpSheet'||activeSheet==='ugSheet'||activeSheet==='afSheet'||activeSheet==='fdSheet'||activeSheet==='afeSheet'||activeSheet==='fdelSheet'){closeSheet();history.pushState(null,'');return;}
     if(activeSheet){closeSheet();history.pushState(null,'');return;}
@@ -740,7 +756,7 @@ function hideSplash(){const s=$('splash');s.classList.add('out');setTimeout(()=>
 async function installApp(){if(!deferredInstall)return;closeUserMenu();deferredInstall.prompt();const{outcome}=await deferredInstall.userChoice;deferredInstall=null;$('installBtn').classList.add('hidden');if(outcome==='accepted')toast('App installed!','ok');}
 function applyUpdate(){if(swReg&&swReg.waiting)swReg.waiting.postMessage({type:'SKIP_WAITING'});window.location.reload();}
 function setupSwipeClose(){
-  ['cpHandle','aboutHandle','detHandle','delHandle','cfHandle','addUserHandle','rpHandle','ugHandle','afHandle','fdHandle','afeHandle','fdelHandle','readingHandle','readingFormHandle','mrDelHandle','qkwhHandle','qkwhRecheckHandle'].forEach(id=>{
+  ['cpHandle','aboutHandle','detHandle','delHandle','cfHandle','addUserHandle','rpHandle','ugHandle','afHandle','fdHandle','afeHandle','fdelHandle','readingHandle','readingFormHandle','mrDelHandle','qkwhHandle','qkwhRecheckHandle','myrHandle'].forEach(id=>{
     const el=$(id);if(!el)return;
     let startY=0;
     el.addEventListener('touchstart',e=>{startY=e.touches[0].clientY;},{passive:true});
@@ -1439,7 +1455,14 @@ async function handleIdentifyScanFile(e){
     }else{
       var match=findConsumerByScan(json.conNo,json.meterNo);
       if(match){
-        if(json.lowConfidence){
+        if(json.kvahOnly){
+          /* Display was showing KVAH, not KWH -- consumer still identified,
+             but no auto-fill: employee waits for the display to cycle to kWh
+             (or reads it off the meter) and types it. Field is left empty on
+             purpose so a KVAH number can never be saved as a KWH reading. */
+          toast('Display shows KVAH, not KWH — wait for kWh, then enter it.','err');
+          qkwhOpenForConsumer(match.conNo,'');
+        }else if(json.lowConfidence){
           qkwhOpenRecheck(match,json.kwhReading);
         }else{
           toast('Found: '+match.consumerName,'ok');
@@ -1641,6 +1664,197 @@ async function qkwhSave(){
   btn.classList.remove('loading');
 }
 $('qkwhSearchInp').addEventListener('input',function(e){var q=e.target.value;clearTimeout(_qkwhSearchT);_qkwhSearchT=setTimeout(function(){qkwhSearch(q);},120);});
+/* MY READINGS (Step 16e) — per-employee KWH export.
+   Year -> Month drill-down mirroring the consumer Meter Readings UI, with a
+   download button on each row. Employees see only their own readings; Admin
+   additionally gets an employee filter dropdown. That restriction is enforced
+   SERVER-side from the session (see handleGetMyReadings) -- this UI never
+   sends who it wants, it just renders what it's allowed to have.
+   Two-call design: a light counts-only summary on open, then the actual rows
+   fetched only at the moment something is downloaded. Keeps the sheet snappy
+   even for an employee with thousands of readings. Online-only, same as the
+   rest of the meter-readings module. */
+var _myrData=null,_myrYear=null,_myrEmployee='',_myrIsAdminView=false;
+function openMyReadings(){
+  closeUserMenu();
+  _myrData=null;_myrYear=null;_myrEmployee='';
+  $('myrTitle').textContent='My KWH Readings';
+  $('myrSub').textContent=session.fullName||session.username||'—';
+  $('myrBackBtn').classList.add('hidden');
+  $('myrEmpWrap').classList.add('hidden');
+  $('myrBody').innerHTML=Array(3).fill('<div class="skeleton" style="height:56px;margin-bottom:8px"></div>').join('');
+  openSheet('myrSheet');
+  myrFetchSummary();
+}
+async function myrFetchSummary(){
+  if(!navigator.onLine){$('myrBody').innerHTML='<div class="err-bar"><span class="material-icons-round">wifi_off</span>Downloads need an internet connection.</div>';return;}
+  try{
+    var controller=new AbortController();var tid=setTimeout(function(){controller.abort();},TIMEOUT);
+    var res=await fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({action:'getMyReadings',token:session.token,mode:'summary',employee:_myrEmployee}),redirect:'follow',signal:controller.signal});clearTimeout(tid);
+    var json=await res.json();
+    if(!json.success){$('myrBody').innerHTML='<div class="err-bar"><span class="material-icons-round">warning_amber</span>'+esc(json.error||'Failed to load.')+'</div>';return;}
+    _myrData=json.years||{};
+    if(json.employees){
+      _myrIsAdminView=true;
+      var sel=$('myrEmpSel');
+      if(sel.options.length<=1){
+        json.employees.forEach(function(name){var o=document.createElement('option');o.value=name;o.textContent=name;sel.appendChild(o);});
+      }
+      $('myrEmpWrap').classList.remove('hidden');
+      $('myrTitle').textContent='KWH Readings';
+    }
+    myrRender();
+  }catch(err){
+    $('myrBody').innerHTML='<div class="err-bar"><span class="material-icons-round">warning_amber</span>'+(err.name==='AbortError'?'Request timed out.':'Network error.')+'</div>';
+  }
+}
+function myrEmployeeChanged(){
+  _myrEmployee=$('myrEmpSel').value;
+  _myrYear=null;
+  $('myrSub').textContent=_myrEmployee||'All employees';
+  $('myrBackBtn').classList.add('hidden');
+  $('myrBody').innerHTML=Array(3).fill('<div class="skeleton" style="height:56px;margin-bottom:8px"></div>').join('');
+  myrFetchSummary();
+}
+function myrBack(){_myrYear=null;$('myrBackBtn').classList.add('hidden');myrRender();}
+function myrRender(){
+  var body=$('myrBody');
+  var years=Object.keys(_myrData||{}).sort(function(a,b){return b.localeCompare(a);});
+  if(!years.length){
+    body.innerHTML='<div class="mr-empty"><span class="material-icons-round">download</span><div class="mr-empty-txt">No KWH readings recorded yet.</div></div>';
+    return;
+  }
+  body.innerHTML='';
+  var frag=document.createDocumentFragment();
+  if(!_myrYear){
+    years.forEach(function(y){
+      var info=_myrData[y];
+      var row=document.createElement('div');row.className='mr-year-row';
+      row.innerHTML='<span class="mr-year-label">'+esc(y)+'</span><span class="myr-row-right"><span class="mr-year-count">'+info.total+' reading'+(info.total!==1?'s':'')+'</span><button class="myr-dl" title="Download year"><span class="material-icons-round">download</span></button><span class="material-icons-round" style="font-size:16px;color:var(--t2)">chevron_right</span></span>';
+      row.addEventListener('click',function(){_myrYear=y;$('myrBackBtn').classList.remove('hidden');myrRender();});
+      row.querySelector('.myr-dl').addEventListener('click',function(e){e.stopPropagation();myrDownload(y,null);});
+      frag.appendChild(row);
+    });
+  }else{
+    var months=_myrData[_myrYear]?Object.keys(_myrData[_myrYear].months).sort(function(a,b){return b.localeCompare(a);}):[];
+    months.forEach(function(m){
+      var count=_myrData[_myrYear].months[m];
+      var row=document.createElement('div');row.className='mr-year-row';
+      row.innerHTML='<span class="mr-year-label">'+esc(MONTH_NAMES[parseInt(m,10)]||m)+'</span><span class="myr-row-right"><span class="mr-year-count">'+count+' reading'+(count!==1?'s':'')+'</span><button class="myr-dl" title="Download month"><span class="material-icons-round">download</span></button></span>';
+      row.querySelector('.myr-dl').addEventListener('click',function(e){e.stopPropagation();myrDownload(_myrYear,m);});
+      frag.appendChild(row);
+    });
+  }
+  body.appendChild(frag);
+  $('myrTitle').textContent=(_myrIsAdminView?'KWH Readings':'My KWH Readings')+(_myrYear?' — '+_myrYear:'');
+}
+/* Builds the CSV client-side from rows the server returns. Consumer names are
+   filled in from masterList (already in memory) so the file reads standalone
+   without the server having to join across sheets. Every field is quoted and
+   internal quotes doubled -- consumer names and addresses routinely contain
+   commas, which would otherwise shift columns. */
+function myrToCsv(rows){
+  var out='Date,Time,Consumer No,Consumer Name,KWH Reading,Entered By\n';
+  rows.forEach(function(r){
+    var c=masterList.find(function(x){return x.conNo===r.ConNo;});
+    var name=c?(c.consumerName||''):'';
+    var d=new Date(r.Timestamp);
+    var dateStr=isNaN(d)?String(r.Timestamp||''):d.toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'});
+    var timeStr=isNaN(d)?'':d.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit',hour12:true});
+    function q(v){return '"'+String(v==null?'':v).replace(/"/g,'""')+'"';}
+    out+=[q(dateStr),q(timeStr),q(r.ConNo),q(name),q(r.Value),q(r.EnteredBy)].join(',')+'\n';
+  });
+  return out;
+}
+var _xlsxLoaded=false,_xlsxLoadPromise=null;
+function loadXlsxStyleScript(){
+  if(_xlsxLoaded)return Promise.resolve();
+  if(_xlsxLoadPromise)return _xlsxLoadPromise;
+  _xlsxLoadPromise=new Promise(function(resolve,reject){
+    var s=document.createElement('script');
+    s.src='https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.bundle.js';
+    s.onload=function(){_xlsxLoaded=true;resolve();};
+    s.onerror=function(){_xlsxLoadPromise=null;reject(new Error('Could not load Excel library.'));};
+    document.head.appendChild(s);
+  });
+  return _xlsxLoadPromise;
+}
+/* Builds a formatted workbook: title row (merged, brand blue, bold), a
+   colored/bold header row matching the app's own primary color, thin
+   borders on every data cell, sensible column widths, and the reading
+   column written as a real number (not text) so Excel treats it correctly
+   for sorting/formulas. Consumer names filled in from masterList so the
+   file reads standalone. Requires xlsx-js-style (loaded on demand, see
+   loadXlsxStyleScript) -- myrDownload falls back to plain CSV if that
+   library fails to load, so a download always succeeds either way. */
+function myrBuildStyledSheet(rows,title){
+  var headerFill={fgColor:{rgb:'0052B4'}};
+  var headerFont={bold:true,color:{rgb:'FFFFFF'},sz:11};
+  var titleFont={bold:true,sz:14,color:{rgb:'0052B4'}};
+  var thin={style:'thin',color:{rgb:'C5D0E8'}};
+  var cellBorder={top:thin,bottom:thin,left:thin,right:thin};
+  var cols=['A','B','C','D','E','F'];
+
+  var aoa=[[title],[],['Date','Time','Consumer No','Consumer Name','KWH Reading','Entered By']];
+  rows.forEach(function(r){
+    var c=masterList.find(function(x){return x.conNo===r.ConNo;});
+    var name=c?(c.consumerName||''):'';
+    var d=new Date(r.Timestamp);
+    var dateStr=isNaN(d)?String(r.Timestamp||''):d.toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'});
+    var timeStr=isNaN(d)?'':d.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit',hour12:true});
+    var val=parseFloat(r.Value);
+    aoa.push([dateStr,timeStr,r.ConNo,name,isNaN(val)?r.Value:val,r.EnteredBy]);
+  });
+
+  var ws=XLSX.utils.aoa_to_sheet(aoa);
+  ws['!cols']=[{wch:12},{wch:10},{wch:12},{wch:26},{wch:13},{wch:20}];
+  ws['!merges']=[{s:{r:0,c:0},e:{r:0,c:5}}];
+  if(ws['A1'])ws['A1'].s={font:titleFont};
+  cols.forEach(function(col){
+    var ref=col+'3';
+    if(ws[ref])ws[ref].s={font:headerFont,fill:headerFill,alignment:{horizontal:'center'},border:cellBorder};
+  });
+  for(var r=4;r<=aoa.length;r++){
+    cols.forEach(function(col){
+      var ref=col+r;
+      if(ws[ref])ws[ref].s={border:cellBorder};
+    });
+  }
+  var wb=XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb,ws,'Readings');
+  return wb;
+}
+async function myrDownload(year,month){
+  if(!navigator.onLine){toast('Downloads need an internet connection.','err');return;}
+  toast('Preparing download…');
+  try{
+    var controller=new AbortController();var tid=setTimeout(function(){controller.abort();},TIMEOUT);
+    var res=await fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({action:'getMyReadings',token:session.token,mode:'export',year:year,month:month||'',employee:_myrEmployee}),redirect:'follow',signal:controller.signal});clearTimeout(tid);
+    var json=await res.json();
+    if(!json.success){toast(json.error||'Download failed.','err');return;}
+    var rows=json.rows||[];
+    if(!rows.length){toast('No readings to download.','err');return;}
+    var who=_myrEmployee||session.fullName||'Employee';
+    var whoSafe=who.replace(/[^A-Za-z0-9]+/g,'_');
+    var periodLabel=month?((MONTH_NAMES[parseInt(month,10)]||month)+' '+year):String(year);
+    var periodSafe=month?(year+'-'+month):String(year);
+    var title='A&N Electricity \u2014 KWH Readings \u2014 '+who+' \u2014 '+periodLabel;
+    try{
+      await loadXlsxStyleScript();
+      var wb=myrBuildStyledSheet(rows,title);
+      XLSX.writeFile(wb,'KWH_'+whoSafe+'_'+periodSafe+'.xlsx');
+      toast(rows.length+' reading'+(rows.length!==1?'s':'')+' downloaded','ok');
+    }catch(libErr){
+      var blob=new Blob([myrToCsv(rows)],{type:'text/csv;charset=utf-8;'});
+      var url=URL.createObjectURL(blob);
+      var a=document.createElement('a');a.href=url;a.download='KWH_'+whoSafe+'_'+periodSafe+'.csv';document.body.appendChild(a);a.click();
+      setTimeout(function(){document.body.removeChild(a);URL.revokeObjectURL(url);},1000);
+      toast(rows.length+' reading'+(rows.length!==1?'s':'')+' downloaded (plain format — Excel library unavailable)','ok');
+    }
+  }catch(err){
+    toast(err.name==='AbortError'?'Request timed out.':'Download failed.','err');
+  }
+}
 init();
 </script>
 </body>
