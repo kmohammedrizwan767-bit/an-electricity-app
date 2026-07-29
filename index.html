@@ -417,6 +417,31 @@
     .bottom-sheet{left:50%;right:auto;width:100%;max-width:480px;transform:translate(-50%,100%);}
     .bottom-sheet.open{transform:translate(-50%,0);}
   }
+
+  /* ===== GLOBAL: prevent Android's long-press callout (Copy/Share/Select all)
+     from firing on icons/buttons. Applies to every tappable control in the
+     app -- navbar icons, FAB, bottom nav, menu items, chips, filter pills.
+     Does NOT touch .det-value/.det-phone-num, which stay user-select:text
+     on purpose so consumer data remains copyable. */
+  button,.nav-btn,.fab,.bnav,.mi,.chip,.f-pill,.sort-btn,.sel-cancel,
+  .sel-all-btn,.eye,.refresh-btn,.mr-back,.mr-close,.mr-del-ico,.myr-dl,
+  .qkwh-change-btn,.prefix-chip,.s-clr,.det-phone-btn{
+    -webkit-touch-callout:none;
+    -webkit-user-select:none;
+    user-select:none;
+    -webkit-user-drag:none;
+    touch-action:manipulation;
+  }
+  /* Icon glyphs inside icon-only buttons must not intercept the long-press
+     themselves -- forces every pointer event on these to resolve to the
+     parent button, not the inner <span>. */
+  .nav-btn .material-icons-round,.fab .material-icons-round,
+  .bnav .material-icons-round,.sel-cancel .material-icons-round,
+  .refresh-btn .material-icons-round,.mr-back .material-icons-round,
+  .mr-close .material-icons-round,.mr-del-ico .material-icons-round,
+  .myr-dl .material-icons-round,.eye .material-icons-round{
+    pointer-events:none;
+  }
   </style>
 </head>
 <body>
