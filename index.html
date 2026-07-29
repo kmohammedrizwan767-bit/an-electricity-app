@@ -432,7 +432,8 @@
     <button class="nav-btn" id="userMenuBtn"><span class="material-icons-round">account_circle</span></button>
   </div>
 </nav>
-<input type="file" accept="image/*" id="homeScanInput" class="hidden" onchange="handleIdentifyScanFile(event)">
+<input type="file" accept="image/*" capture="environment" id="homeScanInput" class="hidden" onchange="handleIdentifyScanFile(event)">
+<input type="file" accept="image/*" id="homeGalleryInput" class="hidden" onchange="handleIdentifyScanFile(event)">
 <div class="sel-bar hidden" id="selBar">
   <button class="sel-cancel" onclick="exitSelectMode()"><span class="material-icons-round">close</span></button>
   <span class="sel-cnt" id="selCnt">Tap to select</span>
@@ -1588,6 +1589,34 @@ function startIdentifyScan(){
   if(!navigator.onLine){toast('AI scan needs an internet connection. Use Quick KWH search instead.','err');return;}
   $('homeScanInput').click();
 }
+function openScanGallery(){
+  if($('navScanBtn').classList.contains('scanning'))return;
+  if(!navigator.onLine){toast('AI scan needs an internet connection. Use Quick KWH search instead.','err');return;}
+  $('homeGalleryInput').click();
+}
+/* Long press on the scan icon opens the gallery instead of the camera --
+   same 500ms + vibration convention already used for card long-press, kept
+   separate from attachLongPress since that one is tied specifically to
+   consumer cards and select-mode, not reusable as-is here. A short tap
+   (the existing onclick) still opens the camera, unchanged. */
+(function(){
+  var scanPressTimer=null,scanLongPressed=false;
+  var btn=$('navScanBtn');
+  btn.addEventListener('pointerdown',function(){
+    scanLongPressed=false;
+    scanPressTimer=setTimeout(function(){
+      scanLongPressed=true;
+      if(navigator.vibrate)navigator.vibrate(50);
+      openScanGallery();
+    },500);
+  });
+  ['pointerup','pointercancel','pointerleave'].forEach(function(evt){
+    btn.addEventListener(evt,function(){clearTimeout(scanPressTimer);});
+  });
+  btn.addEventListener('click',function(e){
+    if(scanLongPressed){e.stopImmediatePropagation();scanLongPressed=false;}
+  },true);
+})();
 /* Step 16d: replaces the old Tesseract path entirely -- one photo, one AI
    call, returns ConNo/MeterNo (to identify who) AND the KWH reading (if
    visible) together. Always online-only -- no offline path exists for this

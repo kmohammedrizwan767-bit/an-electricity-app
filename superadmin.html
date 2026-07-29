@@ -896,6 +896,23 @@
     .mr-add-btn:active { background: rgba(0,82,180,0.16); }
     .mr-add-btn .material-icons-round { font-size: 18px; }
 
+    .sa-result-row {
+      display: flex; align-items: center; justify-content: space-between; gap: 10px;
+      background: var(--bg); border: 1px solid var(--card-border);
+      border-radius: 14px; padding: 12px 14px; margin-bottom: 8px; cursor: pointer;
+    }
+    .sa-result-row:active { opacity: 0.7; }
+    .sa-result-name { font-family: 'Poppins', sans-serif; font-weight: 600; font-size: 13px; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .sa-result-meta { font-size: 11.5px; color: var(--text-secondary); margin-top: 2px; }
+    .sa-read-row {
+      display: flex; align-items: center; justify-content: space-between; gap: 10px;
+      background: var(--bg); border: 1px solid var(--card-border);
+      border-radius: 14px; padding: 11px 13px; margin-bottom: 7px;
+    }
+    .sa-read-con { font-family: 'Poppins', sans-serif; font-weight: 700; font-size: 13px; color: var(--text); }
+    .sa-read-val { font-family: 'Poppins', sans-serif; font-weight: 700; font-size: 14px; color: var(--primary-light); }
+    .sa-read-name { font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
+    .sa-read-time { font-size: 11px; color: var(--text-secondary); margin-top: 2px; }
     .mr-year-row {
       display: flex; align-items: center; justify-content: space-between;
       padding: 14px 4px; cursor: pointer;
@@ -1209,8 +1226,17 @@
 <div class="bottom-sheet" id="sheetViewConsumers">
   <div class="sheet-handle"></div>
   <div class="sheet-header">
-    <div class="sheet-title" id="vcOfficeName">Consumers</div>
-    <div class="sheet-subtitle" id="vcSubtitle">Loading...</div>
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;">
+      <div style="flex:1;min-width:0;">
+        <div class="sheet-title" id="vcOfficeName">Consumers</div>
+        <div class="sheet-subtitle" id="vcSubtitle">Loading...</div>
+      </div>
+      <div style="display:flex;gap:2px;flex-shrink:0;">
+        <button class="icon-btn" onclick="saOpenQkwh()" title="Quick KWH"><span class="material-icons-round">electric_meter</span></button>
+        <button class="icon-btn" onclick="saStartScan()" title="Scan meter"><span class="material-icons-round">document_scanner</span></button>
+        <button class="icon-btn" onclick="saOpenReadings()" title="Readings"><span class="material-icons-round">download</span></button>
+      </div>
+    </div>
   </div>
   <div class="vc-select-bar" id="vcSelectBar">
     <button class="vc-select-close" onclick="vcExitSelect()">
@@ -1232,6 +1258,85 @@
   </div>
   <div class="vc-count-bar" id="vcCountBar"></div>
   <div class="vc-list" id="vcList"></div>
+</div>
+
+<input type="file" accept="image/*" id="saScanInput" style="display:none" onchange="saHandleScanFile(event)">
+
+<!-- QUICK KWH (SuperAdmin) -->
+<div class="bottom-sheet" id="sheetSAQkwh">
+  <div class="sheet-handle"></div>
+  <div class="sheet-header">
+    <div class="sheet-title">Quick KWH</div>
+    <div class="sheet-subtitle" id="saQkwhOfficeSub"></div>
+  </div>
+  <div class="sheet-body">
+    <div id="saQkwhSearchStep">
+      <div class="vc-search-inner" style="position:relative;margin-bottom:8px;">
+        <span class="material-icons-round search-icon">search</span>
+        <input type="search" id="saQkwhSearch" class="form-input" placeholder="Name, ConNo, or meter no..." autocomplete="off" />
+      </div>
+      <div class="prefix-row" id="saQkwhPrefixRow"></div>
+      <div id="saQkwhResults"></div>
+    </div>
+    <div id="saQkwhEntryStep" style="display:none;">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:16px;">
+        <div style="flex:1;min-width:0;">
+          <div class="sheet-title" id="saQkwhName" style="text-align:left;">—</div>
+          <div class="sheet-subtitle" id="saQkwhConno"></div>
+        </div>
+        <button class="btn-secondary" style="width:auto;margin-top:0;padding:8px 14px;" onclick="saQkwhBackToSearch()">Change</button>
+      </div>
+      <div class="form-group">
+        <label class="form-label">KWH Reading</label>
+        <input type="number" inputmode="decimal" step="0.01" class="form-input" id="saQkwhValue" placeholder="Enter KWH value" />
+        <div style="font-size:11.5px;color:var(--text-secondary);margin-top:6px;" id="saQkwhPrev"></div>
+        <div style="font-size:11.5px;color:var(--accent);margin-top:6px;display:none;" id="saQkwhWarn"></div>
+      </div>
+      <button class="btn-primary" onclick="saQkwhSave()"><span class="material-icons-round">save</span>Save &amp; Next</button>
+    </div>
+    <button class="btn-secondary" onclick="hideSheet('sheetSAQkwh')">Close</button>
+  </div>
+</div>
+
+<!-- SCAN RECHECK (SuperAdmin) -->
+<div class="bottom-sheet" id="sheetSARecheck">
+  <div class="sheet-handle"></div>
+  <div class="sheet-header">
+    <div class="sheet-title">Double-Check This Scan</div>
+    <div class="sheet-subtitle">The photo wasn't fully clear — please verify.</div>
+  </div>
+  <div class="sheet-body">
+    <div class="toggle-info-box activate">
+      <div class="tib-name" id="saRecheckName">—</div>
+      <div class="tib-sub" id="saRecheckConno">—</div>
+      <div class="tib-sub" id="saRecheckReading" style="margin-top:6px;font-weight:600;color:var(--text);">KWH: —</div>
+    </div>
+    <button class="btn-primary" onclick="saRecheckConfirm()"><span class="material-icons-round">check</span>Looks Right, Continue</button>
+    <button class="btn-secondary" onclick="saRecheckRescan()">Scan Again</button>
+    <button class="btn-secondary" onclick="saRecheckSearchInstead()">Search Manually Instead</button>
+  </div>
+</div>
+
+<!-- READINGS EXPORT (SuperAdmin) -->
+<div class="bottom-sheet" id="sheetSAReadings">
+  <div class="sheet-handle"></div>
+  <div class="mr-hist-header">
+    <button class="mr-back-btn" id="saReadBackBtn" onclick="saReadBack()"><span class="material-icons-round">arrow_back</span></button>
+    <div class="mr-hist-title-wrap">
+      <div class="sheet-title" id="saReadTitle">KWH Readings</div>
+      <div class="sheet-subtitle" id="saReadSub"></div>
+    </div>
+    <button class="mr-hist-close" onclick="hideSheet('sheetSAReadings')"><span class="material-icons-round">close</span></button>
+  </div>
+  <div style="padding:14px 20px 0;">
+    <div class="form-group" style="margin-bottom:8px;">
+      <label class="form-label">Employee</label>
+      <select class="form-input" id="saReadEmpSel" onchange="saReadEmployeeChanged()">
+        <option value="">All Employees</option>
+      </select>
+    </div>
+  </div>
+  <div class="mr-hist-body" id="saReadBody"></div>
 </div>
 
 <!-- CONSUMER DETAIL (tap card) -->
@@ -1506,7 +1611,7 @@
    ============================================= */
 const API_URL = 'https://script.google.com/macros/s/AKfycbyeO7pIZrT1WKPHHuR8LKxhPKgf4uELmkSkIgUefNwT88JdCBiAoTAfgKTyCBKEMmBowQ/exec';
 
-const ALL_SHEETS = ['sheetAddOffice','sheetApproveReq','sheetChangePwd','sheetViewConsumers','sheetVCDetail','sheetVCEdit','sheetVCDel','sheetVCBulkDel','sheetOfficeTog','sheetMRHistory','sheetMRForm','sheetMRDel'];
+const ALL_SHEETS = ['sheetAddOffice','sheetApproveReq','sheetChangePwd','sheetViewConsumers','sheetVCDetail','sheetVCEdit','sheetVCDel','sheetVCBulkDel','sheetOfficeTog','sheetMRHistory','sheetMRForm','sheetMRDel','sheetSAQkwh','sheetSARecheck','sheetSAReadings'];
 
 let session         = null;
 let allOffices      = [];
@@ -2765,20 +2870,23 @@ function checkUnauthorized(res) {
    a dispatched event rather than duplicating its filter logic.
    ============================================= */
 const QUICK_SEARCH_PREFIXES = ['E/', 'E1/'];
-function renderVcPrefixRow() {
-  const el = document.getElementById('vcPrefixRow');
+function renderPrefixRow(containerId, fillFn) {
+  const el = document.getElementById(containerId);
   if (!el) return;
   el.innerHTML = QUICK_SEARCH_PREFIXES.map(p =>
     `<button class="prefix-chip" data-prefix="${esc(p)}">${esc(p)}</button>`
   ).join('');
   el.querySelectorAll('.prefix-chip').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const inp = document.getElementById('vcSearch');
-      inp.value = btn.dataset.prefix;
-      inp.dispatchEvent(new Event('input'));
-      inp.focus();
-      if (inp.setSelectionRange) inp.setSelectionRange(inp.value.length, inp.value.length);
-    });
+    btn.addEventListener('click', () => fillFn(btn.dataset.prefix));
+  });
+}
+function renderVcPrefixRow() {
+  renderPrefixRow('vcPrefixRow', (prefix) => {
+    const inp = document.getElementById('vcSearch');
+    inp.value = prefix;
+    inp.dispatchEvent(new Event('input'));
+    inp.focus();
+    if (inp.setSelectionRange) inp.setSelectionRange(inp.value.length, inp.value.length);
   });
 }
 
@@ -2886,6 +2994,347 @@ async function init() {
   document.getElementById('otog-btn').addEventListener('click', handleOfficeToggle);
 
   setupEyeButtons();
+}
+
+/* =============================================
+   STEP 16f — SUPERADMIN FEATURE PARITY
+   Quick KWH, AI scan (with recheck gate), and Readings export -- same
+   behavior as index.html's Employee/Admin versions, adapted to this file's
+   structure: _vc.all instead of masterList, _vc.sheetId passed explicitly
+   as officeSheetId on every call (SuperAdmin has no "home" office sheet),
+   and the api() helper instead of raw fetch. Kept as faithful a port as
+   possible rather than reinvented, since the original versions are already
+   tested and correct.
+   ============================================= */
+
+function saStripGpPrefix(v) {
+  return String(v || '').replace(/^\s*GP\s*(?=\d)/i, '').trim();
+}
+function saFindConsumerByScan(conNo, meterNo) {
+  const list = _vc.all;
+  if (conNo) {
+    const hit = list.find(c => c['ConNo'] && String(c['ConNo']).toUpperCase() === String(conNo).toUpperCase());
+    if (hit) return hit;
+  }
+  if (meterNo) {
+    const mNorm = saStripGpPrefix(meterNo).toUpperCase();
+    const hit = list.find(c => c['MeterNo'] && saStripGpPrefix(c['MeterNo']).toUpperCase() === mNorm);
+    if (hit) return hit;
+  }
+  return null;
+}
+
+/* ---- Quick KWH ---- */
+let _saQkwhConsumer = null;
+function saOpenQkwh() {
+  _saQkwhConsumer = null;
+  document.getElementById('saQkwhOfficeSub').textContent = _vc.officeName || '';
+  document.getElementById('saQkwhSearch').value = '';
+  document.getElementById('saQkwhResults').innerHTML = '';
+  document.getElementById('saQkwhSearchStep').style.display = 'block';
+  document.getElementById('saQkwhEntryStep').style.display = 'none';
+  renderPrefixRow('saQkwhPrefixRow', (prefix) => {
+    const inp = document.getElementById('saQkwhSearch');
+    inp.value = prefix; saQkwhSearch(prefix); inp.focus();
+    if (inp.setSelectionRange) inp.setSelectionRange(prefix.length, prefix.length);
+  });
+  showSheet('sheetSAQkwh');
+  setTimeout(() => document.getElementById('saQkwhSearch').focus(), 380);
+}
+function saQkwhSearch(q) {
+  q = (q || '').toLowerCase().trim();
+  const el = document.getElementById('saQkwhResults');
+  if (!q) { el.innerHTML = ''; return; }
+  let list = _vc.all.filter(c =>
+    String(c['ConsumerName'] || '').toLowerCase().includes(q) ||
+    String(c['ConNo'] || '').toLowerCase().includes(q) ||
+    String(c['MeterNo'] || '').toLowerCase().includes(q) ||
+    String(c['PhoneNo'] || '').includes(q));
+  list = list.slice().sort((a, b) => {
+    const aExact = String(a['ConNo'] || '').toLowerCase() === q || saStripGpPrefix(a['MeterNo']).toLowerCase() === q;
+    const bExact = String(b['ConNo'] || '').toLowerCase() === q || saStripGpPrefix(b['MeterNo']).toLowerCase() === q;
+    return aExact && !bExact ? -1 : (bExact && !aExact ? 1 : 0);
+  });
+  if (!list.length) { el.innerHTML = '<div class="empty-state" style="padding:24px 12px;"><p>No matching consumers</p></div>'; return; }
+  el.innerHTML = list.slice(0, 20).map((c, i) =>
+    `<div class="sa-result-row" data-idx="${i}">
+      <div style="min-width:0;flex:1;">
+        <div class="sa-result-name">${esc(c['ConsumerName'] || '—')}</div>
+        <div class="sa-result-meta">${esc(c['ConNo'] || '—')}${c['MeterNo'] ? ' · ' + esc(c['MeterNo']) : ''}</div>
+      </div>
+      <span class="material-icons-round" style="color:var(--text-secondary);">chevron_right</span>
+    </div>`).join('');
+  const shown = list.slice(0, 20);
+  el.querySelectorAll('.sa-result-row').forEach((row, i) => {
+    row.addEventListener('click', () => saQkwhSelectConsumer(shown[i]));
+  });
+}
+function saQkwhShowEntryFor(c, prefilledValue) {
+  _saQkwhConsumer = c;
+  document.getElementById('saQkwhName').textContent = c['ConsumerName'] || '—';
+  document.getElementById('saQkwhConno').textContent = 'Consumer No: ' + (c['ConNo'] || '—');
+  document.getElementById('saQkwhValue').value = prefilledValue || '';
+  const prevEl = document.getElementById('saQkwhPrev');
+  if (c['LatestKWH']) {
+    prevEl.innerHTML = 'Last reading: <strong>' + esc(c['LatestKWH']) + '</strong>' + (c['LatestKWHAt'] ? ' · ' + esc(fmtDate(c['LatestKWHAt'])) : '');
+  } else { prevEl.innerHTML = ''; }
+  saQkwhCheckValue();
+  document.getElementById('saQkwhSearchStep').style.display = 'none';
+  document.getElementById('saQkwhEntryStep').style.display = 'block';
+}
+function saQkwhCheckValue() {
+  const warnEl = document.getElementById('saQkwhWarn');
+  warnEl.style.display = 'none'; warnEl.innerHTML = '';
+  if (!_saQkwhConsumer || !_saQkwhConsumer['LatestKWH']) return;
+  const cur = parseFloat(document.getElementById('saQkwhValue').value);
+  const prev = parseFloat(_saQkwhConsumer['LatestKWH']);
+  if (isNaN(cur) || isNaN(prev)) return;
+  let msg = '';
+  if (cur < prev) msg = 'Lower than the last reading (' + esc(_saQkwhConsumer['LatestKWH']) + '). Check the meter.';
+  else if (prev > 0 && cur > prev * 2 && (cur - prev) > 1000) msg = 'Very large jump from ' + esc(_saQkwhConsumer['LatestKWH']) + '. Double-check the digits.';
+  if (msg) { warnEl.textContent = msg; warnEl.style.display = 'block'; }
+}
+function saQkwhSelectConsumer(c) {
+  saQkwhShowEntryFor(c, '');
+  setTimeout(() => document.getElementById('saQkwhValue').focus(), 200);
+}
+function saQkwhOpenForConsumer(c, prefilledValue) {
+  saQkwhShowEntryFor(c, prefilledValue);
+  showSheet('sheetSAQkwh');
+  setTimeout(() => document.getElementById('saQkwhValue').focus(), 380);
+}
+function saQkwhBackToSearch() {
+  _saQkwhConsumer = null;
+  document.getElementById('saQkwhEntryStep').style.display = 'none';
+  document.getElementById('saQkwhSearchStep').style.display = 'block';
+  setTimeout(() => document.getElementById('saQkwhSearch').focus(), 200);
+}
+async function saQkwhSave() {
+  if (!_saQkwhConsumer) return;
+  const val = document.getElementById('saQkwhValue').value.trim();
+  if (val === '' || isNaN(parseFloat(val))) { showToast('Enter a valid number', 'error'); return; }
+  if (!navigator.onLine) { showToast('Internet connection required to save.', 'error'); return; }
+  const c = _saQkwhConsumer;
+  const name = c['ConsumerName'] || c['ConNo'];
+  c['LatestKWH'] = val; c['LatestKWHAt'] = new Date().toISOString();
+  showToast('Saved: ' + name, 'success');
+  saQkwhBackToSearch();
+  document.getElementById('saQkwhSearch').value = ''; document.getElementById('saQkwhResults').innerHTML = '';
+  try {
+    const res = await api({ action: 'addMeterReading', token: session.token, officeSheetId: _vc.sheetId, conNo: c['ConNo'], readingType: 'KWH', value: val, source: 'Manual' });
+    if (checkUnauthorized(res)) return;
+    if (!res.success) throw new Error(res.message || res.error || 'Save failed');
+  } catch (err) {
+    showToast((name) + ' didn\u2019t save: ' + err.message, 'error', 6000);
+  }
+}
+
+/* ---- AI Scan + Recheck ---- */
+function saStartScan() {
+  if (!navigator.onLine) { showToast('AI scan needs an internet connection.', 'error'); return; }
+  document.getElementById('saScanInput').click();
+}
+async function saHandleScanFile(e) {
+  const file = e.target.files && e.target.files[0];
+  e.target.value = '';
+  if (!file) return;
+  showToast('Scanning photo…');
+  try {
+    const dataUrl = await saDownscaleImage(file, 800);
+    const base64Data = dataUrl.split(',')[1];
+    const res = await api({ action: 'identifyMeterPhoto', token: session.token, image: base64Data, mimeType: 'image/jpeg' });
+    if (checkUnauthorized(res)) return;
+    if (!res.success) { showToast(res.error || 'AI scan failed.', 'error'); return; }
+    const match = saFindConsumerByScan(res.conNo, res.meterNo);
+    if (!match) { showToast("Couldn't match that to a consumer — search manually.", 'error'); saOpenQkwh(); return; }
+    if (res.kvahOnly) {
+      showToast('Display shows KVAH, not KWH — wait for kWh, then enter it.', 'error');
+      saQkwhOpenForConsumer(match, '');
+    } else if (res.lowConfidence) {
+      saOpenRecheck(match, res.kwhReading);
+    } else {
+      showToast('Found: ' + (match['ConsumerName'] || match['ConNo']), 'success');
+      saQkwhOpenForConsumer(match, res.kwhReading);
+    }
+  } catch (err) {
+    showToast('Scan failed: ' + err.message, 'error');
+  }
+}
+function saDownscaleImage(file, maxDim) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    const url = URL.createObjectURL(file);
+    img.onload = () => {
+      const scale = Math.min(1, maxDim / Math.max(img.width, img.height));
+      const w = Math.round(img.width * scale), h = Math.round(img.height * scale);
+      const canvas = document.createElement('canvas'); canvas.width = w; canvas.height = h;
+      canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+      URL.revokeObjectURL(url);
+      resolve(canvas.toDataURL('image/jpeg', 0.85));
+    };
+    img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('Could not read the photo.')); };
+    img.src = url;
+  });
+}
+let _saRecheckConsumer = null, _saRecheckValue = '';
+function saOpenRecheck(c, prefilledValue) {
+  _saRecheckConsumer = c; _saRecheckValue = prefilledValue || '';
+  document.getElementById('saRecheckName').textContent = c['ConsumerName'] || '—';
+  document.getElementById('saRecheckConno').textContent = 'Consumer No: ' + (c['ConNo'] || '—');
+  document.getElementById('saRecheckReading').textContent = _saRecheckValue ? ('KWH: ' + _saRecheckValue) : 'KWH: not read — enter manually';
+  showSheet('sheetSARecheck');
+}
+function saRecheckConfirm() {
+  const c = _saRecheckConsumer, val = _saRecheckValue;
+  hideSheet('sheetSARecheck');
+  setTimeout(() => saQkwhOpenForConsumer(c, val), 250);
+}
+function saRecheckRescan() {
+  hideSheet('sheetSARecheck');
+  setTimeout(() => saStartScan(), 250);
+}
+function saRecheckSearchInstead() {
+  hideSheet('sheetSARecheck');
+  setTimeout(() => saOpenQkwh(), 250);
+}
+
+/* ---- Readings export ---- */
+let _saReadData = null, _saReadYear = null, _saReadMonth = null, _saReadRows = null, _saReadEmployee = '', _saReadToken = 0;
+function saOpenReadings() {
+  _saReadData = null; _saReadYear = null; _saReadMonth = null; _saReadRows = null; _saReadEmployee = '';
+  _saReadToken++;
+  document.getElementById('saReadSub').textContent = _vc.officeName || '';
+  document.getElementById('saReadBackBtn').classList.remove('show');
+  document.getElementById('saReadBody').innerHTML = mrSkeleton();
+  showSheet('sheetSAReadings');
+  saFetchReadSummary();
+}
+async function saFetchReadSummary() {
+  if (!navigator.onLine) { document.getElementById('saReadBody').innerHTML = '<div class="mr-offline">Downloads need an internet connection.</div>'; return; }
+  try {
+    const res = await api({ action: 'getMyReadings', token: session.token, mode: 'summary', employee: _saReadEmployee, officeSheetId: _vc.sheetId });
+    if (checkUnauthorized(res)) return;
+    if (!res.success) { document.getElementById('saReadBody').innerHTML = '<div class="mr-error">' + esc(res.error || 'Failed to load.') + '</div>'; return; }
+    _saReadData = res.years || {};
+    if (res.employees) {
+      const sel = document.getElementById('saReadEmpSel');
+      if (sel.options.length <= 1) res.employees.forEach(name => { const o = document.createElement('option'); o.value = name; o.textContent = name; sel.appendChild(o); });
+    }
+    saRenderReadings();
+  } catch (err) {
+    document.getElementById('saReadBody').innerHTML = '<div class="mr-error">Network error.</div>';
+  }
+}
+function saReadEmployeeChanged() {
+  _saReadEmployee = document.getElementById('saReadEmpSel').value;
+  _saReadYear = null; _saReadMonth = null; _saReadRows = null; _saReadToken++;
+  document.getElementById('saReadBackBtn').classList.remove('show');
+  document.getElementById('saReadBody').innerHTML = mrSkeleton();
+  saFetchReadSummary();
+}
+function saReadBack() {
+  if (_saReadMonth) { _saReadToken++; _saReadMonth = null; _saReadRows = null; saRenderReadings(); return; }
+  _saReadYear = null; document.getElementById('saReadBackBtn').classList.remove('show'); saRenderReadings();
+}
+function saRenderReadings() {
+  const body = document.getElementById('saReadBody');
+  const years = Object.keys(_saReadData || {}).sort((a, b) => b.localeCompare(a));
+  if (!years.length) { body.innerHTML = '<div class="mr-empty"><span class="material-icons-round">download</span><p>No KWH readings recorded yet.</p></div>'; return; }
+  let html = '';
+  if (!_saReadYear) {
+    const grandTotal = years.reduce((s, y) => s + _saReadData[y].total, 0);
+    html += `<button class="mr-add-btn" onclick="saDownloadReadings(null,null)"><span class="material-icons-round">download</span>Download All (${grandTotal} readings)</button>`;
+    html += years.map(y => `<div class="mr-year-row" onclick="saOpenReadYear('${esc(y)}')">
+      <span class="mr-year-label">${esc(y)}</span>
+      <span class="mr-year-count">${_saReadData[y].total} readings
+        <button class="mr-icon-sm" onclick="event.stopPropagation();saDownloadReadings('${esc(y)}',null)"><span class="material-icons-round">download</span></button>
+        <span class="material-icons-round" style="font-size:16px;">chevron_right</span>
+      </span></div>`).join('');
+  } else if (!_saReadMonth) {
+    const months = _saReadData[_saReadYear] ? Object.keys(_saReadData[_saReadYear].months).sort((a, b) => b.localeCompare(a)) : [];
+    html += months.map(m => `<div class="mr-year-row" onclick="saOpenReadMonth('${esc(m)}')">
+      <span class="mr-year-label">${esc(MONTH_NAMES[parseInt(m, 10)] || m)}</span>
+      <span class="mr-year-count">${_saReadData[_saReadYear].months[m]} readings
+        <button class="mr-icon-sm" onclick="event.stopPropagation();saDownloadReadings('${esc(_saReadYear)}','${esc(m)}')"><span class="material-icons-round">download</span></button>
+        <span class="material-icons-round" style="font-size:16px;">chevron_right</span>
+      </span></div>`).join('');
+  } else {
+    if (_saReadRows === null) { body.innerHTML = mrSkeleton(); return; }
+    html += `<button class="mr-add-btn" onclick="saDownloadReadings('${esc(_saReadYear)}','${esc(_saReadMonth)}')"><span class="material-icons-round">download</span>Download This Month</button>`;
+    if (!_saReadRows.length) {
+      html += '<div class="mr-empty"><span class="material-icons-round">inbox</span><p>No readings in this month.</p></div>';
+    } else {
+      html += _saReadRows.slice().reverse().map(r => {
+        const c = _vc.all.find(x => x['ConNo'] === r.ConNo);
+        const nm = c ? (c['ConsumerName'] || '') : '';
+        const when = fmtDate(r.Timestamp);
+        return `<div class="sa-read-row"><div style="min-width:0;flex:1;">
+          <div style="display:flex;justify-content:space-between;gap:8px;">
+            <span class="sa-read-con">${esc(r.ConNo || '—')}</span><span class="sa-read-val">${esc(r.Value)}</span>
+          </div>
+          ${nm ? '<div class="sa-read-name">' + esc(nm) + '</div>' : ''}
+          <div class="sa-read-time">${esc(when)}${r.EnteredBy ? ' · ' + esc(r.EnteredBy) : ''}</div>
+        </div></div>`;
+      }).join('');
+    }
+  }
+  body.innerHTML = html;
+  document.getElementById('saReadTitle').textContent = _saReadMonth ? ((MONTH_NAMES[parseInt(_saReadMonth, 10)] || _saReadMonth) + ' ' + _saReadYear) : (_saReadYear || 'KWH Readings');
+}
+function saOpenReadYear(y) {
+  _saReadYear = y;
+  document.getElementById('saReadBackBtn').classList.add('show');
+  saRenderReadings();
+}
+function saOpenReadMonth(m) {
+  _saReadMonth = m; _saReadRows = null;
+  document.getElementById('saReadBackBtn').classList.add('show');
+  saRenderReadings();
+  saFetchReadRows(_saReadYear, m);
+}
+async function saFetchReadRows(year, month) {
+  const myToken = ++_saReadToken;
+  if (!navigator.onLine) { if (myToken === _saReadToken) { _saReadRows = []; saRenderReadings(); } return; }
+  try {
+    const res = await api({ action: 'getMyReadings', token: session.token, mode: 'export', year: year, month: month || '', employee: _saReadEmployee, officeSheetId: _vc.sheetId });
+    if (myToken !== _saReadToken) return;
+    if (checkUnauthorized(res)) return;
+    _saReadRows = res.success ? (res.rows || []) : [];
+  } catch (err) {
+    if (myToken !== _saReadToken) return;
+    _saReadRows = [];
+  }
+  if (myToken === _saReadToken) saRenderReadings();
+}
+async function saDownloadReadings(year, month) {
+  if (!navigator.onLine) { showToast('Downloads need an internet connection.', 'error'); return; }
+  showToast('Preparing download…');
+  try {
+    const res = await api({ action: 'getMyReadings', token: session.token, mode: 'export', year: year || '', month: month || '', employee: _saReadEmployee, officeSheetId: _vc.sheetId });
+    if (checkUnauthorized(res)) return;
+    if (!res.success) { showToast(res.error || 'Download failed.', 'error'); return; }
+    const rows = res.rows || [];
+    if (!rows.length) { showToast('No readings to download.', 'error'); return; }
+    const who = _saReadEmployee || 'All_Employees';
+    const whoSafe = who.replace(/[^A-Za-z0-9]+/g, '_');
+    const officeSafe = (_vc.officeName || 'office').replace(/[^A-Za-z0-9]+/g, '_');
+    const periodSafe = month ? (year + '-' + month) : (year || 'All');
+    let csv = 'S.No,Date,ConsumerNo,ConsumerName,KWH,EnteredBy\n';
+    rows.forEach((r, i) => {
+      const c = _vc.all.find(x => x['ConNo'] === r.ConNo);
+      const nm = c ? (c['ConsumerName'] || '') : '';
+      const q = v => '"' + String(v == null ? '' : v).replace(/"/g, '""') + '"';
+      csv += [i + 1, q(fmtDate(r.Timestamp)), q(r.ConNo), q(nm), q(r.Value), q(r.EnteredBy)].join(',') + '\n';
+    });
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a'); a.href = url; a.download = 'KWH_' + officeSafe + '_' + whoSafe + '_' + periodSafe + '.csv';
+    document.body.appendChild(a); a.click();
+    setTimeout(() => { document.body.removeChild(a); URL.revokeObjectURL(url); }, 1000);
+    showToast(rows.length + ' readings downloaded', 'success');
+  } catch (err) {
+    showToast('Download failed: ' + err.message, 'error');
+  }
 }
 
 window.addEventListener('DOMContentLoaded', init);
