@@ -3,7 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <meta name="theme-color" id="themeColor" content="#0052B4">
+  <meta name="theme-color" id="themeColor" content="#EEF2F7">
+  <meta name="color-scheme" content="dark light">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <title>A&N Electricity &#8212; Login</title>
@@ -14,112 +15,231 @@
   <link rel="preconnect" href="https://script.googleusercontent.com">
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+
+  <!-- Step 17b: single source of truth for every design token. -->
+  <link rel="stylesheet" href="./theme.css">
+
+  <script>
+    /*
+     * Pre-paint theme resolution. MUST stay in the document head and MUST stay inline.
+     *
+     * Before 17b, the root element was hardcoded to the light theme and applyTheme()
+     * ran from a script at the BOTTOM of the body — so every dark-mode user
+     * got a flash of the light theme on every single load. Resolving the
+     * theme here, before the first paint, is what removes that flash.
+     *
+     * The two hex values below are the ONLY raw colours outside theme.css.
+     * They are --surface-0 for each theme, and a meta tag needs a literal.
+     * If theme.css --surface-0 ever changes, change these to match.
+     */
+    window.__SURFACE0 = { dark: '#060C18', light: '#EEF2F7' };
+    (function () {
+      var saved = null;
+      try { saved = localStorage.getItem('an_elect_theme'); } catch (e) {}
+      var t = saved || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+      document.documentElement.setAttribute('data-theme', t);
+      var m = document.getElementById('themeColor');
+      if (m) m.content = window.__SURFACE0[t];
+    })();
+  </script>
+
   <style>
-    :root{--primary:#0052B4;--primary-light:#1976D2;--primary-dark:#003A82;--accent:#FFC107;--bg:#EEF2F7;--card:#FFFFFF;--card-border:#D1DCF0;--text-1:#1A1A2E;--text-2:#5A6A85;--inp-bg:#F4F7FF;--inp-border:#C5D0E8;--inp-focus:#0052B4;--icon-clr:#8096B2;--theme-btn-bg:#E8EEFA;--theme-btn-clr:#0052B4;--shadow:0 8px 32px rgba(0,82,180,0.13);--err:#D32F2F;--err-bg:rgba(211,47,47,0.08);--err-border:rgba(211,47,47,0.2);--ok:#2E7D32;--ok-bg:rgba(46,125,50,0.08);--ok-border:rgba(46,125,50,0.2);--ff-display:'Poppins',sans-serif;--ff-body:'Roboto',sans-serif;--ease:0.28s ease;}
-    [data-theme="dark"]{--bg:#080F1E;--card:#0D1D36;--card-border:#162A4A;--text-1:#E8F0FE;--text-2:#7A99CC;--inp-bg:#081428;--inp-border:#162A4A;--inp-focus:#4D91FF;--icon-clr:#4A6A99;--theme-btn-bg:#162A4A;--theme-btn-clr:#4D91FF;--shadow:0 8px 40px rgba(0,0,0,0.45);--err:#EF5350;--err-bg:rgba(239,83,80,0.1);--err-border:rgba(239,83,80,0.25);--ok:#66BB6A;--ok-bg:rgba(102,187,106,0.1);--ok-border:rgba(102,187,106,0.25);}
+    /* ════════════════════════════════════════════════════════════
+       login.html component CSS — Step 17b
+       Every colour, radius, duration and type step comes from
+       theme.css. There is no raw hex in this block by design.
+
+       Removed in 17b (all decoration, per DESIGN_SPEC 1 + 7):
+         - body::before ambient radial glow
+         - .pulse-line  (animated background-position, infinite)
+         - .logo-box::after logoShine (animated left, infinite)
+         - .btn-primary::before hover sheen
+         - .wrap fadeUp page-load animation
+         - both linear-gradient fills (logo box, primary button)
+         - backdrop-filter: blur(4px) on the sheet scrim  -- BANNED
+       The two infinite repaint-per-frame loops were also the only
+       real rendering cost on this page.
+       ════════════════════════════════════════════════════════════ */
+
     *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
-    body{font-family:var(--ff-body);background:var(--bg);color:var(--text-1);min-height:100vh;min-height:100dvh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:1.25rem 1rem;transition:background var(--ease),color var(--ease);position:relative;overflow-x:hidden;}
-    body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 60% 40% at 15% 15%,rgba(0,82,180,0.09) 0%,transparent 60%),radial-gradient(ellipse 50% 40% at 85% 85%,rgba(255,193,7,0.06) 0%,transparent 55%);pointer-events:none;z-index:0;}
-    [data-theme="dark"] body::before{background:radial-gradient(ellipse 60% 40% at 15% 15%,rgba(0,82,180,0.22) 0%,transparent 60%),radial-gradient(ellipse 50% 40% at 85% 85%,rgba(255,193,7,0.07) 0%,transparent 55%);}
-    #themeToggle{position:fixed;top:.875rem;right:.875rem;z-index:99;width:44px;height:44px;border-radius:50%;border:none;background:var(--theme-btn-bg);color:var(--theme-btn-clr);cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 10px rgba(0,0,0,.14);transition:background var(--ease),color var(--ease),transform 0.15s;}
-    #themeToggle:active{transform:scale(0.9);}
-    #themeToggle .material-icons-round{font-size:21px;}
-    .wrap{width:100%;max-width:390px;position:relative;z-index:1;animation:fadeUp .4s ease both;}
-    @keyframes fadeUp{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:translateY(0)}}
-    .logo-area{text-align:center;margin-bottom:1.5rem;}
-    .logo-box{width:72px;height:72px;background:linear-gradient(140deg,var(--primary-dark) 0%,var(--primary-light) 100%);border-radius:20px;display:inline-flex;align-items:center;justify-content:center;box-shadow:0 8px 24px rgba(0,82,180,.32);position:relative;overflow:hidden;}
-    .logo-box::after{content:'';position:absolute;top:0;left:-120%;width:55%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.18),transparent);animation:logoShine 3.5s ease infinite;}
-    @keyframes logoShine{0%{left:-120%}45%,100%{left:220%}}
-    .logo-box .material-icons-round{font-size:38px;color:var(--accent);position:relative;z-index:1;}
-    .logo-name{font-family:var(--ff-display);font-size:1.2rem;font-weight:700;color:var(--text-1);letter-spacing:-.02em;margin-top:.75rem;}
-    .logo-sub{font-size:.75rem;color:var(--text-2);letter-spacing:.08em;text-transform:uppercase;margin-top:.2rem;}
-    .card{background:var(--card);border:1.5px solid var(--card-border);border-radius:24px;padding:1.75rem 1.5rem 1.5rem;box-shadow:var(--shadow);position:relative;overflow:hidden;transition:background var(--ease),border-color var(--ease),box-shadow var(--ease);}
-    .pulse-line{position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,transparent 0%,var(--primary) 20%,var(--accent) 50%,var(--primary) 80%,transparent 100%);background-size:250% 100%;animation:pulseFlow 2.8s ease-in-out infinite;}
-    @keyframes pulseFlow{0%{background-position:200% 0;opacity:.6}50%{opacity:1}100%{background-position:-200% 0;opacity:.6}}
-    .card-title{font-family:var(--ff-display);font-size:1.25rem;font-weight:600;color:var(--text-1);margin-bottom:.25rem;}
-    .card-sub{font-size:.83rem;color:var(--text-2);margin-bottom:1.5rem;}
+
+    /* Android long-press callout prevention (16f pattern, ported here) */
+    button,.material-icons-round{-webkit-touch-callout:none;-webkit-user-select:none;user-select:none;}
+    button .material-icons-round{pointer-events:none;}
+
+    body{font:var(--t-body);background:var(--surface-0);color:var(--text-1);min-height:100vh;min-height:100dvh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:var(--s-5) var(--edge);overflow-x:hidden;overscroll-behavior:none;}
+
+    /* ── Splash (APP_FLOW_SPEC 3.1) ──────────────────────────────
+       Visible by default; removed the moment the icon font resolves.
+       Deliberately NO minimum display timer -- a timed splash would
+       make the app slower. Its only job is covering the window where
+       Material Icons would otherwise paint as literal words, plus the
+       already-logged-in redirect. Safety net at 1500ms so a failed
+       font load can never trap the user behind it. */
+    #splash{position:fixed;inset:0;z-index:400;background:var(--surface-0);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:var(--s-4);transition:opacity var(--dur-slow) var(--ease-accel);}
+    #splash.gone{opacity:0;pointer-events:none;}
+    .sp-mark{width:64px;height:64px;border-radius:var(--r-lg);background:var(--primary);display:flex;align-items:center;justify-content:center;}
+    .sp-mark .material-icons-round{font-size:34px;color:var(--warning);}
+    .sp-title{font:var(--t-display);letter-spacing:var(--t-display-ls);color:var(--text-1);}
+    .sp-bar{width:112px;height:2px;border-radius:var(--r-full);background:var(--border);overflow:hidden;}
+    .sp-bar::after{content:'';display:block;width:40%;height:100%;border-radius:var(--r-full);background:var(--primary);animation:spSlide 1.1s var(--ease-standard) infinite;}
+    @keyframes spSlide{0%{transform:translateX(-100%)}100%{transform:translateX(350%)}}
+
+    /* ── Shell ──────────────────────────────────────────────────── */
+    #themeToggle{position:fixed;top:var(--s-2);right:var(--s-2);z-index:99;width:var(--tap-min);height:var(--tap-min);border-radius:var(--r-full);border:none;background:transparent;color:var(--text-2);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:opacity var(--dur-instant) var(--ease-standard),background var(--dur-fast) var(--ease-standard);}
+    #themeToggle:active{opacity:.82;background:var(--surface-3);}
+    #themeToggle:focus-visible{outline:none;box-shadow:var(--focus-ring);}
+    #themeToggle .material-icons-round{font-size:22px;}
+
+    .wrap{width:100%;max-width:390px;}
+    .logo-area{text-align:center;margin-bottom:var(--s-6);}
+    .logo-box{width:64px;height:64px;background:var(--primary);border-radius:var(--r-lg);display:inline-flex;align-items:center;justify-content:center;}
+    .logo-box .material-icons-round{font-size:34px;color:var(--warning);}
+    .logo-name{font:var(--t-display);letter-spacing:var(--t-display-ls);color:var(--text-1);margin-top:var(--s-3);}
+    .logo-sub{font:var(--t-body);color:var(--text-2);margin-top:var(--s-1);}
+
+    .card{background:var(--surface-1);border:1px solid var(--border-subtle);border-radius:var(--r-lg);padding:var(--s-6) var(--s-5) var(--s-5);box-shadow:var(--shadow-2);}
+    .card-title{font:var(--t-headline);letter-spacing:var(--t-headline-ls);color:var(--text-1);margin-bottom:var(--s-1);}
+    .card-sub{font:var(--t-body);color:var(--text-2);margin-bottom:var(--s-5);}
     .screen{display:block}
     .screen.hidden{display:none}
-    .alert{display:none;align-items:flex-start;gap:.5rem;padding:.7rem .875rem;border-radius:10px;font-size:.83rem;line-height:1.45;margin-bottom:.75rem;border:1px solid;}
+
+    /* ── Banners ─────────────────────────────────────────────────
+       Message text is --t-body-sm (13px) not --t-label (12px): these
+       carry full sentences, not labels. Deliberate, documented step up.
+       Every state pairs colour with an icon -- never colour alone. */
+    .alert{display:none;align-items:flex-start;gap:var(--s-2);padding:10px var(--s-3);border-radius:var(--r-md);font:var(--t-body-sm);margin-bottom:var(--s-3);}
     .alert.show{display:flex}
     .alert .material-icons-round{font-size:18px;flex-shrink:0;margin-top:1px;}
-    .alert-err{background:var(--err-bg);color:var(--err);border-color:var(--err-border);}
-    .alert-ok{background:var(--ok-bg);color:var(--ok);border-color:var(--ok-border);}
-    .contact-hint{display:none;align-items:flex-start;gap:.5rem;padding:.6rem .875rem;border-radius:10px;font-size:.8rem;line-height:1.5;margin-bottom:.75rem;background:rgba(0,82,180,.07);color:var(--text-2);border:1px solid rgba(0,82,180,.15);}
+    .alert-err{background:var(--danger-container);color:var(--on-danger-container);}
+    .alert-ok{background:var(--success-container);color:var(--on-success-container);}
+    .alert-warn{background:var(--warning-container);color:var(--on-warning-container);}
+
+    /* Neutral hint -- not an error, so no danger styling */
+    .contact-hint{display:none;align-items:flex-start;gap:var(--s-2);padding:10px var(--s-3);border-radius:var(--r-md);font:var(--t-body-sm);color:var(--text-2);background:var(--surface-3);margin-bottom:var(--s-3);}
     .contact-hint.show{display:flex}
-    .contact-hint .material-icons-round{font-size:16px;flex-shrink:0;margin-top:1px;color:var(--primary);}
-    [data-theme="dark"] .contact-hint{background:rgba(77,145,255,.08);border-color:rgba(77,145,255,.2);}
-    .field{margin-bottom:.95rem;}
-    .field-label{display:block;font-size:.78rem;font-weight:500;color:var(--text-2);letter-spacing:.03em;margin-bottom:.35rem;}
+    .contact-hint .material-icons-round{font-size:16px;flex-shrink:0;margin-top:1px;color:var(--primary-text);}
+
+    /* ── Inputs ─────────────────────────────────────────────────── */
+    .field{margin-bottom:var(--s-4);}
+    .field-label{display:block;font:var(--t-label);letter-spacing:var(--t-label-ls);color:var(--text-2);margin-bottom:var(--s-2);}
     .inp-wrap{position:relative;display:flex;align-items:center;}
-    .inp-icon{position:absolute;left:.85rem;color:var(--icon-clr);font-size:20px!important;pointer-events:none;transition:color var(--ease);}
-    .inp-wrap:focus-within .inp-icon{color:var(--inp-focus);}
-    .inp{width:100%;height:50px;background:var(--inp-bg);border:1.5px solid var(--inp-border);border-radius:12px;padding:0 3rem 0 2.85rem;font-family:var(--ff-body);font-size:.95rem;color:var(--text-1);outline:none;transition:border-color var(--ease),background var(--ease),box-shadow var(--ease);-webkit-appearance:none;}
-    .inp::placeholder{color:var(--icon-clr);font-size:.875rem;}
-    .inp:focus{border-color:var(--inp-focus);background:var(--card);box-shadow:0 0 0 3px rgba(0,82,180,.1);}
-    [data-theme="dark"] .inp:focus{box-shadow:0 0 0 3px rgba(77,145,255,.14);}
-    .btn-eye{position:absolute;right:.6rem;background:none;border:none;cursor:pointer;color:var(--icon-clr);padding:.4rem;border-radius:8px;display:flex;align-items:center;transition:color var(--ease);}
-    .btn-eye:active{color:var(--inp-focus);}
+    .inp-icon{position:absolute;left:var(--s-4);color:var(--text-3);font-size:20px!important;pointer-events:none;transition:color var(--dur-fast) var(--ease-standard);}
+    .inp-wrap:focus-within .inp-icon{color:var(--primary);}
+    .inp{width:100%;height:52px;background:var(--input-bg);border:1px solid var(--input-border);border-radius:var(--r-sm);padding:0 52px 0 46px;font:var(--t-body-lg);color:var(--text-1);outline:none;transition:border-color var(--dur-fast) var(--ease-standard),box-shadow var(--dur-fast) var(--ease-standard);-webkit-appearance:none;}
+    .inp::placeholder{color:var(--text-3);}
+    .inp:focus{border-color:var(--primary);box-shadow:var(--focus-ring);}
+
+    .btn-eye{position:absolute;right:2px;width:var(--tap-min);height:var(--tap-min);background:none;border:none;cursor:pointer;color:var(--text-3);border-radius:var(--r-full);display:flex;align-items:center;justify-content:center;transition:color var(--dur-fast) var(--ease-standard),opacity var(--dur-instant) var(--ease-standard);}
+    .btn-eye:active{opacity:.82;color:var(--primary);}
+    .btn-eye:focus-visible{outline:none;box-shadow:var(--focus-ring);}
     .btn-eye .material-icons-round{font-size:20px;}
-    .options-row{display:flex;align-items:center;justify-content:space-between;margin:1.1rem 0 1.35rem;}
-    .remember-label{display:flex;align-items:center;gap:.55rem;cursor:pointer;user-select:none;}
-    #rememberMe{display:none;}
-    .toggle-track{width:42px;height:24px;background:var(--inp-border);border-radius:12px;position:relative;flex-shrink:0;transition:background var(--ease);}
-    .toggle-track::after{content:'';position:absolute;top:4px;left:4px;width:16px;height:16px;background:#fff;border-radius:50%;box-shadow:0 1px 4px rgba(0,0,0,.22);transition:transform var(--ease);}
+
+    /* ── Remember me ─────────────────────────────────────────────
+       Checkbox is visually hidden rather than display:none so it
+       stays in the tab order and can show a focus ring. */
+    .options-row{display:flex;align-items:center;justify-content:space-between;margin:var(--s-4) 0 var(--s-5);}
+    .remember-label{display:flex;align-items:center;gap:var(--s-3);cursor:pointer;min-height:var(--tap-min);}
+    #rememberMe{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none;}
+    .toggle-track{width:44px;height:26px;background:var(--border-strong);border-radius:var(--r-full);position:relative;flex-shrink:0;transition:background var(--dur-fast) var(--ease-standard);}
+    .toggle-track::after{content:'';position:absolute;top:3px;left:3px;width:20px;height:20px;background:var(--on-primary);border-radius:var(--r-full);box-shadow:var(--shadow-1);transition:transform var(--dur-fast) var(--ease-standard);}
     #rememberMe:checked + .toggle-track{background:var(--primary);}
-    [data-theme="dark"] #rememberMe:checked + .toggle-track{background:#4D91FF;}
     #rememberMe:checked + .toggle-track::after{transform:translateX(18px);}
-    .remember-text{font-size:.85rem;color:var(--text-2);}
-    .btn-primary{width:100%;height:52px;background:linear-gradient(135deg,var(--primary-dark) 0%,var(--primary-light) 100%);color:#fff;border:none;border-radius:14px;font-family:var(--ff-display);font-size:.975rem;font-weight:600;letter-spacing:.02em;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:.45rem;box-shadow:0 4px 18px rgba(0,82,180,.38);transition:transform .15s,box-shadow .15s,opacity var(--ease);position:relative;overflow:hidden;}
-    .btn-primary::before{content:'';position:absolute;top:0;left:-110%;width:55%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.14),transparent);transition:left .5s ease;}
-    .btn-primary:hover::before{left:160%;}
-    .btn-primary:active{transform:scale(.975);box-shadow:0 2px 10px rgba(0,82,180,.3);}
-    .btn-primary:disabled{opacity:.65;cursor:not-allowed;transform:none;}
+    #rememberMe:focus-visible + .toggle-track{box-shadow:var(--focus-ring);}
+    .remember-text{font:var(--t-body);color:var(--text-2);}
+
+    /* ── Buttons (DESIGN_SPEC 8) ─────────────────────────────────
+       Filled: flat --primary, 48h, --r-md. Press = opacity .82 +
+       scale(.98) at --dur-instant. The dead ripple() is not revived. */
+    .btn-primary{width:100%;height:var(--tap-min);background:var(--primary);color:var(--on-primary);border:none;border-radius:var(--r-md);font:var(--t-subtitle);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:var(--s-2);transition:opacity var(--dur-instant) var(--ease-standard),transform var(--dur-instant) var(--ease-standard);}
+    .btn-primary:active{opacity:.82;transform:scale(.98);}
+    .btn-primary:disabled{opacity:.5;cursor:not-allowed;transform:none;}
+    .btn-primary:focus-visible{outline:none;box-shadow:var(--focus-ring);}
     .btn-primary .material-icons-round{font-size:20px;}
-    .spin{display:none;width:20px;height:20px;border:2.5px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .65s linear infinite;}
+    .spin{display:none;width:20px;height:20px;border:2px solid var(--primary-container);border-top-color:var(--on-primary);border-radius:var(--r-full);animation:spin .65s linear infinite;}
     .btn-primary.loading .spin{display:block;}
     .btn-primary.loading .btn-lbl{display:none;}
     .btn-primary.loading .material-icons-round{display:none;}
     @keyframes spin{to{transform:rotate(360deg)}}
-    .footer{text-align:center;margin-top:1.5rem;font-size:.78rem;color:var(--text-2);line-height:1.6;}
-    .footer strong{color:var(--primary);font-weight:500;}
-    [data-theme="dark"] .footer strong{color:#4D91FF;}
-    .ver-tag{position:fixed;bottom:.65rem;left:50%;transform:translateX(-50%);font-size:.7rem;color:var(--text-2);opacity:.45;z-index:1;white-space:nowrap;}
-    @media(max-width:360px){.card{padding:1.5rem 1.125rem}.logo-box{width:64px;height:64px}.logo-box .material-icons-round{font-size:32px;}}
-    @media(min-height:700px){.logo-area{margin-bottom:1.875rem;}}
 
-    /* ── Biometric Login ─────────────────────────────── */
-    .bio-divider{display:none;align-items:center;gap:.75rem;margin:.9rem 0 .2rem;font-size:.72rem;color:var(--text-2);letter-spacing:.04em;text-transform:uppercase;}
+    .footer{text-align:center;margin-top:var(--s-6);font:var(--t-body-sm);color:var(--text-2);line-height:1.6;}
+    .footer strong{color:var(--primary-text);font-weight:500;}
+    .ver-tag{position:fixed;bottom:var(--s-2);left:50%;transform:translateX(-50%);font:var(--t-label-sm);letter-spacing:var(--t-label-sm-ls);color:var(--text-2);white-space:nowrap;}
+
+    /* ── Password strength meter (APP_FLOW_SPEC 3.3) ─────────────
+       ADVISORY ONLY. The server enforces 8 characters and nothing
+       else, so this must never block a password the server accepts.
+       Existing validation (min 8, must match) is unchanged. */
+    .pw-meter{display:flex;gap:var(--s-1);margin:0 0 var(--s-3);}
+    .pw-seg{flex:1;height:4px;border-radius:var(--r-full);background:var(--border);transition:background var(--dur-fast) var(--ease-standard);}
+    .pw-seg.on-weak{background:var(--danger);}
+    .pw-seg.on-fair{background:var(--warning);}
+    .pw-seg.on-good{background:var(--primary);}
+    .pw-seg.on-strong{background:var(--success);}
+    .pw-rules{list-style:none;display:grid;gap:var(--s-1);margin-bottom:var(--s-4);}
+    .pw-rule{display:flex;align-items:center;gap:var(--s-2);font:var(--t-body-sm);color:var(--text-2);transition:color var(--dur-fast) var(--ease-standard);}
+    .pw-rule .material-icons-round{font-size:16px;color:var(--text-3);transition:color var(--dur-fast) var(--ease-standard);}
+    .pw-rule.met{color:var(--text-1);}
+    .pw-rule.met .material-icons-round{color:var(--success-text);}
+
+    /* ── Biometric quick-login ───────────────────────────────────
+       Tonal button per DESIGN_SPEC 8. Renders only when a stored
+       credential AND platform authenticator are both confirmed. */
+    .bio-divider{display:none;align-items:center;gap:var(--s-3);margin:var(--s-4) 0 0;font:var(--t-label);letter-spacing:var(--t-label-ls);color:var(--text-2);text-transform:uppercase;}
     .bio-divider.visible{display:flex;}
-    .bio-divider::before,.bio-divider::after{content:'';flex:1;height:1px;background:var(--inp-border);}
-    .btn-bio{width:100%;height:50px;background:var(--inp-bg);border:1.5px solid var(--inp-border);border-radius:14px;font-family:var(--ff-display);font-size:.9rem;font-weight:500;color:var(--text-1);cursor:pointer;display:none;align-items:center;justify-content:center;gap:.55rem;margin-top:.5rem;transition:background var(--ease),border-color var(--ease),transform .15s;position:relative;overflow:hidden;}
+    .bio-divider::before,.bio-divider::after{content:'';flex:1;height:1px;background:var(--border);}
+    .btn-bio{width:100%;height:var(--tap-min);background:var(--primary-container);color:var(--on-primary-container);border:none;border-radius:var(--r-md);font:var(--t-subtitle);cursor:pointer;display:none;align-items:center;justify-content:center;gap:var(--s-2);margin-top:var(--s-3);position:relative;transition:opacity var(--dur-instant) var(--ease-standard),transform var(--dur-instant) var(--ease-standard);}
     .btn-bio.visible{display:flex;}
-    .btn-bio:active{transform:scale(.975);background:var(--card);}
-    .btn-bio:disabled{opacity:.6;cursor:not-allowed;transform:none;}
-    .bio-btn-icon{font-size:22px!important;color:var(--primary);}
-    [data-theme="dark"] .bio-btn-icon{color:#4D91FF;}
-    .bio-btn-lbl{transition:opacity .15s;}
-    .bio-spin{display:none;width:18px;height:18px;border:2px solid rgba(0,82,180,.25);border-top-color:var(--primary);border-radius:50%;animation:spin .65s linear infinite;position:absolute;}
-    [data-theme="dark"] .bio-spin{border-color:rgba(77,145,255,.2);border-top-color:#4D91FF;}
+    .btn-bio:active{opacity:.82;transform:scale(.98);}
+    .btn-bio:disabled{cursor:not-allowed;transform:none;}
+    .btn-bio:focus-visible{outline:none;box-shadow:var(--focus-ring);}
+    .bio-btn-icon{font-size:22px!important;}
+    .bio-btn-lbl{transition:opacity var(--dur-fast) var(--ease-standard);}
+    .bio-spin{display:none;width:18px;height:18px;border:2px solid var(--border-strong);border-top-color:var(--on-primary-container);border-radius:var(--r-full);animation:spin .65s linear infinite;position:absolute;}
     .btn-bio.loading .bio-btn-icon,.btn-bio.loading .bio-btn-lbl{opacity:0;}
     .btn-bio.loading .bio-spin{display:block;}
 
-    /* ── Biometric Registration Overlay ─────────────── */
-    .bio-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:200;display:none;align-items:flex-end;justify-content:center;padding:.75rem;-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px);}
+    /* ── Biometric registration sheet ────────────────────────────
+       Flat scrim, no blur. --ease-spring is used here -- one of the
+       three places DESIGN_SPEC 7 allows it (sheet entry). */
+    .bio-overlay{position:fixed;inset:0;background:var(--scrim);z-index:200;display:none;align-items:flex-end;justify-content:center;}
     .bio-overlay.show{display:flex;}
-    .bio-reg-sheet{background:var(--card);border:1.5px solid var(--card-border);border-radius:24px 24px 20px 20px;padding:2rem 1.5rem 1.5rem;width:100%;max-width:390px;text-align:center;animation:slideUp .32s cubic-bezier(.25,.46,.45,.94) both;}
-    @keyframes slideUp{from{transform:translateY(80px);opacity:0}to{transform:translateY(0);opacity:1}}
-    .bio-reg-icon{width:72px;height:72px;background:linear-gradient(135deg,rgba(0,82,180,.11),rgba(0,82,180,.05));border-radius:50%;display:inline-flex;align-items:center;justify-content:center;margin-bottom:1rem;box-shadow:0 4px 16px rgba(0,82,180,.12);}
-    .bio-reg-icon .material-icons-round{font-size:34px;color:var(--primary);}
-    [data-theme="dark"] .bio-reg-icon{background:linear-gradient(135deg,rgba(77,145,255,.14),rgba(77,145,255,.06));box-shadow:0 4px 16px rgba(0,0,0,.28);}
-    [data-theme="dark"] .bio-reg-icon .material-icons-round{color:#4D91FF;}
-    .bio-reg-title{font-family:var(--ff-display);font-size:1.1rem;font-weight:600;color:var(--text-1);margin-bottom:.4rem;}
-    .bio-reg-desc{font-size:.83rem;color:var(--text-2);line-height:1.55;margin-bottom:1.4rem;padding:0 .25rem;}
-    .btn-skip{width:100%;height:44px;background:none;border:none;font-family:var(--ff-body);font-size:.87rem;color:var(--text-2);cursor:pointer;margin-top:.4rem;border-radius:10px;transition:color var(--ease);}
-    .btn-skip:active{color:var(--text-1);}
+    .bio-reg-sheet{background:var(--surface-2);border-radius:var(--r-xl) var(--r-xl) 0 0;padding:0 var(--s-5) calc(var(--s-6) + env(safe-area-inset-bottom));width:100%;max-width:var(--sheet-max);text-align:center;box-shadow:var(--shadow-3);animation:sheetIn var(--dur-sheet) var(--ease-spring) both;}
+    @keyframes sheetIn{from{transform:translateY(100%)}to{transform:translateY(0)}}
+    .sheet-handle{width:36px;height:4px;border-radius:var(--r-full);background:var(--border-strong);margin:12px auto 16px;}
+    .bio-reg-icon{width:64px;height:64px;background:var(--primary-container);border-radius:var(--r-full);display:inline-flex;align-items:center;justify-content:center;margin-bottom:var(--s-4);}
+    .bio-reg-icon .material-icons-round{font-size:32px;color:var(--on-primary-container);}
+    .bio-reg-title{font:var(--t-headline);letter-spacing:var(--t-headline-ls);color:var(--text-1);margin-bottom:var(--s-2);}
+    .bio-reg-desc{font:var(--t-body);color:var(--text-2);margin-bottom:var(--s-5);}
+    .btn-skip{width:100%;height:44px;background:none;border:none;font:var(--t-body);color:var(--primary-text);cursor:pointer;margin-top:var(--s-2);border-radius:var(--r-sm);transition:opacity var(--dur-instant) var(--ease-standard);}
+    .btn-skip:active{opacity:.82;}
+    .btn-skip:focus-visible{outline:none;box-shadow:var(--focus-ring);}
+
+    /* ── Narrow phones ──────────────────────────────────────────── */
+    @media(max-width:360px){
+      .card{padding:var(--s-5) var(--s-4);}
+      .logo-box,.sp-mark{width:56px;height:56px;}
+      .logo-box .material-icons-round,.sp-mark .material-icons-round{font-size:30px;}
+      .logo-name,.sp-title{font-size:24px;line-height:30px;}
+    }
+    @media(min-height:700px){.logo-area{margin-bottom:var(--s-8);}}
+
+    /* theme.css zeroes every duration token; these two need shape
+       changes rather than just faster timing. */
+    @media(prefers-reduced-motion:reduce){
+      .sp-bar::after{width:100%;animation:none;}
+      .bio-reg-sheet{animation:none;}
+    }
   </style>
 </head>
 <body>
+  <!-- Splash: always shown, removed as soon as the icon font resolves -->
+  <div id="splash">
+    <div class="sp-mark"><span class="material-icons-round">bolt</span></div>
+    <div class="sp-title">A&amp;N Electricity</div>
+    <div class="sp-bar" role="progressbar" aria-label="Loading"></div>
+  </div>
+
   <button id="themeToggle" aria-label="Toggle dark/light mode">
     <span class="material-icons-round" id="themeIcon">light_mode</span>
   </button>
@@ -127,16 +247,18 @@
   <div class="wrap">
     <div class="logo-area">
       <div class="logo-box"><span class="material-icons-round">bolt</span></div>
-      <div class="logo-name">A&amp;N Electricity Dept.</div>
+      <div class="logo-name">A&amp;N Electricity</div>
       <div class="logo-sub">Consumer Manager</div>
     </div>
     <div class="card">
-      <div class="pulse-line" aria-hidden="true"></div>
-
       <!-- ── LOGIN SCREEN ── -->
       <div id="screenLogin" class="screen">
         <div class="card-title">Welcome back</div>
         <div class="card-sub">Sign in to your office account</div>
+        <div class="alert alert-warn" id="lockBanner">
+          <span class="material-icons-round">timer</span>
+          <span id="lockMsg">Too many failed attempts.</span>
+        </div>
         <div class="alert alert-err" id="loginErr">
           <span class="material-icons-round">error_outline</span>
           <span id="loginErrMsg">Invalid credentials. Try again.</span>
@@ -198,6 +320,15 @@
             <button class="btn-eye" type="button" onclick="toggleEye('newPass','eyeIcon2')"><span class="material-icons-round" id="eyeIcon2">visibility_off</span></button>
           </div>
         </div>
+        <div class="pw-meter" aria-hidden="true">
+          <div class="pw-seg"></div><div class="pw-seg"></div><div class="pw-seg"></div><div class="pw-seg"></div>
+        </div>
+        <ul class="pw-rules">
+          <li class="pw-rule" id="pwR1"><span class="material-icons-round">radio_button_unchecked</span>At least 8 characters</li>
+          <li class="pw-rule" id="pwR2"><span class="material-icons-round">radio_button_unchecked</span>Upper and lower case</li>
+          <li class="pw-rule" id="pwR3"><span class="material-icons-round">radio_button_unchecked</span>At least one number</li>
+          <li class="pw-rule" id="pwR4"><span class="material-icons-round">radio_button_unchecked</span>At least one symbol</li>
+        </ul>
         <div class="field">
           <label class="field-label" for="confirmPass">Confirm Password</label>
           <div class="inp-wrap">
@@ -220,6 +351,7 @@
   <!-- ── Biometric Registration Overlay ── -->
   <div id="bioOverlay" class="bio-overlay">
     <div class="bio-reg-sheet">
+      <div class="sheet-handle" aria-hidden="true"></div>
       <div class="bio-reg-icon">
         <span class="material-icons-round">fingerprint</span>
       </div>
@@ -252,6 +384,8 @@
        * Cleared only when the server reports token expired (index.html session expiry handler).
        */
       BIO_VAULT_KEY: 'an_bio_vault',
+      LOCK_KEY:      'an_login_lock_until',  // Step 17b: ms timestamp, survives reload
+
       ROUTES: { superadmin: 'superadmin.html', admin: 'index.html', employee: 'index.html' }
     };
 
@@ -262,7 +396,7 @@
     function applyTheme(theme) {
       html.setAttribute('data-theme', theme);
       $('themeIcon').textContent = theme === 'dark' ? 'dark_mode' : 'light_mode';
-      $('themeColor').content = theme === 'dark' ? '#0D1D36' : '#0052B4';
+      $('themeColor').content = window.__SURFACE0[theme];
       localStorage.setItem(CFG.THEME_KEY, theme);
     }
     const _saved = localStorage.getItem(CFG.THEME_KEY);
@@ -548,6 +682,8 @@
       const password   = $('password').value;
       const rememberMe = $('rememberMe').checked;
 
+      if (tickLockout()) return; // still locked out -- do not spend a request
+
       hideAll('loginErr');
       $('contactHint').classList.remove('show');
 
@@ -558,7 +694,15 @@
       try {
         const result = await apiCall({ action: 'login', username, password, rememberMe });
 
+        if (result.lockedOut) {
+          // Auth.gs returns lockedOut + minutesLeft (5 failures, 15 min window).
+          // Warning treatment, not an error: nothing the user typed is wrong.
+          applyLockout(Date.now() + ((Number(result.minutesLeft) || 15) * 60000));
+          return;
+        }
+
         if (result.success) {
+          clearLockout();
           if (result.forcePasswordChange) {
             window.__tempLogin = { result, rememberMe, username, password };
             showChangePassScreen();
@@ -584,6 +728,7 @@
         showErr('loginErr', 'loginErrMsg', 'Could not connect. Check your internet and try again.');
       } finally {
         setLoading('btnLogin', false);
+        tickLockout(); // setLoading re-enables the button; re-disable if still locked
       }
     }
 
@@ -649,9 +794,113 @@
       $(id).addEventListener('keydown', e => { if (e.key === 'Enter') handleChangePass(); });
       $(id).addEventListener('input',   () => hideAll('cpErr'));
     });
+    $('newPass').addEventListener('input', updateStrength);
+
+    /* ════════════════════════════════════════════════
+       Splash — APP_FLOW_SPEC 3.1
+       Hidden as soon as the icon font is ready, so Material Icons
+       never paint as literal words. No artificial minimum delay.
+    ════════════════════════════════════════════════ */
+    function hideSplash() {
+      const s = $('splash');
+      if (!s || s.classList.contains('gone')) return;
+      s.classList.add('gone');
+      setTimeout(() => { if (s.parentNode) s.parentNode.removeChild(s); }, 400);
+    }
+    if (document.fonts && document.fonts.ready) {
+      document.fonts.ready.then(hideSplash).catch(hideSplash);
+    } else {
+      window.addEventListener('load', hideSplash);
+    }
+    setTimeout(hideSplash, 1500); // safety net: never trap the user behind the splash
+
+    /* ════════════════════════════════════════════════
+       Login lockout — APP_FLOW_SPEC 3.2
+       Server side already exists (Auth.gs, Step 16a): 5 failures per
+       username, 15-minute window, real minutes returned. This mirrors
+       the deadline locally so the button stays disabled across a
+       reload and the countdown keeps running.
+
+       Fingerprint stays available throughout, by design: WebAuthn
+       restores from an_bio_vault and never calls the login action,
+       so it is not what is being rate limited.
+    ════════════════════════════════════════════════ */
+    let _lockTimer = null;
+
+    function applyLockout(untilMs) {
+      try { localStorage.setItem(CFG.LOCK_KEY, String(untilMs)); } catch (e) {}
+      tickLockout();
+    }
+
+    function clearLockout() {
+      try { localStorage.removeItem(CFG.LOCK_KEY); } catch (e) {}
+      if (_lockTimer) { clearInterval(_lockTimer); _lockTimer = null; }
+      $('lockBanner').classList.remove('show');
+      $('btnLogin').disabled = false;
+    }
+
+    /* Returns true while a lockout is active. Safe to call any time. */
+    function tickLockout() {
+      let raw = null;
+      try { raw = localStorage.getItem(CFG.LOCK_KEY); } catch (e) {}
+      if (!raw) return false;
+
+      const until  = Number(raw);
+      const msLeft = until - Date.now();
+      if (!until || msLeft <= 0) { clearLockout(); return false; }
+
+      const mins = Math.floor(msLeft / 60000);
+      const secs = Math.floor((msLeft % 60000) / 1000);
+      $('lockMsg').textContent = mins > 0
+        ? 'Too many failed attempts. Try again in ' + mins + ' min ' + secs + ' s.'
+        : 'Too many failed attempts. Try again in ' + secs + ' s.';
+
+      $('lockBanner').classList.add('show');
+      $('btnLogin').disabled = true;
+      hideAll('loginErr');
+
+      if (!_lockTimer) _lockTimer = setInterval(tickLockout, 1000);
+      return true;
+    }
+
+    /* ════════════════════════════════════════════════
+       Password strength — APP_FLOW_SPEC 3.3
+       ADVISORY. The server enforces 8 characters and difference from
+       the current password; nothing here blocks a submit that the
+       server would accept. Existing validation is untouched.
+    ════════════════════════════════════════════════ */
+    const PW_RULES = [
+      { id: 'pwR1', test: v => v.length >= 8 },
+      { id: 'pwR2', test: v => /[a-z]/.test(v) && /[A-Z]/.test(v) },
+      { id: 'pwR3', test: v => /[0-9]/.test(v) },
+      { id: 'pwR4', test: v => /[^A-Za-z0-9]/.test(v) }
+    ];
+    const PW_TIERS = ['', 'on-weak', 'on-fair', 'on-good', 'on-strong'];
+
+    function updateStrength() {
+      const v = $('newPass').value;
+      let met = 0;
+
+      PW_RULES.forEach(r => {
+        const ok = r.test(v);
+        if (ok) met++;
+        const el = $(r.id);
+        el.classList.toggle('met', ok);
+        const icon = el.querySelector('.material-icons-round');
+        if (icon) icon.textContent = ok ? 'check_circle' : 'radio_button_unchecked';
+      });
+
+      const tier = PW_TIERS[met];
+      const segs = document.querySelectorAll('.pw-seg');
+      for (let i = 0; i < segs.length; i++) {
+        segs[i].className = 'pw-seg' + (tier && i < met ? ' ' + tier : '');
+      }
+    }
 
     /* ── Init ── */
     checkBiometricOnLoad();
+    tickLockout();       // restore an in-progress lockout across reload
+    updateStrength();    // paint the meter in its empty state
   </script>
 </body>
 </html>

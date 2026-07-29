@@ -1,0 +1,293 @@
+/* ════════════════════════════════════════════════════════════════════════
+   theme.css — A&N Electricity Consumer Manager
+   Single source of truth for EVERY design token. DESIGN_SPEC.md §2–§7.
+
+   Loaded by: login.html, index.html, superadmin.html, import.html
+   Created:   Step 17b
+
+   HARD RULE: no raw hex anywhere outside this file. Component CSS uses
+   tokens only. This file exists because the same values were duplicated
+   across four pages and silently drifted on 3 of 5 light-mode values in
+   superadmin.html, and on 6 values in login.html.
+
+   CONTAINS: tokens + the reduced-motion override + one numeric utility.
+   Deliberately contains NO component CSS and NO reset — each page keeps
+   its own, so loading this file into index.html/superadmin.html in 17c/17d
+   cannot collide with anything they already define.
+   ════════════════════════════════════════════════════════════════════════ */
+
+/* ─────────────────────────────────────────────────────────────────────────
+   1. THEME-INDEPENDENT TOKENS
+   Faces, primary ramp, type scale, shape, spacing, motion.
+   These are identical in both themes.
+   ───────────────────────────────────────────────────────────────────────── */
+
+:root {
+
+  /* ── Type faces (§3) — Poppins + Roboto, no third family ───────────── */
+  --ff-display: 'Poppins', system-ui, sans-serif;
+  --ff-body:    'Roboto',  system-ui, sans-serif;
+
+  /* ── Primary ramp, hue ~213 (§2.1) ─────────────────────────────────── */
+  --p-10: #001C3B;
+  --p-20: #003063;
+  --p-30: #003A82;   /* legacy Primary Dark  */
+  --p-40: #0052B4;   /* legacy Primary — brand anchor */
+  --p-50: #1976D2;   /* legacy Primary Light */
+  --p-60: #3D8FE8;
+  --p-70: #6BA9F0;
+  --p-80: #9CC5F7;
+  --p-90: #CFE3FC;
+  --p-95: #E7F1FE;
+
+  /* ── Type scale (§3.1) ──────────────────────────────────────────────
+     Applied as:  font: var(--t-title);
+     Letter-spacing rides separately — it cannot travel in the `font`
+     shorthand. Only the steps that need it have a -ls partner.
+     NOTE: the `font` shorthand resets font-variant-numeric, so always
+     apply .tnum / --num-weight AFTER any font: declaration.           */
+  --t-display:     600 28px/34px var(--ff-display);
+  --t-display-ls:  -0.5px;
+  --t-headline:    600 22px/28px var(--ff-display);
+  --t-headline-ls: -0.25px;
+  --t-title:       600 17px/22px var(--ff-display);
+  --t-subtitle:    500 15px/20px var(--ff-display);
+  --t-body-lg:     400 15px/22px var(--ff-body);
+  --t-body:        400 14px/20px var(--ff-body);
+  --t-body-sm:     400 13px/18px var(--ff-body);
+  --t-label:       500 12px/16px var(--ff-body);
+  --t-label-ls:    0.3px;
+  --t-label-sm:    500 11px/14px var(--ff-body);
+  --t-label-sm-ls: 0.4px;
+
+  /* Numerals: every ConNo / meter no / reading / amount (§3.1, §3.2) */
+  --num-weight: 500;
+
+  /* ── Shape scale (§4) ───────────────────────────────────────────────
+     Varied radii distinguish component classes. One radius everywhere
+     was the old look's biggest tell.                                  */
+  --r-xs:   6px;    /* badges, prefix chips, inline tags              */
+  --r-sm:   10px;   /* inputs, text fields, small buttons             */
+  --r-md:   14px;   /* buttons, list rows, banners                    */
+  --r-lg:   20px;   /* cards — the existing 20px, preserved           */
+  --r-xl:   28px;   /* bottom sheet top corners                       */
+  --r-full: 999px;  /* FAB, pills, avatars, sync bar                  */
+
+  /* ── Spacing, base 4px (§5) ─────────────────────────────────────────── */
+  --s-1:  4px;
+  --s-2:  8px;
+  --s-3:  12px;
+  --s-4:  16px;
+  --s-5:  20px;
+  --s-6:  24px;
+  --s-8:  32px;
+  --s-10: 40px;
+  --s-12: 48px;
+
+  /* ── Fixed sizing (§5) ──────────────────────────────────────────────── */
+  --tap-min:   48px;   /* minimum touch target, no exceptions          */
+  --edge:      16px;   /* screen edge padding                          */
+  --appbar-h:  56px;
+  --nav-h:     64px;   /* + safe-area inset                           */
+  --sheet-max: 480px;  /* bottom sheet cap, centred >=960px            */
+
+  /* ── Motion (§7) ────────────────────────────────────────────────────── */
+  --dur-instant: 90ms;    /* chip select, checkbox                     */
+  --dur-fast:    140ms;   /* press, toast in                           */
+  --dur-base:    200ms;   /* tab switch, banner in                     */
+  --dur-slow:    280ms;   /* scrim fade, toast out                     */
+  --dur-sheet:   320ms;   /* bottom sheet slide                        */
+
+  --ease-standard: cubic-bezier(.2, 0, 0, 1);
+  --ease-decel:    cubic-bezier(0, 0, 0, 1);
+  --ease-accel:    cubic-bezier(.3, 0, 1, 1);
+  --ease-spring:   cubic-bezier(.34, 1.4, .64, 1);  /* sheet, FAB, chip ONLY */
+}
+
+
+/* ─────────────────────────────────────────────────────────────────────────
+   2. LIGHT THEME  (§2.2, §2.4, §2.5, §2.6, §2.7)
+   Lives in :root so it is also the no-JS fallback. An unstyled light
+   page is far less alarming than an unstyled dark one.
+   ───────────────────────────────────────────────────────────────────────── */
+
+:root {
+
+  /* ── Role ── */
+  --primary:               #0052B4;
+  --on-primary:            #FFFFFF;
+  --primary-container:     #CFE3FC;
+  --on-primary-container:  #001C3B;
+  --primary-text:          #003A82;   /* links, active labels — 10.9:1 on white */
+
+  /* ── Surfaces ── elevation is a SHADOW on white, never a tone shift ── */
+  --surface-0: #EEF2F7;   /* app background      */
+  --surface-1: #FFFFFF;   /* cards               */
+  --surface-2: #FFFFFF;   /* sheets  — pair with --shadow-2 */
+  --surface-3: #F4F7FF;   /* nested / recessed   */
+  --surface-4: #FFFFFF;   /* toasts  — pair with --shadow-3 */
+
+  --input-bg:     #F4F7FF;
+  --input-border: #C5D0E8;
+
+  /* ── Borders ── */
+  --border-subtle: #E2E9F5;
+  --border:        #D1DCF0;
+  --border-strong: #B4C4E0;
+
+  /* ── Text ── */
+  --text-1:        #1A1A2E;   /* primary content                        */
+  --text-2:        #3C4A60;   /* labels, secondary — AAA, 16c-unlock fix */
+  --text-3:        #5F6E86;   /* hints, timestamps — >=14px ONLY, 4.6:1  */
+  --text-disabled: #97A2B5;
+
+  /* ── Semantic (§2.7) ──
+     #D32F2F and #FFC107 are FILL-ONLY. Never text on a light surface —
+     amber on white is 1.8:1. Use the -text variants.                  */
+  --danger:                #D32F2F;
+  --on-danger:             #FFFFFF;
+  --danger-text:           #B3261E;
+  --danger-container:      #FFDAD6;
+  --on-danger-container:   #B3261E;
+
+  --success:               #2E7D32;
+  --on-success:            #FFFFFF;
+  --success-text:          #1B5E20;
+  --success-container:     #C8E6C9;
+  --on-success-container:  #1B5E20;
+
+  --warning:               #FFC107;
+  --warning-text:          #6D4A00;
+  --warning-container:     #FFF1CC;
+  --on-warning-container:  #6D4A00;
+
+  /* Offline is a NEUTRAL state, never a warning. No amber, no red. */
+  --offline-bg:   var(--surface-3);
+  --offline-text: var(--text-2);
+
+  /* ── Elevation (§6) ── */
+  --shadow-1: 0 1px 2px rgba(16,24,40,.06),    0 1px 3px rgba(16,24,40,.10);
+  --shadow-2: 0 4px 8px -2px rgba(16,24,40,.10),  0 2px 4px -2px rgba(16,24,40,.06);
+  --shadow-3: 0 12px 16px -4px rgba(16,24,40,.10), 0 4px 6px -2px rgba(16,24,40,.05);
+
+  /* ── Scrim — flat colour, NO blur, ever (§1, §6) ── */
+  --scrim: rgba(16,24,40,.42);
+
+  /* ── Focus ring — visible keyboard focus is required, not optional ── */
+  --focus-ring: 0 0 0 3px rgba(0,82,180,.22);
+
+  /* Native form controls / scrollbars follow the theme */
+  color-scheme: light;
+}
+
+
+/* ─────────────────────────────────────────────────────────────────────────
+   3. DARK THEME  (§2.2, §2.3, §2.5, §2.6, §2.7)
+   Dark is the PRIMARY surface, not an inverted afterthought.
+   Depth comes from FIVE surface tones. Shadows are invisible on dark,
+   so they resolve to none and a tone shift does the work instead.
+   ───────────────────────────────────────────────────────────────────────── */
+
+[data-theme="dark"] {
+
+  /* ── Role ── */
+  --primary:               #1976D2;
+  --on-primary:            #FFFFFF;
+  --primary-container:     #003A82;
+  --on-primary-container:  #CFE3FC;
+  --primary-text:          #9CC5F7;   /* 9.1:1 on --surface-1 */
+
+  /* ── Surfaces — five levels (§2.3) ── */
+  --surface-0: #060C18;   /* app background                            */
+  --surface-1: #0F1F3C;   /* cards, list rows                          */
+  --surface-2: #15294B;   /* bottom sheets, scrolled app bar           */
+  --surface-3: #1B3459;   /* nested in a sheet: header, selected row   */
+  --surface-4: #223E68;   /* topmost: toasts, menus, save banner       */
+
+  --input-bg:     #081428;   /* deliberately RECESSED below surface-1  */
+  --input-border: #1E3868;
+
+  /* ── Borders ── */
+  --border-subtle: #16294A;
+  --border:        #1E3868;
+  --border-strong: #2E4E85;
+
+  /* ── Text ── */
+  --text-1:        #EEF4FF;
+  --text-2:        #9CB8DC;
+  --text-3:        #7290B8;   /* 5.0:1 on --surface-1 — >=14px ONLY    */
+  --text-disabled: #4E688F;
+
+  /* ── Semantic (§2.7) ── */
+  --danger:                #D32F2F;
+  --on-danger:             #FFFFFF;
+  --danger-text:           #FFB4AB;   /* 9.6:1 on --surface-1 */
+  --danger-container:      #7A1113;
+  --on-danger-container:   #FFB4AB;
+
+  --success:               #2E7D32;
+  --on-success:            #FFFFFF;
+  --success-text:          #8FD694;   /* 9.5:1 on --surface-1 */
+  --success-container:     #0F3A14;
+  --on-success-container:  #8FD694;
+
+  --warning:               #FFC107;
+  --warning-text:          #FFDD8A;
+  --warning-container:     #4A3200;
+  --on-warning-container:  #FFDD8A;
+
+  --offline-bg:   var(--surface-3);
+  --offline-text: var(--text-2);
+
+  /* ── Elevation: tone, never shadow (§6) ── */
+  --shadow-1: none;
+  --shadow-2: none;
+  --shadow-3: none;
+
+  --scrim: rgba(3,7,15,.62);
+
+  --focus-ring: 0 0 0 3px rgba(25,118,210,.30);
+
+  color-scheme: dark;
+}
+
+
+/* ─────────────────────────────────────────────────────────────────────────
+   4. NUMERIC UTILITY (§3.1)
+   The one utility class in this file. Justified because "all ConNo /
+   meter no / readings / amounts" is a cross-file requirement, and
+   repeating three declarations in four files is how drift starts.
+   Named .tnum rather than .num to avoid colliding with existing classes.
+   ───────────────────────────────────────────────────────────────────────── */
+
+.tnum {
+  font-family: var(--ff-body);
+  font-weight: var(--num-weight);
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: 'tnum' 1;
+}
+
+
+/* ─────────────────────────────────────────────────────────────────────────
+   5. REDUCED MOTION (§7)
+   Non-negotiable. Setting the duration tokens to 1ms disables every
+   transition in every page at once, because no page hardcodes a duration.
+   The !important is required to beat per-page :root re-declarations while
+   17c–17e are still in flight.
+   ───────────────────────────────────────────────────────────────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --dur-instant: 1ms !important;
+    --dur-fast:    1ms !important;
+    --dur-base:    1ms !important;
+    --dur-slow:    1ms !important;
+    --dur-sheet:   1ms !important;
+  }
+  *, *::before, *::after {
+    animation-duration: 1ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 1ms !important;
+    scroll-behavior: auto !important;
+  }
+}

@@ -11,7 +11,13 @@
 
 'use strict';
 
-const CACHE_VERSION  = 'v1';
+// Step 17b: bumped v1 -> v2. REQUIRED, not cosmetic.
+// The fetch handler serves .html/.css stale-while-revalidate, so without a
+// version bump the first load after a deploy returns the OLD cached page and
+// the new one only appears on the second load. Bumping makes the activate
+// handler delete an-elect-v1 wholesale, forcing a clean fetch.
+// BUMP THIS ON EVERY FRONTEND DEPLOY.
+const CACHE_VERSION  = 'v2';
 const CACHE_NAME     = `an-elect-${CACHE_VERSION}`;
 const SYNC_TAG       = 'sync-pending-changes';
 const DB_NAME        = 'an_elect_db';
@@ -21,6 +27,7 @@ const DB_VERSION     = 1;
 
 const APP_ASSETS = [
   './login.html',
+  './theme.css',        // Step 17b: shared design tokens — render-blocking, must be cached
   './index.html',
   './superadmin.html',
   './manifest.json',
