@@ -973,6 +973,21 @@
       .bottom-sheet{left:50%;right:auto;width:100%;max-width:480px;transform:translate(-50%,100%);}
       .bottom-sheet.open{transform:translate(-50%,0);}
     }
+
+    /* ===== GLOBAL: prevent Android's long-press callout (Copy/Share/Select all)
+       from firing on icons/buttons. Same fix as index.html -- applies to every
+       tappable control here: icon-btn (nav/scan/qkwh/readings/theme), and any
+       other plain buttons. Does not touch actual copyable data fields. */
+    button,.icon-btn{
+      -webkit-touch-callout:none;
+      -webkit-user-select:none;
+      user-select:none;
+      -webkit-user-drag:none;
+      touch-action:manipulation;
+    }
+    .icon-btn .material-icons-round{
+      pointer-events:none;
+    }
   </style>
 </head>
 <body class="dark-mode">
@@ -1260,7 +1275,8 @@
   <div class="vc-list" id="vcList"></div>
 </div>
 
-<input type="file" accept="image/*" id="saScanInput" style="display:none" onchange="saHandleScanFile(event)">
+<input type="file" accept="image/*" capture="environment" id="saScanInput" style="display:none" onchange="saHandleScanFile(event)">
+<input type="file" accept="image/*" id="saGalleryInput" style="display:none" onchange="saHandleScanFile(event)">
 
 <!-- QUICK KWH (SuperAdmin) -->
 <div class="bottom-sheet" id="sheetSAQkwh">
@@ -3134,6 +3150,32 @@ function saStartScan() {
   if (!navigator.onLine) { showToast('AI scan needs an internet connection.', 'error'); return; }
   document.getElementById('saScanInput').click();
 }
+function saOpenScanGallery() {
+  if (!navigator.onLine) { showToast('AI scan needs an internet connection.', 'error'); return; }
+  document.getElementById('saGalleryInput').click();
+}
+/* Long press on the scan icon opens the gallery instead of the camera --
+   same 500ms + vibration convention as index.html's navScanBtn. A short tap
+   (the existing onclick="saStartScan()") still opens the camera, unchanged. */
+(function(){
+  var scanPressTimer = null, scanLongPressed = false;
+  var btn = document.querySelector('.icon-btn[onclick="saStartScan()"]');
+  if (!btn) return;
+  btn.addEventListener('pointerdown', function(){
+    scanLongPressed = false;
+    scanPressTimer = setTimeout(function(){
+      scanLongPressed = true;
+      if (navigator.vibrate) navigator.vibrate(50);
+      saOpenScanGallery();
+    }, 500);
+  });
+  ['pointerup','pointercancel','pointerleave'].forEach(function(evt){
+    btn.addEventListener(evt, function(){ clearTimeout(scanPressTimer); });
+  });
+  btn.addEventListener('click', function(e){
+    if (scanLongPressed) { e.stopImmediatePropagation(); scanLongPressed = false; }
+  }, true);
+})();
 async function saHandleScanFile(e) {
   const file = e.target.files && e.target.files[0];
   e.target.value = '';
