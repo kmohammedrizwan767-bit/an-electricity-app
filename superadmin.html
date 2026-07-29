@@ -381,6 +381,14 @@
       font-size: 18px; color: var(--text-secondary); pointer-events: none;
     }
     .vc-search-inner .form-input { padding-left: 40px; }
+    .prefix-row { display: flex; gap: 8px; padding: 10px 16px 0; flex-wrap: wrap; }
+    .prefix-chip {
+      background: var(--bg); border: 1.5px solid var(--card-border);
+      border-radius: 20px; padding: 5px 16px;
+      font-size: 12.5px; font-family: 'Poppins', sans-serif; font-weight: 700;
+      color: var(--primary-light); cursor: pointer; transition: opacity 0.15s;
+    }
+    .prefix-chip:active { opacity: 0.6; }
     .vc-count-bar {
       padding: 6px 16px;
       font-size: 12px; color: var(--text-secondary);
@@ -1220,6 +1228,7 @@
       <input type="search" id="vcSearch" class="form-input"
         placeholder="Search by name, ConNo or meter no..." autocomplete="off" />
     </div>
+    <div class="prefix-row" id="vcPrefixRow"></div>
   </div>
   <div class="vc-count-bar" id="vcCountBar"></div>
   <div class="vc-list" id="vcList"></div>
@@ -2747,6 +2756,32 @@ function checkUnauthorized(res) {
   return false;
 }
 
+/* =============================================
+   QUICK-PREFIX SEARCH CHIPS
+   Same idea and same list as index.html's version -- kept as a separate
+   copy since these are two independent files with no shared module, so
+   if a new prefix is ever added, update BOTH files' QUICK_SEARCH_PREFIXES
+   to keep them consistent. Reuses vcSearch's existing 'input' listener via
+   a dispatched event rather than duplicating its filter logic.
+   ============================================= */
+const QUICK_SEARCH_PREFIXES = ['E/', 'E1/'];
+function renderVcPrefixRow() {
+  const el = document.getElementById('vcPrefixRow');
+  if (!el) return;
+  el.innerHTML = QUICK_SEARCH_PREFIXES.map(p =>
+    `<button class="prefix-chip" data-prefix="${esc(p)}">${esc(p)}</button>`
+  ).join('');
+  el.querySelectorAll('.prefix-chip').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const inp = document.getElementById('vcSearch');
+      inp.value = btn.dataset.prefix;
+      inp.dispatchEvent(new Event('input'));
+      inp.focus();
+      if (inp.setSelectionRange) inp.setSelectionRange(inp.value.length, inp.value.length);
+    });
+  });
+}
+
 async function init() {
   applyTheme(localStorage.getItem('an_theme') !== 'light');
 
@@ -2763,6 +2798,7 @@ async function init() {
   document.getElementById('profileAvatar').textContent = initials;
   document.getElementById('profileName').textContent   =
     session.fullName || 'Super Admin';
+  renderVcPrefixRow();
 
   setTimeout(() => {
     document.getElementById('splash').classList.add('hide');
