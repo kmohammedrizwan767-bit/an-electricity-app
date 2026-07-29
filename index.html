@@ -429,7 +429,6 @@
     <button class="nav-btn hidden" id="selectBtn" onclick="enterSelectMode()"><span class="material-icons-round">checklist</span></button>
     <button class="nav-btn" id="navScanBtn" onclick="startIdentifyScan()"><span class="material-icons-round">document_scanner</span></button>
     <button class="nav-btn" id="navQkwhBtn" onclick="openQuickKwh()"><span class="material-icons-round">electric_meter</span></button>
-    <button class="nav-btn" id="themeToggle"><span class="material-icons-round" id="themeIcon">dark_mode</span></button>
     <button class="nav-btn" id="userMenuBtn"><span class="material-icons-round">account_circle</span></button>
   </div>
 </nav>
@@ -444,6 +443,7 @@
   <div class="um-name" id="uName">&#8212;</div><div class="um-role" id="uRole">&#8212;</div>
   <div class="menu-div"></div>
   <button class="mi install hidden" id="installBtn" onclick="installApp()"><span class="material-icons-round">install_mobile</span>Install App</button>
+  <button class="mi" id="themeMenuItem" onclick="toggleThemeFromMenu()"><span class="material-icons-round" id="themeMenuIcon">dark_mode</span><span id="themeMenuLabel">Dark Mode</span></button>
   <button class="mi" onclick="openChangePass()"><span class="material-icons-round">lock_reset</span>Change Password</button>
   <button class="mi" onclick="openMyReadings()"><span class="material-icons-round">download</span>My Readings</button>
   <button class="mi" onclick="openAbout()"><span class="material-icons-round">info_outline</span>About</button>
@@ -1035,8 +1035,8 @@ function clearSearch(){$('searchInp').value='';searchQ='';$('sClear').classList.
 function setArea(el,code){activeArea=code;document.querySelectorAll('.chip').forEach(function(c){c.classList.remove('active');});el.classList.add('active');resetAndLoad();}
 function setStatus(el,status){activeStatus=status;document.querySelectorAll('.f-pill').forEach(function(p){p.classList.remove('active','active-s','inactive-s','defaulter-s');});if(status==='ALL')el.classList.add('active');else if(status==='Active')el.classList.add('active-s');else if(status==='Inactive')el.classList.add('inactive-s');else if(status==='Defaulter')el.classList.add('defaulter-s');resetAndLoad();}
 function cycleSort(){var orders=['default','asc','desc'],labels=['Default','A \u2192 Z','Z \u2192 A'];var cur=orders.indexOf(sortOrder);sortOrder=orders[(cur+1)%3];$('sortLbl').textContent=labels[orders.indexOf(sortOrder)];$('sortBtn').classList.toggle('active',sortOrder!=='default');resetAndLoad();}
-function applyTheme(t){document.documentElement.setAttribute('data-theme',t);$('themeIcon').textContent=t==='dark'?'dark_mode':'light_mode';$('themeColorMeta').content=t==='dark'?'#0F1F3C':'#0052B4';localStorage.setItem('an_elect_theme',t);}
-$('themeToggle').addEventListener('click',function(){applyTheme(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark');});
+function applyTheme(t){document.documentElement.setAttribute('data-theme',t);$('themeMenuIcon').textContent=t==='dark'?'light_mode':'dark_mode';$('themeMenuLabel').textContent=t==='dark'?'Switch to Light Mode':'Switch to Dark Mode';$('themeColorMeta').content=t==='dark'?'#0F1F3C':'#0052B4';localStorage.setItem('an_elect_theme',t);}
+function toggleThemeFromMenu(){applyTheme(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark');}
 $('userMenuBtn').addEventListener('click',function(){var open=$('userMenu').classList.contains('show');if(open)closeUserMenu();else{$('userMenu').classList.add('show');$('menuOv').classList.remove('hidden');}});
 function closeUserMenu(){$('userMenu').classList.remove('show');$('menuOv').classList.add('hidden');}
 function openChangePass(){closeUserMenu();$('cpCur').value=$('cpNew').value=$('cpCfm').value='';$('cpErr').classList.remove('show');$('cpOk').classList.remove('show');$('sfi').style.width='0%';$('stxt').textContent='';openSheet('cpSheet');}
