@@ -433,7 +433,7 @@
     <button class="nav-btn" id="userMenuBtn"><span class="material-icons-round">account_circle</span></button>
   </div>
 </nav>
-<input type="file" accept="image/*" capture="environment" id="homeScanInput" class="hidden" onchange="handleIdentifyScanFile(event)">
+<input type="file" accept="image/*" id="homeScanInput" class="hidden" onchange="handleIdentifyScanFile(event)">
 <div class="sel-bar hidden" id="selBar">
   <button class="sel-cancel" onclick="exitSelectMode()"><span class="material-icons-round">close</span></button>
   <span class="sel-cnt" id="selCnt">Tap to select</span>
@@ -1131,32 +1131,91 @@ function openEditFormWithData(c){
   $('cfErr').classList.remove('show');$('cfErrMsg').textContent='';$('cfBtn').classList.remove('loading');
   openSheet('cfSheet');
 }
-async function saveConsumer(){
+/* Applies a consumer add/edit to masterList immediately, before the network
+   call happens. Returns an undo snapshot (the pre-edit object for edits;
+   null for adds, since a failed add just gets removed rather than reverted
+   to something). Shared between the initial optimistic save and a banner
+   retry, so both take the exact same path -- no separate "retry" logic that
+   could drift out of sync with what a normal save actually does. */
+function applyConsumerOptimistic(mode,consumerData,originalConsumer){
+  if(mode==='add'){
+    var temp=normalize(Object.assign({},consumerData,{_rowIndex:-1}),true);
+    masterList.unshift(temp);
+    return null;
+  }
+  var snapshot=Object.assign({},originalConsumer);
+  var updated=normalize(Object.assign({},consumerData,{_rowIndex:originalConsumer._rowIndex,'S.No.':originalConsumer.sNo,CreatedAt:originalConsumer.createdAt}),true);
+  var ix=masterList.findIndex(function(c){return c.conNo===originalConsumer.conNo;});
+  if(ix!==-1)masterList[ix]=updated;
+  return snapshot;
+}
+function revertConsumerOptimistic(mode,consumerData,originalConsumer,snapshot){
+  if(mode==='add'){
+    masterList=masterList.filter(function(c){return !(c.conNo===consumerData.ConNo&&c._rowIndex===-1);});
+  }else if(snapshot){
+    var ix=masterList.findIndex(function(c){return c.conNo===originalConsumer.conNo;});
+    if(ix!==-1)masterList[ix]=snapshot;
+  }
+}
+async function sendConsumerSave(mode,consumerData,originalConsumer,snapshot){
+  _pendingSaves++;
+  try{
+    var controller=new AbortController();var tid=setTimeout(function(){controller.abort();},TIMEOUT);
+    var payload=mode==='add'?{action:'addConsumer',token:session.token,officeId:session.officeId,sheetName:'CONSUMER DATA ALL',consumer:consumerData}:{action:'updateConsumer',token:session.token,officeId:session.officeId,sheetName:'CONSUMER DATA ALL',rowIndex:originalConsumer._rowIndex,consumer:consumerData};
+    var res=await fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify(payload),redirect:'follow',signal:controller.signal});clearTimeout(tid);
+    var json=await res.json();
+    if(!json.success)throw new Error(json.message||json.error||'Save failed');
+    if(mode==='add'){
+      var saved=normalize(json.consumer||Object.assign({},consumerData,{_rowIndex:json.rowIndex||0,'S.No.':json.sNo||''}),true);
+      try{await AN_DB.upsertConsumer(saved);}catch(e){}
+      var idxTemp=masterList.findIndex(function(c){return c.conNo===consumerData.ConNo&&c._rowIndex===-1;});
+      if(idxTemp!==-1)masterList[idxTemp]=saved;else masterList.unshift(saved);
+    }else{
+      var updated=normalize(Object.assign({},consumerData,{_rowIndex:originalConsumer._rowIndex,'S.No.':originalConsumer.sNo,CreatedAt:originalConsumer.createdAt}),true);
+      try{await AN_DB.upsertConsumer(updated);}catch(e){}
+      var ix=masterList.findIndex(function(c){return c.conNo===originalConsumer.conNo;});
+      if(ix!==-1)masterList[ix]=updated;
+    }
+    if(activeTab==='consumers')resetAndLoad();
+    backgroundFullSync();
+  }catch(err){
+    revertConsumerOptimistic(mode,consumerData,originalConsumer,snapshot);
+    if(activeTab==='consumers')resetAndLoad();
+    queueFailedSave((mode==='add'?'Add: ':'Edit: ')+(consumerData.ConsumerName||consumerData.ConNo),function(){
+      applyConsumerOptimistic(mode,consumerData,originalConsumer);
+      if(activeTab==='consumers')resetAndLoad();
+      sendConsumerSave(mode,consumerData,originalConsumer,snapshot);
+    },err.name==='AbortError'?'request timed out':err.message);
+  }
+  _pendingSaves--;
+}
+function saveConsumer(){
   var conNo=$('cfConNo').value.trim(),cName=$('cfCName').value.trim(),addr=$('cfAddr').value.trim(),labNo=$('cfLabNo').value.trim(),meter=$('cfMeter').value.trim(),transf=$('cfTransf').value,phone=$('cfPhone').value.trim(),status=$('cfStatus').value,sdNo=$('cfSdNo').value.trim(),sdAmt=$('cfSdAmt').value.trim(),sdDate=$('cfSdDate').value;
   $('cfErr').classList.remove('show');
   if(!conNo){showCfErr('Consumer No. is required.');$('cfConNo').focus();return;}
   if(!cName){showCfErr('Consumer Name is required.');$('cfCName').focus();return;}
   if(!session||!session.token){location.replace('./login.html');return;}
-  var btn=$('cfBtn');btn.classList.add('loading');
   var consumerData={ConNo:conNo,ConsumerName:cName,Address:addr,LabNo:labNo,MeterNo:meter,TransfCode:transf,PhoneNo:phone,Status:status,'Passbook/SD No':sdNo,'SD Amount':sdAmt,'SD Date':sdDate};
   document.querySelectorAll('#cfCustomFields [data-field-label]').forEach(function(el){consumerData[el.getAttribute('data-field-label')]=el.value.trim();});
   if(!navigator.onLine){
-    try{if(CF.mode==='add'){await AN_DB.addPendingChange('addConsumer',consumerData,session.officeId);var tmp=normalize(Object.assign({},consumerData,{_rowIndex:-1}),true);await AN_DB.upsertConsumer(tmp);masterList.unshift(tmp);}
-    else{await AN_DB.addPendingChange('updateConsumer',{rowIndex:CF.consumer._rowIndex,consumer:consumerData},session.officeId);var upd=normalize(Object.assign({},consumerData,{_rowIndex:CF.consumer._rowIndex}),true);await AN_DB.upsertConsumer(upd);var idx=masterList.findIndex(function(c){return c.conNo===CF.consumer.conNo;});if(idx!==-1)masterList[idx]=upd;}}catch(e){console.warn('CF offline:',e);}
-    closeSheet();resetAndLoad();toast(CF.mode==='add'?'Saved offline - will sync when connected':'Updated offline - will sync','');AN_DB.requestSync();btn.classList.remove('loading');return;
+    (async function(){
+      try{if(CF.mode==='add'){await AN_DB.addPendingChange('addConsumer',consumerData,session.officeId);var tmp=normalize(Object.assign({},consumerData,{_rowIndex:-1}),true);await AN_DB.upsertConsumer(tmp);masterList.unshift(tmp);}
+      else{await AN_DB.addPendingChange('updateConsumer',{rowIndex:CF.consumer._rowIndex,consumer:consumerData},session.officeId);var upd=normalize(Object.assign({},consumerData,{_rowIndex:CF.consumer._rowIndex}),true);await AN_DB.upsertConsumer(upd);var idx=masterList.findIndex(function(c){return c.conNo===CF.consumer.conNo;});if(idx!==-1)masterList[idx]=upd;}}catch(e){console.warn('CF offline:',e);}
+      closeSheet();resetAndLoad();toast(CF.mode==='add'?'Saved offline - will sync when connected':'Updated offline - will sync','');AN_DB.requestSync();
+    })();
+    return;
   }
-  try{
-    var controller=new AbortController();var tid=setTimeout(function(){controller.abort();},TIMEOUT);
-    var payload=CF.mode==='add'?{action:'addConsumer',token:session.token,officeId:session.officeId,sheetName:'CONSUMER DATA ALL',consumer:consumerData}:{action:'updateConsumer',token:session.token,officeId:session.officeId,sheetName:'CONSUMER DATA ALL',rowIndex:CF.consumer._rowIndex,consumer:consumerData};
-    var res=await fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify(payload),redirect:'follow',signal:controller.signal});clearTimeout(tid);
-    var json=await res.json();
-    if(json.success){
-      if(CF.mode==='add'){var saved=normalize(json.consumer||Object.assign({},consumerData,{_rowIndex:json.rowIndex||0,'S.No.':json.sNo||''}),true);try{await AN_DB.upsertConsumer(saved);}catch(e){}masterList.unshift(saved);}
-      else{var updated=normalize(Object.assign({},consumerData,{_rowIndex:CF.consumer._rowIndex,'S.No.':CF.consumer.sNo,CreatedAt:CF.consumer.createdAt}),true);try{await AN_DB.upsertConsumer(updated);}catch(e){}var ix=masterList.findIndex(function(c){return c.conNo===CF.consumer.conNo;});if(ix!==-1)masterList[ix]=updated;}
-      closeSheet();resetAndLoad();toast(CF.mode==='add'?'Consumer added successfully':'Consumer updated successfully','ok');backgroundFullSync();
-    }else{showCfErr(json.message||json.error||'Failed to save. Please try again.');}
-  }catch(err){showCfErr(err.name==='AbortError'?'Request timed out (30s). Check connection.':'Network error. Please retry.');}
-  btn.classList.remove('loading');
+  /* Optimistic online save: the list updates and the sheet closes right
+     away; the actual network call runs in the background via
+     sendConsumerSave. A failure reverts the list to what the server
+     actually has (or removes the temp add) and surfaces through the same
+     failed-save banner meter readings use, with a Retry that re-runs this
+     exact same optimistic-then-send path. */
+  var mode=CF.mode,originalConsumer=CF.consumer;
+  var snapshot=applyConsumerOptimistic(mode,consumerData,originalConsumer);
+  closeSheet();resetAndLoad();
+  toast((mode==='add'?'Consumer added: ':'Consumer updated: ')+cName,'ok');
+  sendConsumerSave(mode,consumerData,originalConsumer,snapshot);
 }
 function showCfErr(msg){$('cfErrMsg').textContent=msg;$('cfErr').classList.add('show');}
 async function loadUsers(){
@@ -1195,7 +1254,7 @@ function makeUserCard(u){
   return div;
 }
 function openAddUserForm(){$('auName').value='';$('auUser').value='';$('auPass').value='';$('auErr').classList.remove('show');$('auErrMsg').textContent='';$('auBtn').classList.remove('loading');openSheet('addUserSheet');setTimeout(function(){$('auName').focus();},380);}
-async function doAddUser(){
+function doAddUser(){
   var name=$('auName').value.trim(),username=$('auUser').value.trim().toLowerCase(),password=$('auPass').value;
   $('auErr').classList.remove('show');
   if(!name){$('auErrMsg').textContent='Full name is required.';$('auErr').classList.add('show');$('auName').focus();return;}
@@ -1203,9 +1262,22 @@ async function doAddUser(){
   if(username.indexOf(' ')>=0){$('auErrMsg').textContent='Username cannot have spaces.';$('auErr').classList.add('show');$('auUser').focus();return;}
   if(!password||password.length<6){$('auErrMsg').textContent='Password must be at least 6 characters.';$('auErr').classList.add('show');$('auPass').focus();return;}
   if(!session||!session.token){location.replace('./login.html');return;}
-  var btn=$('auBtn');btn.classList.add('loading');
-  try{var controller=new AbortController();var tid=setTimeout(function(){controller.abort();},TIMEOUT);var res=await fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({action:'addUser',token:session.token,username:username,password:password,fullName:name,role:'Employee'}),redirect:'follow',signal:controller.signal});clearTimeout(tid);var json=await res.json();if(json.success){closeSheet();toast('Employee added successfully','ok');setTimeout(loadUsers,500);}else{$('auErrMsg').textContent=json.error||json.message||'Failed to add user.';$('auErr').classList.add('show');}}catch(err){$('auErrMsg').textContent=err.name==='AbortError'?'Request timed out.':'Network error. Please retry.';$('auErr').classList.add('show');}
-  btn.classList.remove('loading');
+  closeSheet();
+  toast('Employee added: '+name,'ok');
+  sendAddUser(username,password,name);
+}
+async function sendAddUser(username,password,name){
+  _pendingSaves++;
+  try{
+    var controller=new AbortController();var tid=setTimeout(function(){controller.abort();},TIMEOUT);
+    var res=await fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({action:'addUser',token:session.token,username:username,password:password,fullName:name,role:'Employee'}),redirect:'follow',signal:controller.signal});clearTimeout(tid);
+    var json=await res.json();
+    if(!json.success)throw new Error(json.error||json.message||'Failed to add user.');
+    if(activeTab==='admin')loadUsers();
+  }catch(err){
+    queueFailedSave('Add employee: '+name,function(){sendAddUser(username,password,name);},err.name==='AbortError'?'request timed out':err.message);
+  }
+  _pendingSaves--;
 }
 function openResetPwdForm(userId){var u=_userCache[userId]||{};var name=u['FullName']||'User';userForReset={userId:userId,name:name};$('rpTitle').textContent='Reset Password: '+name;$('rpPass').value='';$('rpErr').classList.remove('show');$('rpErrMsg').textContent='';$('rpBtn').classList.remove('loading');openSheet('rpSheet');setTimeout(function(){$('rpPass').focus();},380);}
 async function doResetPassword(){
@@ -1269,21 +1341,28 @@ function openAddFieldForm(){
 function toggleFieldOptions(){
   $('afOptionsWrap').classList.toggle('hidden',$('afType').value!=='dropdown');
 }
-async function doAddField(){
+function doAddField(){
   var label=$('afLabel').value.trim(),type=$('afType').value,options=$('afOptions').value.trim();
   $('afErr').classList.remove('show');
   if(!label){$('afErrMsg').textContent='Field name is required.';$('afErr').classList.add('show');$('afLabel').focus();return;}
   if(type==='dropdown'&&!options){$('afErrMsg').textContent='Add at least one option for dropdown fields.';$('afErr').classList.add('show');$('afOptions').focus();return;}
   if(!session||!session.token){location.replace('./login.html');return;}
-  var btn=$('afBtn');btn.classList.add('loading');
+  closeSheet();
+  toast('Field "'+label+'" added','ok');
+  sendAddField(label,type,options);
+}
+async function sendAddField(label,type,options){
+  _pendingSaves++;
   try{
     var controller=new AbortController();var tid=setTimeout(function(){controller.abort();},TIMEOUT);
     var res=await fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({action:'addCustomField',token:session.token,fieldLabel:label,fieldType:type,options:options}),redirect:'follow',signal:controller.signal});clearTimeout(tid);
     var json=await res.json();
-    if(json.success){closeSheet();toast('Field "'+label+'" added','ok');setTimeout(loadCustomFields,500);}
-    else{$('afErrMsg').textContent=json.error||json.message||'Failed to add field.';$('afErr').classList.add('show');}
-  }catch(err){$('afErrMsg').textContent=err.name==='AbortError'?'Request timed out.':'Network error. Please retry.';$('afErr').classList.add('show');}
-  btn.classList.remove('loading');
+    if(!json.success)throw new Error(json.error||json.message||'Failed to add field.');
+    if(activeTab==='fields')loadCustomFields();
+  }catch(err){
+    queueFailedSave('Add field: '+label,function(){sendAddField(label,type,options);},err.name==='AbortError'?'request timed out':err.message);
+  }
+  _pendingSaves--;
 }
 function openEditFieldForm(f){
   _fieldBeingEdited=f;
@@ -1765,13 +1844,29 @@ function showQkwhErr(msg){$('qkwhErrMsg').textContent=msg;$('qkwhErr').classList
    readings deliberately do NOT use the IndexedDB offline queue that
    consumer add/edit uses (the whole readings module is online-only by
    design), so an unsaved reading would otherwise be lost without warning. */
-var _pendingSaves=0,_failedSaves=[];
+var _pendingSaves=0,_failedSaves=[]; // each entry: {name, retryFn}
 function renderSaveBanner(){
   var el=$('saveBanner');
   if(!_failedSaves.length){el.classList.add('hidden');return;}
   var n=_failedSaves.length;
-  $('saveBannerTxt').innerHTML=n+' reading'+(n!==1?'s':'')+' failed to save ('+esc(_failedSaves.map(function(f){return f.name;}).slice(0,2).join(', '))+(n>2?' +'+(n-2)+' more':'')+')';
+  if(n===1){
+    $('saveBannerTxt').innerHTML=esc(_failedSaves[0].name)+' didn\u2019t save'+(_failedSaves[0].reason?': '+esc(_failedSaves[0].reason):'');
+  }else{
+    $('saveBannerTxt').innerHTML=n+' items failed to save ('+esc(_failedSaves.map(function(f){return f.name;}).slice(0,2).join(', '))+(n>2?' +'+(n-2)+' more':'')+')';
+  }
   el.classList.remove('hidden');
+}
+function queueFailedSave(name,retryFn,reason){
+  _failedSaves.push({name:name,retryFn:retryFn,reason:reason||''});
+  renderSaveBanner();
+}
+function retryFailedSaves(){
+  if(!_failedSaves.length)return;
+  if(!navigator.onLine){toast('Still offline — connect and try again.','err');return;}
+  var queue=_failedSaves.slice();
+  _failedSaves=[];renderSaveBanner();
+  toast('Retrying '+queue.length+' item'+(queue.length!==1?'s':'')+'…');
+  queue.forEach(function(item){item.retryFn();});
 }
 async function sendReadingSave(entry){
   _pendingSaves++;
@@ -1783,18 +1878,9 @@ async function sendReadingSave(entry){
     var idx=masterList.findIndex(function(x){return x.conNo===entry.conNo;});
     if(idx!==-1){masterList[idx].latestKwh=entry.value;masterList[idx].latestKwhAt=(json.reading&&json.reading.timestamp)?json.reading.timestamp:new Date().toISOString();}
   }catch(err){
-    _failedSaves.push(entry);
-    renderSaveBanner();
+    queueFailedSave(entry.name,function(){sendReadingSave(entry);},err.name==='AbortError'?'request timed out':err.message);
   }
   _pendingSaves--;
-}
-function retryFailedSaves(){
-  if(!_failedSaves.length)return;
-  if(!navigator.onLine){toast('Still offline — connect and try again.','err');return;}
-  var queue=_failedSaves.slice();
-  _failedSaves=[];renderSaveBanner();
-  toast('Retrying '+queue.length+' reading'+(queue.length!==1?'s':'')+'…');
-  queue.forEach(function(entry){sendReadingSave(entry);});
 }
 window.addEventListener('beforeunload',function(e){
   if(_pendingSaves>0||_failedSaves.length>0){e.preventDefault();e.returnValue='';}
@@ -1829,7 +1915,7 @@ $('qkwhSearchInp').addEventListener('input',function(e){var q=e.target.value;cle
    fetched only at the moment something is downloaded. Keeps the sheet snappy
    even for an employee with thousands of readings. Online-only, same as the
    rest of the meter-readings module. */
-var _myrData=null,_myrYear=null,_myrMonth=null,_myrRows=null,_myrEmployee='',_myrIsAdminView=false;
+var _myrData=null,_myrYear=null,_myrMonth=null,_myrRows=null,_myrEmployee='',_myrIsAdminView=false,_myrFetchToken=0;
 /* Single source of truth for "whose data is this" -- used in the subtitle,
    the download filename, and the title printed inside the file. Fixes a
    real bug: Admin viewing the unfiltered "all employees" view was
@@ -1842,6 +1928,7 @@ function myrEmployeeLabel(){
 function openMyReadings(){
   closeUserMenu();
   _myrData=null;_myrYear=null;_myrMonth=null;_myrRows=null;_myrEmployee='';
+  _myrFetchToken++;
   $('myrTitle').textContent='My KWH Readings';
   $('myrSub').textContent=session.fullName||session.username||'—';
   $('myrBackBtn').classList.add('hidden');
@@ -1876,13 +1963,14 @@ async function myrFetchSummary(){
 function myrEmployeeChanged(){
   _myrEmployee=$('myrEmpSel').value;
   _myrYear=null;_myrMonth=null;_myrRows=null;
+  _myrFetchToken++; // invalidate any in-flight month-fetch from the previous employee
   $('myrSub').textContent=myrEmployeeLabel();
   $('myrBackBtn').classList.add('hidden');
   $('myrBody').innerHTML=Array(3).fill('<div class="skeleton" style="height:56px;margin-bottom:8px"></div>').join('');
   myrFetchSummary();
 }
 function myrBack(){
-  if(_myrMonth){_myrMonth=null;_myrRows=null;myrRender();return;}
+  if(_myrMonth){_myrFetchToken++;_myrMonth=null;_myrRows=null;myrRender();return;}
   _myrYear=null;$('myrBackBtn').classList.add('hidden');myrRender();
 }
 function myrRender(){
@@ -2036,19 +2124,31 @@ function myrOpenMonth(m){
   myrRender();
   myrFetchRows(_myrYear,m);
 }
+/* Token guards against a real race: open month A, back out, open month B --
+   if A's request resolves after B's has already started, its result must
+   never be allowed to overwrite B's. Only the fetch matching the CURRENT
+   token is allowed to write _myrRows or trigger a render; every earlier one
+   is silently discarded, no matter what order they actually resolve in. */
 async function myrFetchRows(year,month){
-  if(!navigator.onLine){_myrRows=[];myrRender();toast('Viewing readings needs an internet connection.','err');return;}
+  var myToken=++_myrFetchToken;
+  if(!navigator.onLine){
+    if(myToken===_myrFetchToken){_myrRows=[];myrRender();}
+    toast('Viewing readings needs an internet connection.','err');
+    return;
+  }
   try{
     var controller=new AbortController();var tid=setTimeout(function(){controller.abort();},TIMEOUT);
     var res=await fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({action:'getMyReadings',token:session.token,mode:'export',year:year,month:month||'',employee:_myrEmployee}),redirect:'follow',signal:controller.signal});clearTimeout(tid);
     var json=await res.json();
+    if(myToken!==_myrFetchToken)return;
     _myrRows=json.success?(json.rows||[]):[];
     if(!json.success)toast(json.error||'Could not load readings.','err');
   }catch(err){
+    if(myToken!==_myrFetchToken)return;
     _myrRows=[];
     toast(err.name==='AbortError'?'Request timed out.':'Network error.','err');
   }
-  if(activeSheet==='myrSheet'&&_myrMonth===month)myrRender();
+  if(myToken===_myrFetchToken&&activeSheet==='myrSheet'&&_myrMonth===month)myrRender();
 }
 async function myrDownload(year,month){
   if(!navigator.onLine){toast('Downloads need an internet connection.','err');return;}
