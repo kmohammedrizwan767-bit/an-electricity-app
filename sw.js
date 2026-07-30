@@ -17,7 +17,7 @@
 // the new one only appears on the second load. Bumping makes the activate
 // handler delete an-elect-v1 wholesale, forcing a clean fetch.
 // BUMP THIS ON EVERY FRONTEND DEPLOY.
-const CACHE_VERSION  = 'v3';
+const CACHE_VERSION  = 'v4';
 const CACHE_NAME     = `an-elect-${CACHE_VERSION}`;
 const SYNC_TAG       = 'sync-pending-changes';
 const DB_NAME        = 'an_elect_db';
