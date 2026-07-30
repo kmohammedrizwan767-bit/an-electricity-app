@@ -390,6 +390,8 @@
   .save-banner .material-icons-round{font-size:18px;flex-shrink:0}
   .save-banner-txt{flex:1;line-height:1.35}
   .save-banner-btn{background:rgba(255,255,255,.2);border:none;color:#fff;border-radius:9px;padding:6px 13px;font-family:var(--fd);font-size:12px;font-weight:700;cursor:pointer;flex-shrink:0}
+  .save-banner-btn.fix{background:rgba(255,255,255,.34)}
+  .save-banner-btn:active{background:rgba(255,255,255,.45)}
   .qkwh-prev{font-size:11.5px;color:var(--t2);margin-top:6px;display:flex;align-items:center;gap:5px;line-height:1.4}
   .qkwh-prev .material-icons-round{font-size:14px}
   .qkwh-warn{font-size:11.5px;color:#B8860B;margin-top:6px;display:flex;align-items:flex-start;gap:5px;line-height:1.4}
@@ -753,6 +755,7 @@
 <div class="save-banner hidden" id="saveBanner">
   <span class="material-icons-round">cloud_off</span>
   <span class="save-banner-txt" id="saveBannerTxt"></span>
+  <button class="save-banner-btn fix hidden" id="saveBannerFix" onclick="fixFailedSave()">Fix</button>
   <button class="save-banner-btn" onclick="retryFailedSaves()">Retry</button>
 </div>
 <button class="fab" id="fabBtn" onclick="openAddForm()"><span class="material-icons-round">add</span></button>
@@ -1223,13 +1226,53 @@ async function sendConsumerSave(mode,consumerData,originalConsumer,snapshot){
   }catch(err){
     revertConsumerOptimistic(mode,consumerData,originalConsumer,snapshot);
     if(activeTab==='consumers')resetAndLoad();
+    var _reason=err.name==='AbortError'?'request timed out':err.message;
     queueFailedSave((mode==='add'?'Add: ':'Edit: ')+(consumerData.ConsumerName||consumerData.ConNo),function(){
       applyConsumerOptimistic(mode,consumerData,originalConsumer);
       if(activeTab==='consumers')resetAndLoad();
       sendConsumerSave(mode,consumerData,originalConsumer,snapshot);
-    },err.name==='AbortError'?'request timed out':err.message);
+    },_reason,function(){
+      fixConsumerForm(mode,consumerData,originalConsumer,_reason);
+    });
   }
   _pendingSaves--;
+}
+/* Gap 7.1 - reopen the consumer form holding exactly what was attempted.
+   Two things make this correct rather than approximate:
+   1. CF.consumer must be the ORIGINAL record, not the attempted one, because
+      saveConsumer() reads _rowIndex / sNo / createdAt off it to build the
+      update payload. So the form is opened from the original and the visible
+      field values are then overwritten with the attempted ones.
+   2. consumerData is PascalCase (sheet header keys, as sent to the server),
+      while the form fields are read back individually - so each input is set
+      from its own key rather than by running it through normalize(). */
+function fixConsumerForm(mode,consumerData,originalConsumer,reason){
+  closeSheet();
+  setTimeout(function(){
+    if(mode==='add')openAddForm();
+    else openEditFormWithData(originalConsumer);
+    $('cfConNo').value=consumerData.ConNo||'';
+    $('cfCName').value=consumerData.ConsumerName||'';
+    $('cfAddr').value=consumerData.Address||'';
+    $('cfLabNo').value=consumerData.LabNo||'';
+    $('cfMeter').value=consumerData.MeterNo||'';
+    $('cfTransf').value=consumerData.TransfCode||'';
+    $('cfPhone').value=consumerData.PhoneNo||'';
+    $('cfStatus').value=consumerData.Status||'Active';
+    $('cfSdNo').value=consumerData['Passbook/SD No']||'';
+    $('cfSdAmt').value=consumerData['SD Amount']||'';
+    $('cfSdDate').value=consumerData['SD Date']||'';
+    document.querySelectorAll('#cfCustomFields [data-field-label]').forEach(function(el){
+      var lbl=el.getAttribute('data-field-label');
+      if(consumerData[lbl]!==undefined)el.value=consumerData[lbl];
+    });
+    /* The server's own words, not a guess. Field-level attribution is not
+       possible yet: Consumer.gs returns a message string with no field key,
+       so pointing at a specific input would be invention. Add a `field` key
+       to the rejection response and this can focus the offending input. */
+    showCfErr(reason?('Server rejected this: '+reason):'That save was rejected. Check the values and try again.');
+    setTimeout(function(){$(mode==='add'?'cfConNo':'cfCName').focus();},260);
+  },220);
 }
 function saveConsumer(){
   var conNo=$('cfConNo').value.trim(),cName=$('cfCName').value.trim(),addr=$('cfAddr').value.trim(),labNo=$('cfLabNo').value.trim(),meter=$('cfMeter').value.trim(),transf=$('cfTransf').value,phone=$('cfPhone').value.trim(),status=$('cfStatus').value,sdNo=$('cfSdNo').value.trim(),sdAmt=$('cfSdAmt').value.trim(),sdDate=$('cfSdDate').value;
@@ -1925,10 +1968,30 @@ function renderSaveBanner(){
     $('saveBannerTxt').innerHTML=n+' items failed to save ('+esc(_failedSaves.map(function(f){return f.name;}).slice(0,2).join(', '))+(n>2?' +'+(n-2)+' more':'')+')';
   }
   el.classList.remove('hidden');
+  /* Fix is only offered when the queue actually holds something reopenable.
+     Saves without a fix handler (employees, custom fields, readings) keep
+     Retry alone, exactly as before. */
+  var fixable=_failedSaves.some(function(f){return typeof f.fixFn==='function';});
+  $('saveBannerFix').classList.toggle('hidden',!fixable);
 }
-function queueFailedSave(name,retryFn,reason){
-  _failedSaves.push({name:name,retryFn:retryFn,reason:reason||''});
+function queueFailedSave(name,retryFn,reason,fixFn){
+  _failedSaves.push({name:name,retryFn:retryFn,reason:reason||'',fixFn:fixFn||null});
   renderSaveBanner();
+}
+/* Gap 7.1. Pulls the first reopenable failure out of the queue and hands it
+   back to the user in its own form. Removing it from _failedSaves is the point:
+   the user is taking ownership of it, so it must not also sit there waiting for
+   a Retry that would resend the same rejected data. If they close the form
+   without saving, the record simply stays as the server has it -- the list was
+   already reverted when the save failed. */
+function fixFailedSave(){
+  var i=-1;
+  for(var k=0;k<_failedSaves.length;k++){if(typeof _failedSaves[k].fixFn==='function'){i=k;break;}}
+  if(i===-1)return;
+  var item=_failedSaves[i];
+  _failedSaves.splice(i,1);
+  renderSaveBanner();
+  item.fixFn();
 }
 function retryFailedSaves(){
   if(!_failedSaves.length)return;
