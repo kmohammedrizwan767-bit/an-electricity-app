@@ -194,7 +194,13 @@ const AN_DB = (() => {
    * search/filter/sort/list-display/bulk-actions/OCR-match need. Kept as a
    * single list so the merge logic below and the sync caller can't drift apart.
    */
-  const LITE_FIELDS = ['conNo', 'consumerName', 'address', 'meterNo', 'transfCode', 'phoneNo', 'status', 'sdPassbookNo', '_rowIndex'];
+  /* 'sdPending' added for gap 7.4. This list is a WHITELIST: mergeLiteConsumers
+     copies only these keys from a fresh lite row onto the cached record, so a
+     server field missing from here is silently discarded on the first
+     background sync - the badge would appear on load and then quietly vanish.
+     It also feeds the dataChanged comparison below, so without it a consumer's
+     SD being paid would not register as a change. */
+  const LITE_FIELDS = ['conNo', 'consumerName', 'address', 'meterNo', 'transfCode', 'phoneNo', 'status', 'sdPassbookNo', 'sdPending', '_rowIndex'];
 
   /**
    * Merge a fresh "lite" server list into the local cache WITHOUT discarding

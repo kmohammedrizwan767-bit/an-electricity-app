@@ -193,6 +193,8 @@
   .f-pill.active-s{background:rgba(46,125,50,.15);border-color:rgba(46,125,50,.3);color:#2E7D32}
   .f-pill.inactive-s{background:rgba(120,120,120,.12);border-color:rgba(120,120,120,.2);color:#757575}
   .f-pill.defaulter-s{background:rgba(211,47,47,.12);border-color:rgba(211,47,47,.2);color:var(--danger)}
+  .f-pill.sd-pill.on{background:rgba(184,134,11,.15);border-color:rgba(184,134,11,.3);color:#8A6100}
+  [data-theme=dark] .f-pill.sd-pill.on{background:rgba(255,193,7,.2);border-color:rgba(255,193,7,.35);color:#FFD166}
   [data-theme=dark] .f-pill.active-s{background:rgba(76,175,80,.2);color:#66BB6A;border-color:rgba(76,175,80,.3)}
   [data-theme=dark] .f-pill.inactive-s{background:rgba(120,120,120,.2);color:#BDBDBD}
   [data-theme=dark] .f-pill.defaulter-s{background:rgba(211,47,47,.2);color:#EF9A9A}
@@ -218,6 +220,8 @@
   .cnt-txt{font-size:12px;font-family:var(--fd);font-weight:600;color:var(--primary)}
   .cnt-btn{background:none;border:none;padding:2px 0;cursor:pointer;flex-shrink:0;font-size:12px;font-family:var(--fd);font-weight:600;color:var(--primary)}
   .stat-seg{background:none;border:none;padding:2px 0;cursor:pointer;flex-shrink:0;font-size:12px;font-family:var(--fd);font-weight:600;color:var(--danger);white-space:nowrap}
+  .stat-seg.stat-sd{color:#8A6100}
+  [data-theme=dark] .stat-seg.stat-sd{color:#FFD166}
   .cnt-btn:active,.stat-seg:active{opacity:.55}
   .cnt-btn:empty{display:none}
   .refresh-btn{background:none;border:none;color:var(--t2);cursor:pointer;padding:4px;display:flex;align-items:center;border-radius:50%}
@@ -249,6 +253,8 @@
   .status-badge.active{background:rgba(46,125,50,.12);color:#2E7D32}
   .status-badge.inactive{background:rgba(120,120,120,.12);color:#757575}
   .status-badge.defaulter{background:rgba(211,47,47,.12);color:var(--danger)}
+  .status-badge.sd-pending{background:rgba(184,134,11,.13);color:#8A6100}
+  [data-theme=dark] .status-badge.sd-pending{background:rgba(255,193,7,.18);color:#FFD166}
   [data-theme=dark] .status-badge.active{background:rgba(46,125,50,.25);color:#81C784}
   [data-theme=dark] .status-badge.inactive{background:rgba(120,120,120,.25);color:#BDBDBD}
   [data-theme=dark] .status-badge.defaulter{background:rgba(211,47,47,.25);color:#EF9A9A}
@@ -696,6 +702,7 @@
   <div class="prefix-row" id="prefixRow"></div>
   <div class="f-row">
     <button class="f-pill active" onclick="setStatus(this,'ALL')">All Status</button>
+    <button class="f-pill sd-pill hidden" id="sdPill" onclick="toggleSdPending(this)"><span class="material-icons-round">savings</span>SD pending</button>
     <button class="f-pill" onclick="setStatus(this,'Active')"><span class="material-icons-round stat-dot-active">circle</span>Active</button>
     <button class="f-pill" onclick="setStatus(this,'Inactive')"><span class="material-icons-round stat-dot-inactive">circle</span>Inactive</button>
     <button class="f-pill" onclick="setStatus(this,'Defaulter')"><span class="material-icons-round stat-dot-defaulter">circle</span>Defaulter</button>
@@ -725,7 +732,7 @@
 </div>
 <main class="main" id="main">
   <div id="consumerView">
-    <div class="sync-row"><span class="sync-dot syncing" id="syncDot"></span><span class="sync-txt" id="syncTxt">Loading&#8230;</span><button class="cnt-txt cnt-btn" id="cntTxt" onclick="syncStatFilter('ALL')"></button><button class="stat-seg hidden" id="statDef" onclick="syncStatFilter('Defaulter')"></button><button class="refresh-btn" id="refreshBtn" onclick="refreshData()"><span class="material-icons-round">refresh</span></button></div>
+    <div class="sync-row"><span class="sync-dot syncing" id="syncDot"></span><span class="sync-txt" id="syncTxt">Loading&#8230;</span><button class="cnt-txt cnt-btn" id="cntTxt" onclick="syncStatFilter('ALL')"></button><button class="stat-seg hidden" id="statDef" onclick="syncStatFilter('Defaulter')"></button><button class="stat-seg stat-sd hidden" id="statSd" onclick="tapSdSegment()"></button><button class="refresh-btn" id="refreshBtn" onclick="refreshData()"><span class="material-icons-round">refresh</span></button></div>
     <div id="consumerList"></div><div id="sentinel"></div>
     <div class="empty-state hidden" id="emptyState"><span class="material-icons-round" id="emptyIco">people_outline</span><div class="empty-title" id="emptyTtl">No consumers yet</div><div class="empty-sub" id="emptySub">Tap + to add the first consumer</div></div>
   </div>
@@ -777,6 +784,7 @@
 const API_URL='https://script.google.com/macros/s/AKfycbyeO7pIZrT1WKPHHuR8LKxhPKgf4uELmkSkIgUefNwT88JdCBiAoTAfgKTyCBKEMmBowQ/exec';
 const PAGE_SIZE=30,TIMEOUT=30000;
 let session=null,isAdmin=false,masterList=[],filtered=[],displayedN=0;
+var sdOnly=false; // Gap 7.4 - orthogonal to activeStatus, not a fourth status
 let activeArea='ALL',activeStatus='ALL',sortOrder='default',searchQ='';
 let searchT=null,toastT=null,activeSheet=null,lastScrollY=0;
 let selectMode=false,selectedSet=new Set();
@@ -887,6 +895,11 @@ function normalize(c,isFull){
   function getRaw(){for(var i=0;i<arguments.length;i++){var v=c[arguments[i]];if(v!==undefined&&v!==null&&String(v).trim()!=='')return String(v).trim();}return '';}
   var mr=c['MeterNo']||c.meterNo||c['Meter No']||'';
   var result={_rowIndex:c._rowIndex||0,_full:isFull===true,sNo:get('S.No.','sNo'),conNo:get('ConNo','conNo'),consumerName:get('ConsumerName','Consumer Name','consumerName'),address:get('Address','address'),labNo:get('LabNo','labNo','Lab No'),meterNo:mr?String(mr).trim():'',transfCode:get('TransfCode','transfCode','Transf Code','AreaCode','areaCode'),phoneNo:get('PhoneNo','phoneNo','Phone','phone'),status:get('Status','status')||'Active',lastEditedBy:get('LastEditedBy','lastEditedBy'),lastEditedAt:get('LastEditedAt','lastEditedAt'),createdAt:get('CreatedAt','createdAt'),sdPassbookNo:get('Passbook/SD No','sdPassbookNo'),sdAmount:get('SD Amount','sdAmount'),sdDate:get('SD Date','sdDate'),latestKwh:getRaw('LatestKWH','latestKwh'),latestKwhAt:getRaw('LatestKWHAt','latestKwhAt'),latestKvah:getRaw('LatestKVAH','latestKvah'),latestKvahAt:getRaw('LatestKVAHAt','latestKvahAt')};
+  /* Gap 7.4 tri-state: true / false / undefined. Must NOT go through get(),
+     which would turn both false and undefined into ''. undefined means this
+     office sheet has no SD Amount column, i.e. unknown - never "paid". */
+  var _sdp=(c.SdPending!==undefined)?c.SdPending:c.sdPending;
+  if(_sdp!==undefined&&_sdp!==null&&_sdp!=='')result.sdPending=(_sdp===true||_sdp==='true'||_sdp===1||_sdp==='TRUE');
   var known=['S.No.','sNo','ConNo','conNo','ConsumerName','Consumer Name','consumerName','Address','address','LabNo','labNo','Lab No','MeterNo','meterNo','Meter No','TransfCode','transfCode','Transf Code','AreaCode','areaCode','PhoneNo','phoneNo','Phone','phone','Status','status','LastEditedBy','lastEditedBy','LastEditedAt','lastEditedAt','CreatedAt','createdAt','Passbook/SD No','sdPassbookNo','SD Amount','sdAmount','SD Date','sdDate','LatestKWH','latestKwh','LatestKWHAt','latestKwhAt','LatestKVAH','latestKvah','LatestKVAHAt','latestKvahAt','_rowIndex'];
   Object.keys(c).forEach(function(k){if(known.indexOf(k)===-1)result[k]=(c[k]!==undefined&&c[k]!==null)?String(c[k]).trim():'';});
   return result;
@@ -906,6 +919,9 @@ function computeLocalFiltered(){
   var list=masterList;
   if(activeArea!=='ALL')list=list.filter(function(c){return c.transfCode===activeArea;});
   if(activeStatus!=='ALL')list=list.filter(function(c){return(c.status||'Active').toLowerCase()===activeStatus.toLowerCase();});
+  /* Strictly ===true. A record whose flag is undefined is unknown, and
+     filtering "show me pending" must not include unknowns. */
+  if(sdOnly)list=list.filter(function(c){return c.sdPending===true;});
   var q=searchQ.toLowerCase().trim();
   if(q){list=list.filter(function(c){return(c.consumerName||'').toLowerCase().indexOf(q)>=0||(c.conNo||'').toLowerCase().indexOf(q)>=0||(c.meterNo||'').indexOf(q)>=0||(c.phoneNo||'').indexOf(q)>=0||(c.address||'').toLowerCase().indexOf(q)>=0||(c.sdPassbookNo||'').toLowerCase().indexOf(q)>=0;});}
   if(sortOrder==='asc')list=list.slice().sort(function(a,b){return(a.consumerName||'').localeCompare(b.consumerName||'');});
@@ -1003,7 +1019,7 @@ function makeCard(c){
   var addr=c.address?'<div class="c-mi addr"><span class="material-icons-round">location_on</span>'+esc(c.address).substring(0,28)+'</div>':'';
   var check=selectMode?'<div class="c-check"><span class="material-icons-round">check</span></div>':'';
   var arrow=selectMode?'':'<span class="c-arrow material-icons-round">chevron_right</span>';
-  div.innerHTML='<div class="c-inner">'+check+'<div class="c-body"><div class="c-row1"><span class="c-conno">'+esc(c.conNo||'—')+'</span><div class="badges">'+area+'<span class="status-badge '+status+'">'+esc(c.status||'Active')+'</span></div></div><div class="c-name">'+esc(c.consumerName||'—')+'</div><div class="c-meta">'+meter+phone+addr+'</div></div>'+arrow+'</div>';
+  div.innerHTML='<div class="c-inner">'+check+'<div class="c-body"><div class="c-row1"><span class="c-conno">'+esc(c.conNo||'—')+'</span><div class="badges">'+area+(c.sdPending===true?'<span class="status-badge sd-pending">SD pending</span>':'')+'<span class="status-badge '+status+'">'+esc(c.status||'Active')+'</span></div></div><div class="c-name">'+esc(c.consumerName||'—')+'</div><div class="c-meta">'+meter+phone+addr+'</div></div>'+arrow+'</div>';
   if(selectMode){div.addEventListener('click',function(){toggleCard(c.conNo,div);});}
   else{div.addEventListener('click',function(){openDetail(c);});attachLongPress(div,c);div.addEventListener('pointerdown',function(e){addRipple(div,e);prefetchConsumerDetail(c);});}
   return div;
@@ -1084,6 +1100,15 @@ function openDetail(c){
 $('searchInp').addEventListener('input',function(e){searchQ=e.target.value;$('sClear').classList.toggle('hidden',!searchQ);clearTimeout(searchT);searchT=setTimeout(resetAndLoad,120);});
 function clearSearch(){$('searchInp').value='';searchQ='';$('sClear').classList.add('hidden');resetAndLoad();}
 function setArea(el,code){activeArea=code;document.querySelectorAll('.chip').forEach(function(c){c.classList.remove('active');});el.classList.add('active');resetAndLoad();}
+function tapSdSegment(){
+  var pill=$('sdPill');
+  if(pill&&!sdOnly)toggleSdPending(pill);
+}
+function toggleSdPending(el){
+  sdOnly=!sdOnly;
+  el.classList.toggle('on',sdOnly);
+  resetAndLoad();
+}
 /* Gap 7.2. Office-wide defaulter count from masterList - status is one of the
    8 lite-safe fields, so this is a real number for every record, not just the
    hydrated ones. Recomputed on every list render so it stays correct after a
@@ -1100,6 +1125,24 @@ function renderSyncStats(){
   var hide=(n===0)||(typeof activeStatus!=='undefined'&&activeStatus==='Defaulter');
   el.textContent=hide?'':(n+' defaulter'+(n!==1?'s':''));
   el.classList.toggle('hidden',hide);
+
+  /* Gap 7.4 completes the third segment 7.2 had to omit. Now honest, because
+     the flag is server-computed. `known` guards the older-sheet case: if no
+     record carries the flag, the answer is unknown and both the segment and
+     the pill stay hidden rather than claiming zero. */
+  var sd=0,known=0;
+  for(var j=0;j<masterList.length;j++){
+    if(masterList[j].sdPending===undefined)continue;
+    known++;
+    if(masterList[j].sdPending===true)sd++;
+  }
+  var seg=$('statSd'),pill=$('sdPill');
+  if(pill)pill.classList.toggle('hidden',known===0);
+  if(seg){
+    var hideSd=(known===0)||(sd===0)||sdOnly;
+    seg.textContent=hideSd?'':(sd+' SD pending');
+    seg.classList.toggle('hidden',hideSd);
+  }
 }
 /* Taps route through the real pill so the pill row and the list can never
    disagree - setStatus() owns both the active class and resetAndLoad(). The
@@ -1114,7 +1157,7 @@ function syncStatFilter(status){
     }
   }
 }
-function setStatus(el,status){activeStatus=status;document.querySelectorAll('.f-pill').forEach(function(p){p.classList.remove('active','active-s','inactive-s','defaulter-s');});if(status==='ALL')el.classList.add('active');else if(status==='Active')el.classList.add('active-s');else if(status==='Inactive')el.classList.add('inactive-s');else if(status==='Defaulter')el.classList.add('defaulter-s');resetAndLoad();}
+function setStatus(el,status){activeStatus=status;document.querySelectorAll('.f-pill:not(.sd-pill)').forEach(function(p){p.classList.remove('active','active-s','inactive-s','defaulter-s');});if(status==='ALL')el.classList.add('active');else if(status==='Active')el.classList.add('active-s');else if(status==='Inactive')el.classList.add('inactive-s');else if(status==='Defaulter')el.classList.add('defaulter-s');resetAndLoad();}
 function cycleSort(){var orders=['default','asc','desc'],labels=['Default','A \u2192 Z','Z \u2192 A'];var cur=orders.indexOf(sortOrder);sortOrder=orders[(cur+1)%3];$('sortLbl').textContent=labels[orders.indexOf(sortOrder)];$('sortBtn').classList.toggle('active',sortOrder!=='default');resetAndLoad();}
 function applyTheme(t){document.documentElement.setAttribute('data-theme',t);$('themeMenuIcon').textContent=t==='dark'?'light_mode':'dark_mode';$('themeMenuLabel').textContent=t==='dark'?'Switch to Light Mode':'Switch to Dark Mode';$('themeColorMeta').content=t==='dark'?'#0F1F3C':'#0052B4';localStorage.setItem('an_elect_theme',t);}
 function toggleThemeFromMenu(){applyTheme(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark');}
