@@ -222,6 +222,18 @@
   .stat-seg{background:none;border:none;padding:2px 0;cursor:pointer;flex-shrink:0;font-size:12px;font-family:var(--fd);font-weight:600;color:var(--danger);white-space:nowrap}
   .stat-seg.stat-sd{color:#8A6100}
   [data-theme=dark] .stat-seg.stat-sd{color:#FFD166}
+  /* Gap 7.5. The queue chip is INFORMATIONAL, so it must not inherit
+     .stat-seg's danger red. Per-theme colours follow the .stat-sd
+     precedent above, because --primary measures only 2.67:1 on the dark
+     background -- under the 4.5:1 floor, and exactly the low-brightness
+     failure the design system warns about. #6FA8FF measures 8.12:1.
+     max-width + ellipsis matter because .stat-seg is flex-shrink:0 and
+     nowrap, so an uncapped label pushes the whole sync row into
+     horizontal overflow on a narrow phone. */
+  .stat-seg.stat-queue{color:#0052B4;max-width:46%;min-width:0;flex-shrink:1;overflow:hidden;text-overflow:ellipsis}
+  [data-theme=dark] .stat-seg.stat-queue{color:#6FA8FF}
+  /* Pre-existing, same root cause: .cnt-txt had no dark override either. */
+  [data-theme=dark] .cnt-txt{color:#6FA8FF}
   .cnt-btn:active,.stat-seg:active{opacity:.55}
   .cnt-btn:empty{display:none}
   .refresh-btn{background:none;border:none;color:var(--t2);cursor:pointer;padding:4px;display:flex;align-items:center;border-radius:50%}
@@ -402,6 +414,16 @@
   .save-banner-btn{background:rgba(255,255,255,.2);border:none;color:#fff;border-radius:9px;padding:6px 13px;font-family:var(--fd);font-size:12px;font-weight:700;cursor:pointer;flex-shrink:0}
   .save-banner-btn.fix{background:rgba(255,255,255,.34)}
   .save-banner-btn:active{background:rgba(255,255,255,.45)}
+  /* Gap 7.5. Fix + Discard + Retry can all be visible at once, which is
+     roughly 270px of controls once icon, gaps and padding are counted --
+     more than a 360px screen has left over for the message. Without
+     flex-wrap the banner overflows; with it the buttons drop to a second
+     line and stay reachable. Discard gets a darker fill so a destructive
+     action never looks like the safe one sitting next to it. */
+  .save-banner{flex-wrap:wrap}
+  .save-banner-txt{min-width:150px}
+  .save-banner-btn.danger{background:rgba(0,0,0,.28)}
+  .save-banner-btn.danger:active{background:rgba(0,0,0,.44)}
   .qkwh-prev{font-size:11.5px;color:var(--t2);margin-top:6px;display:flex;align-items:center;gap:5px;line-height:1.4}
   .qkwh-prev .material-icons-round{font-size:14px}
   .qkwh-warn{font-size:11.5px;color:#B8860B;margin-top:6px;display:flex;align-items:flex-start;gap:5px;line-height:1.4}
@@ -740,7 +762,7 @@
 </div>
 <main class="main" id="main">
   <div id="consumerView">
-    <div class="sync-row"><span class="sync-dot syncing" id="syncDot"></span><span class="sync-txt" id="syncTxt">Loading&#8230;</span><button class="cnt-txt cnt-btn" id="cntTxt" onclick="syncStatFilter('ALL')"></button><button class="stat-seg hidden" id="statDef" onclick="syncStatFilter('Defaulter')"></button><button class="stat-seg stat-sd hidden" id="statSd" onclick="tapSdSegment()"></button><button class="stat-seg hidden" id="statQueue" onclick="tapQueueSegment()"></button><button class="refresh-btn" id="refreshBtn" onclick="refreshData()"><span class="material-icons-round">refresh</span></button></div>
+    <div class="sync-row"><span class="sync-dot syncing" id="syncDot"></span><span class="sync-txt" id="syncTxt">Loading&#8230;</span><button class="cnt-txt cnt-btn" id="cntTxt" onclick="syncStatFilter('ALL')"></button><button class="stat-seg hidden" id="statDef" onclick="syncStatFilter('Defaulter')"></button><button class="stat-seg stat-sd hidden" id="statSd" onclick="tapSdSegment()"></button><button class="stat-seg stat-queue hidden" id="statQueue" onclick="tapQueueSegment()"></button><button class="refresh-btn" id="refreshBtn" onclick="refreshData()"><span class="material-icons-round">refresh</span></button></div>
     <div id="consumerList"></div><div id="sentinel"></div>
     <div class="empty-state hidden" id="emptyState"><span class="material-icons-round" id="emptyIco">people_outline</span><div class="empty-title" id="emptyTtl">No consumers yet</div><div class="empty-sub" id="emptySub">Tap + to add the first consumer</div></div>
   </div>
@@ -776,7 +798,7 @@
   <span class="material-icons-round">cloud_off</span>
   <span class="save-banner-txt" id="saveBannerTxt"></span>
   <button class="save-banner-btn fix hidden" id="saveBannerFix" onclick="fixFailedSave()">Fix</button>
-  <button class="save-banner-btn hidden" id="saveBannerDiscard" onclick="confirmDiscardDead()">Discard</button>
+  <button class="save-banner-btn danger hidden" id="saveBannerDiscard" onclick="confirmDiscardDead()">Discard</button>
   <button class="save-banner-btn" onclick="retryFailedSaves()">Retry</button>
 </div>
 <button class="fab" id="fabBtn" onclick="openAddForm()"><span class="material-icons-round">add</span></button>
@@ -2166,15 +2188,31 @@ async function refreshQueueStats(){
   var el=$('statQueue');if(!el)return;
   try{
     var s=await AN_DB.getQueueStats(session&&session.username);
-    var parts=[];
-    if(s.pending)parts.push(s.pending+' waiting to sync');
-    if(s.waiting)parts.push(s.waiting+' from another user');
-    if(parts.length){el.textContent=parts.join(' · ');el.classList.remove('hidden');}
-    else el.classList.add('hidden');
+    /* Kept deliberately terse. This chip shares one flex row with the status
+       text, the count, two filter segments and the refresh button, so a
+       sentence-length label does not fit on a phone. The full explanation
+       lives on tap and in the title attribute instead of being truncated. */
+    var parts=[],full=[];
+    if(s.pending){parts.push(s.pending+' to sync');full.push(s.pending+' change'+(s.pending!==1?'s':'')+' waiting to sync');}
+    if(s.waiting){parts.push(s.waiting+' held');full.push(s.waiting+' queued by another user');}
+    if(parts.length){
+      el.textContent=parts.join(' · ');
+      el.title=full.join('; ');
+      el.classList.remove('hidden');
+    }else el.classList.add('hidden');
     if(s.dead)surfaceDeadLetters();
   }catch(e){el.classList.add('hidden');}
 }
-function tapQueueSegment(){
+async function tapQueueSegment(){
+  /* The chip is terse by necessity, so tapping it is what actually explains
+     the state. A held change is the confusing case -- it looks stuck but is
+     being withheld on purpose -- so it gets said plainly. */
+  var s=null;
+  try{s=await AN_DB.getQueueStats(session&&session.username);}catch(e){}
+  if(s&&s.waiting){
+    toast(s.waiting+' change'+(s.waiting!==1?'s':'')+' queued by another user — these sync when that user logs in.');
+    return;
+  }
   if(!navigator.onLine){toast('Still offline — these will sync automatically.');return;}
   AN_DB.requestSync();toast('Syncing…');
 }
