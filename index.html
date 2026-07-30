@@ -618,6 +618,14 @@
   <button class="btn-del-confirm" onclick="doDeleteField()">Yes, Delete Permanently</button>
   <button class="btn-cancel" onclick="closeSheet()">Cancel</button>
 </div>
+<div class="bottom-sheet" id="dlSheet">
+  <div class="sheet-handle" id="dlHandle"></div>
+  <div class="del-ico"><span class="material-icons-round">delete_forever</span></div>
+  <div class="del-ttl">Discard unsynced changes?</div>
+  <div class="del-sub">These were refused by the server and will be thrown away. Anything typed in the field is lost for good. This cannot be undone.<span class="del-who" id="dlWho"></span></div>
+  <button class="btn-del-confirm" onclick="doDiscardDead()">Yes, Discard</button>
+  <button class="btn-cancel" onclick="closeSheet()">Cancel</button>
+</div>
 <div class="bottom-sheet" id="readingSheet">
   <div class="sheet-handle" id="readingHandle"></div>
   <div class="mr-hdr">
@@ -732,7 +740,7 @@
 </div>
 <main class="main" id="main">
   <div id="consumerView">
-    <div class="sync-row"><span class="sync-dot syncing" id="syncDot"></span><span class="sync-txt" id="syncTxt">Loading&#8230;</span><button class="cnt-txt cnt-btn" id="cntTxt" onclick="syncStatFilter('ALL')"></button><button class="stat-seg hidden" id="statDef" onclick="syncStatFilter('Defaulter')"></button><button class="stat-seg stat-sd hidden" id="statSd" onclick="tapSdSegment()"></button><button class="refresh-btn" id="refreshBtn" onclick="refreshData()"><span class="material-icons-round">refresh</span></button></div>
+    <div class="sync-row"><span class="sync-dot syncing" id="syncDot"></span><span class="sync-txt" id="syncTxt">Loading&#8230;</span><button class="cnt-txt cnt-btn" id="cntTxt" onclick="syncStatFilter('ALL')"></button><button class="stat-seg hidden" id="statDef" onclick="syncStatFilter('Defaulter')"></button><button class="stat-seg stat-sd hidden" id="statSd" onclick="tapSdSegment()"></button><button class="stat-seg hidden" id="statQueue" onclick="tapQueueSegment()"></button><button class="refresh-btn" id="refreshBtn" onclick="refreshData()"><span class="material-icons-round">refresh</span></button></div>
     <div id="consumerList"></div><div id="sentinel"></div>
     <div class="empty-state hidden" id="emptyState"><span class="material-icons-round" id="emptyIco">people_outline</span><div class="empty-title" id="emptyTtl">No consumers yet</div><div class="empty-sub" id="emptySub">Tap + to add the first consumer</div></div>
   </div>
@@ -768,6 +776,7 @@
   <span class="material-icons-round">cloud_off</span>
   <span class="save-banner-txt" id="saveBannerTxt"></span>
   <button class="save-banner-btn fix hidden" id="saveBannerFix" onclick="fixFailedSave()">Fix</button>
+  <button class="save-banner-btn hidden" id="saveBannerDiscard" onclick="confirmDiscardDead()">Discard</button>
   <button class="save-banner-btn" onclick="retryFailedSaves()">Retry</button>
 </div>
 <button class="fab" id="fabBtn" onclick="openAddForm()"><span class="material-icons-round">add</span></button>
@@ -883,7 +892,7 @@ function hideSplash(){const s=$('splash');s.classList.add('out');setTimeout(()=>
 async function installApp(){if(!deferredInstall)return;closeUserMenu();deferredInstall.prompt();const{outcome}=await deferredInstall.userChoice;deferredInstall=null;$('installBtn').classList.add('hidden');if(outcome==='accepted')toast('App installed!','ok');}
 function applyUpdate(){if(swReg&&swReg.waiting)swReg.waiting.postMessage({type:'SKIP_WAITING'});window.location.reload();}
 function setupSwipeClose(){
-  ['cpHandle','aboutHandle','detHandle','delHandle','cfHandle','addUserHandle','rpHandle','ugHandle','afHandle','fdHandle','afeHandle','fdelHandle','readingHandle','readingFormHandle','mrDelHandle','qkwhHandle','qkwhRecheckHandle','myrHandle'].forEach(id=>{
+  ['cpHandle','aboutHandle','detHandle','delHandle','cfHandle','addUserHandle','rpHandle','ugHandle','afHandle','fdHandle','afeHandle','fdelHandle','dlHandle','readingHandle','readingFormHandle','mrDelHandle','qkwhHandle','qkwhRecheckHandle','myrHandle'].forEach(id=>{
     const el=$(id);if(!el)return;
     let startY=0;
     el.addEventListener('touchstart',e=>{startY=e.touches[0].clientY;},{passive:true});
@@ -996,7 +1005,7 @@ async function backgroundFullSync(){
       var mergeResult=await AN_DB.mergeLiteConsumers(list);await AN_DB.setLastSync(Date.now());
       masterList=await AN_DB.getAllConsumers();
       if(mergeResult&&mergeResult.changed){renderFilteredView(true);}
-      setSync('online','Synced');
+      setSync('online','Synced');refreshQueueStats();
     }else if(json.code==='UNAUTHORIZED'||json.error==='SESSION_EXPIRED'){
       localStorage.removeItem('an_bio_vault');await AN_DB.clearSession();alert('Session expired. Please log in again.');location.replace('./login.html');
     }else{setSync('online','Loaded from cache');console.warn('[App]',json.message||json.error);}
@@ -1190,7 +1199,7 @@ async function executeBulkDelete(){
   for(var i=0;i<toDelete.length;i++){
     var c=toDelete[i];
     try{if(navigator.onLine){var res=await fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({action:'deleteConsumer',token:session.token,officeId:session.officeId,sheetName:'CONSUMER DATA ALL',rowIndex:c._rowIndex,conNo:c.conNo,consumerName:c.consumerName})});var json=await res.json();if(json.success){await AN_DB.deleteConsumer(c.conNo);masterList=masterList.filter(function(x){return x.conNo!==c.conNo;});deletedIdx.push(c._rowIndex);deleted++;}else failed++;}
-    else{await AN_DB.deleteConsumer(c.conNo);await AN_DB.addPendingChange('deleteConsumer',{rowIndex:c._rowIndex,conNo:c.conNo},session.officeId);masterList=masterList.filter(function(x){return x.conNo!==c.conNo;});deletedIdx.push(c._rowIndex);deleted++;}}catch(e){failed++;}
+    else{await AN_DB.deleteConsumer(c.conNo);await queueChange('deleteConsumer',{sheetName:'CONSUMER DATA ALL',rowIndex:c._rowIndex,conNo:c.conNo,consumerName:c.consumerName});masterList=masterList.filter(function(x){return x.conNo!==c.conNo;});deletedIdx.push(c._rowIndex);deleted++;}}catch(e){failed++;}
   }
   adjustRowIndicesAfterDelete(deletedIdx);
   exitSelectMode();resetAndLoad();
@@ -1200,7 +1209,7 @@ async function executeBulkDelete(){
 function confirmDelete(rowIdx,conNo,name){closeSheet();delRowIdx=rowIdx;delConNo=conNo;delName=name;window._bulkDelete=false;$('delWho').textContent=name;setTimeout(function(){openSheet('delSheet');},150);}
 async function executeSingleDelete(){
   try{if(navigator.onLine){var res=await fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({action:'deleteConsumer',token:session.token,officeId:session.officeId,sheetName:'CONSUMER DATA ALL',rowIndex:delRowIdx,conNo:delConNo,consumerName:delName})});var json=await res.json();if(json.success){await AN_DB.deleteConsumer(delConNo);masterList=masterList.filter(function(c){return c.conNo!==delConNo;});adjustRowIndicesAfterDelete([delRowIdx]);resetAndLoad();toast('Consumer deleted','ok');backgroundFullSync();}else toast(json.error||json.message||'Delete failed','err');}
-  else{await AN_DB.deleteConsumer(delConNo);await AN_DB.addPendingChange('deleteConsumer',{rowIndex:delRowIdx,conNo:delConNo},session.officeId);masterList=masterList.filter(function(c){return c.conNo!==delConNo;});adjustRowIndicesAfterDelete([delRowIdx]);resetAndLoad();toast('Deleted offline - will sync when online');AN_DB.requestSync();}}catch(e){toast('Error deleting','err');}
+  else{await AN_DB.deleteConsumer(delConNo);await queueChange('deleteConsumer',{sheetName:'CONSUMER DATA ALL',rowIndex:delRowIdx,conNo:delConNo,consumerName:delName});masterList=masterList.filter(function(c){return c.conNo!==delConNo;});adjustRowIndicesAfterDelete([delRowIdx]);resetAndLoad();toast('Deleted offline - will sync when online');AN_DB.requestSync();}}catch(e){toast('Error deleting','err');}
 }
 function toDateInput(v){if(!v)return '';try{var d=new Date(v);return isNaN(d)?'':d.toISOString().split('T')[0];}catch(e){return '';}}
 function activeFieldsList(){return _customFields.filter(function(f){return f['IsActive']===undefined||f['IsActive']==='TRUE'||f['IsActive']===true;});}
@@ -1363,8 +1372,8 @@ function saveConsumer(){
   document.querySelectorAll('#cfCustomFields [data-field-label]').forEach(function(el){consumerData[el.getAttribute('data-field-label')]=el.value.trim();});
   if(!navigator.onLine){
     (async function(){
-      try{if(CF.mode==='add'){await AN_DB.addPendingChange('addConsumer',consumerData,session.officeId);var tmp=normalize(Object.assign({},consumerData,{_rowIndex:-1}),true);await AN_DB.upsertConsumer(tmp);masterList.unshift(tmp);}
-      else{await AN_DB.addPendingChange('updateConsumer',{rowIndex:CF.consumer._rowIndex,consumer:consumerData},session.officeId);var upd=normalize(Object.assign({},consumerData,{_rowIndex:CF.consumer._rowIndex}),true);await AN_DB.upsertConsumer(upd);var idx=masterList.findIndex(function(c){return c.conNo===CF.consumer.conNo;});if(idx!==-1)masterList[idx]=upd;}}catch(e){console.warn('CF offline:',e);}
+      try{if(CF.mode==='add'){await queueChange('addConsumer',{sheetName:'CONSUMER DATA ALL',consumer:consumerData});var tmp=normalize(Object.assign({},consumerData,{_rowIndex:-1}),true);await AN_DB.upsertConsumer(tmp);masterList.unshift(tmp);}
+      else{await queueChange('updateConsumer',{sheetName:'CONSUMER DATA ALL',rowIndex:CF.consumer._rowIndex,consumer:consumerData});var upd=normalize(Object.assign({},consumerData,{_rowIndex:CF.consumer._rowIndex}),true);await AN_DB.upsertConsumer(upd);var idx=masterList.findIndex(function(c){return c.conNo===CF.consumer.conNo;});if(idx!==-1)masterList[idx]=upd;}}catch(e){console.warn('CF offline:',e);}
       closeSheet();resetAndLoad();toast(CF.mode==='add'?'Saved offline - will sync when connected':'Updated offline - will sync','');AN_DB.requestSync();
     })();
     return;
@@ -1607,7 +1616,23 @@ function setSync(type,txt){$('syncDot').className='sync-dot '+type;$('syncTxt').
 function setRefreshSpin(on){$('refreshBtn').classList.toggle('spin',on);}
 function onOnline(){setSync('syncing','Back online - syncing...');AN_DB.requestSync();setTimeout(backgroundFullSync,600);}
 function onOffline(){setSync('offline','Offline - edits save locally');}
-function onSWMsg(e){var data=e.data;if(!data)return;if(data.type==='SYNC_COMPLETE'){setSync('online',data.synced+' change'+(data.synced!==1?'s':'')+' synced');backgroundFullSync();}if(data.type==='SYNC_FAILED')setSync('pending','Sync failed - will retry');}
+/* Gap 7.5. The service worker now reports three separate numbers, because
+   they mean three different things to the user: synced (done), waitingForUser
+   (queued by someone else, held deliberately -- see the attribution guard in
+   sw.js), and deadLetter (refused repeatedly, needs a decision). Only the
+   last one raises the banner. */
+function onSWMsg(e){
+  var data=e.data;if(!data)return;
+  if(data.type==='SYNC_STARTED')setSync('syncing','Syncing '+data.count+' change'+(data.count!==1?'s':'')+'…');
+  if(data.type==='SYNC_COMPLETE'){
+    if(data.synced)setSync('online',data.synced+' change'+(data.synced!==1?'s':'')+' synced');
+    else setSync('online','Synced');
+    if(data.deadLetter)surfaceDeadLetters();
+    refreshQueueStats();
+    backgroundFullSync();
+  }
+  if(data.type==='SYNC_FAILED'){setSync('pending','Sync failed - will retry');if(data.deadLetter)surfaceDeadLetters();}
+}
 function showErr(msg){$('consumerList').innerHTML='<div class="err-bar"><span class="material-icons-round">warning_amber</span>'+esc(msg)+'</div>';}
 function addRipple(el,e){var r=el.getBoundingClientRect(),sz=Math.max(r.width,r.height)*1.4;var rip=document.createElement('span');rip.className='ripple';rip.style.cssText='width:'+sz+'px;height:'+sz+'px;left:'+(e.clientX-r.left-sz/2)+'px;top:'+(e.clientY-r.top-sz/2)+'px;';el.appendChild(rip);setTimeout(function(){rip.remove();},600);}
 function toast(msg,type){var el=$('toast');el.textContent=msg;el.className='show '+(type||'');clearTimeout(toastT);toastT=setTimeout(function(){el.className=type||'';},2800);}
@@ -1831,7 +1856,21 @@ async function saveReading(){
   var val=$('mrfValue').value.trim();
   $('mrfErr').classList.remove('show');
   if(val===''||isNaN(parseFloat(val))){showMrfErr('Enter a valid number.');return;}
-  if(!navigator.onLine){showMrfErr('Internet connection required to save a reading.');return;}
+  /* Gap 7.5. Adding a reading now queues offline. EDITING one stays online-only,
+     and that is forced rather than chosen: fetchReadingDataQuiet returns
+     'offline', so the history list never renders and there is no row to pick
+     in the first place. */
+  if(!navigator.onLine){
+    if(_mrEditing){showMrfErr('Editing a reading needs an internet connection.');return;}
+    var qb=$('mrfBtn');qb.classList.add('loading');
+    try{
+      await queueReadingOffline(_mrConNo,_mrType,val);
+      _mrEditing=null;closeSheet();
+      toast('Queued '+_mrType+' '+val+' — will sync when online','ok');
+    }catch(e){showMrfErr('Could not queue this reading. Try again.');}
+    qb.classList.remove('loading');
+    return;
+  }
   var btn=$('mrfBtn');btn.classList.add('loading');
   try{
     var controller=new AbortController();var tid=setTimeout(function(){controller.abort();},TIMEOUT);
@@ -2032,11 +2071,14 @@ function showQkwhErr(msg){$('qkwhErrMsg').textContent=msg;$('qkwhErr').classList
    is tracked, and any that fails lands in _failedSaves and raises a
    persistent red banner with a Retry button (see renderSaveBanner). Nothing
    fails silently. A beforeunload guard warns if the app is closed while
-   saves are still in flight, since these live in memory only -- meter
-   readings deliberately do NOT use the IndexedDB offline queue that
-   consumer add/edit uses (the whole readings module is online-only by
-   design), so an unsaved reading would otherwise be lost without warning. */
-var _pendingSaves=0,_failedSaves=[]; // each entry: {name, retryFn}
+   saves are still in flight, since these live in memory only.
+   GAP 7.5 UPDATE -- this comment used to say readings deliberately do NOT use
+   the IndexedDB offline queue. They now do, for ADDS. A reading that cannot
+   reach the server is persisted to the queue instead of held in memory, so
+   closing the app no longer loses it. _failedSaves is now for server
+   REJECTIONS (which a retry cannot fix) plus dead-lettered queue entries
+   surfaced out of IndexedDB. */
+var _pendingSaves=0,_failedSaves=[]; // {name, retryFn, reason, fixFn, __deadId?}
 function renderSaveBanner(){
   var el=$('saveBanner');
   if(!_failedSaves.length){el.classList.add('hidden');return;}
@@ -2052,6 +2094,11 @@ function renderSaveBanner(){
      Retry alone, exactly as before. */
   var fixable=_failedSaves.some(function(f){return typeof f.fixFn==='function';});
   $('saveBannerFix').classList.toggle('hidden',!fixable);
+  /* Gap 7.5. Discard appears only when the banner is holding a dead-lettered
+     queue entry -- the one and only path that destroys queued field data, so
+     it is never offered for an ordinary in-memory failure. */
+  var hasDead=_failedSaves.some(function(f){return !!f.__deadId;});
+  $('saveBannerDiscard').classList.toggle('hidden',!hasDead);
 }
 function queueFailedSave(name,retryFn,reason,fixFn){
   _failedSaves.push({name:name,retryFn:retryFn,reason:reason||'',fixFn:fixFn||null});
@@ -2080,31 +2127,159 @@ function retryFailedSaves(){
   toast('Retrying '+queue.length+' item'+(queue.length!==1?'s':'')+'…');
   queue.forEach(function(item){item.retryFn();});
 }
+/* ==========================================================================
+   GAP 7.5 — OFFLINE READING SAVES AND DURABLE QUEUE PLUMBING
+   ==========================================================================
+   Every queued change goes through queueChange() so that two things can never
+   be forgotten at a call site: the office id, and WHO queued it. The second
+   matters because the server stamps EnteredBy / LastEditedBy from whichever
+   session replays the change — see the attribution guard in sw.js.
+   The queued payload shape must mirror the ONLINE payload for the same action,
+   minus the token. Code.gs reads flat whitelisted keys (payload.consumer,
+   payload.rowIndex, payload.conNo, ...), so a payload that only nests its
+   fields under `data` arrives completely empty and is rejected as 'required'.
+   That was the live bug behind every offline consumer edit vanishing.
+   ========================================================================== */
+function newClientId(){
+  try{if(window.crypto&&typeof crypto.randomUUID==='function')return crypto.randomUUID();}catch(e){}
+  return 'c-'+Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,10);
+}
+function queueChange(action,data){
+  return AN_DB.addPendingChange(action,data,session.officeId,session.username);
+}
+/* clientReadingId is the idempotency key. On patchy coverage a POST can reach
+   the sheet and still lose its response, leaving the change queued for a
+   replay that would write a SECOND reading. handleAddMeterReading uses this
+   value as the row's ReadingID and refuses to insert one that already exists,
+   so a replay becomes a no-op instead of a duplicate. */
+async function queueReadingOffline(conNo,type,val){
+  await queueChange('addMeterReading',{conNo:conNo,readingType:type,value:val,source:'Manual',clientReadingId:newClientId()});
+  var idx=masterList.findIndex(function(x){return x.conNo===conNo;});
+  if(idx!==-1){
+    if(type==='KVAH'){masterList[idx].latestKvah=val;masterList[idx].latestKvahAt=new Date().toISOString();}
+    else{masterList[idx].latestKwh=val;masterList[idx].latestKwhAt=new Date().toISOString();}
+  }
+  AN_DB.requestSync();
+  refreshQueueStats();
+}
+async function refreshQueueStats(){
+  var el=$('statQueue');if(!el)return;
+  try{
+    var s=await AN_DB.getQueueStats(session&&session.username);
+    var parts=[];
+    if(s.pending)parts.push(s.pending+' waiting to sync');
+    if(s.waiting)parts.push(s.waiting+' from another user');
+    if(parts.length){el.textContent=parts.join(' · ');el.classList.remove('hidden');}
+    else el.classList.add('hidden');
+    if(s.dead)surfaceDeadLetters();
+  }catch(e){el.classList.add('hidden');}
+}
+function tapQueueSegment(){
+  if(!navigator.onLine){toast('Still offline — these will sync automatically.');return;}
+  AN_DB.requestSync();toast('Syncing…');
+}
+function deadLetterName(c){
+  var d=c.data||{};
+  if(c.action==='addMeterReading')return 'Reading for '+(d.conNo||'a consumer');
+  if(c.action==='addConsumer')return 'New consumer '+((d.consumer&&d.consumer.conNo)||'');
+  if(c.action==='updateConsumer')return 'Edit to '+((d.consumer&&d.consumer.conNo)||'a consumer');
+  if(c.action==='deleteConsumer')return 'Delete of '+(d.conNo||'a consumer');
+  return c.action;
+}
+/* A dead-lettered change is work the server refused five times, so it will
+   never succeed unchanged. It is kept rather than deleted and shown through
+   the same banner as any other failed save. Retry clears the flag and hands
+   it back to the sync engine with a fresh budget; Discard is the only thing
+   that ever destroys it, and only behind a confirmation sheet. */
+async function surfaceDeadLetters(){
+  try{
+    var dead=await AN_DB.getDeadLetters();
+    var added=false;
+    dead.forEach(function(c){
+      for(var i=0;i<_failedSaves.length;i++){if(_failedSaves[i].__deadId===c.id)return;}
+      _failedSaves.push({
+        name:deadLetterName(c),
+        reason:c.lastError||'the server refused it',
+        retryFn:function(){AN_DB.revivePendingChange(c.id).then(function(){AN_DB.requestSync();refreshQueueStats();});},
+        fixFn:null,__deadId:c.id
+      });
+      added=true;
+    });
+    if(added)renderSaveBanner();
+  }catch(e){console.warn('[7.5] deadLetters:',e);}
+}
+function confirmDiscardDead(){
+  var n=0;
+  for(var i=0;i<_failedSaves.length;i++){if(_failedSaves[i].__deadId)n++;}
+  if(!n)return;
+  $('dlWho').textContent=n+' change'+(n!==1?'s':'');
+  openSheet('dlSheet');
+}
+async function doDiscardDead(){
+  closeSheet();
+  var dead=_failedSaves.filter(function(f){return !!f.__deadId;});
+  if(!dead.length)return;
+  try{
+    for(var i=0;i<dead.length;i++)await AN_DB.removePendingChange(dead[i].__deadId);
+    _failedSaves=_failedSaves.filter(function(f){return !f.__deadId;});
+    renderSaveBanner();refreshQueueStats();
+    toast('Discarded '+dead.length+' item'+(dead.length!==1?'s':''));
+  }catch(e){toast('Could not discard','err');}
+}
 async function sendReadingSave(entry){
   _pendingSaves++;
   try{
     var controller=new AbortController();var tid=setTimeout(function(){controller.abort();},TIMEOUT);
     var res=await fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({action:'addMeterReading',token:session.token,officeId:session.officeId,conNo:entry.conNo,readingType:'KWH',value:entry.value,source:entry.source||'Manual'}),redirect:'follow',signal:controller.signal});clearTimeout(tid);
     var json=await res.json();
-    if(!json.success)throw new Error(json.error||json.message||'Save failed');
+    if(!json.success){var rej=new Error(json.error||json.message||'Save failed');rej.__rejected=true;throw rej;}
     var idx=masterList.findIndex(function(x){return x.conNo===entry.conNo;});
     if(idx!==-1){masterList[idx].latestKwh=entry.value;masterList[idx].latestKwhAt=(json.reading&&json.reading.timestamp)?json.reading.timestamp:new Date().toISOString();}
   }catch(err){
-    queueFailedSave(entry.name,function(){sendReadingSave(entry);},err.name==='AbortError'?'request timed out':err.message);
+    /* Gap 7.5. A server REJECTION needs a human, so it goes to the banner
+       exactly as before. Anything else means the request died in transit
+       — which is NOT the same as navigator.onLine being false.
+       Android reports onLine optimistically, so on a patchy route this branch
+       catches most real failures while the app still believes it is connected.
+       Persist those to the durable IndexedDB queue rather than the in-memory
+       _failedSaves list, which does not survive the app being closed. */
+    if(err&&err.__rejected){
+      queueFailedSave(entry.name,function(){sendReadingSave(entry);},err.message);
+    }else{
+      try{
+        await queueReadingOffline(entry.conNo,'KWH',entry.value);
+        toast('Queued: '+entry.name+' — will sync when online');
+      }catch(e2){
+        queueFailedSave(entry.name,function(){sendReadingSave(entry);},err.name==='AbortError'?'request timed out':err.message);
+      }
+    }
   }
   _pendingSaves--;
 }
 window.addEventListener('beforeunload',function(e){
   if(_pendingSaves>0||_failedSaves.length>0){e.preventDefault();e.returnValue='';}
 });
-function qkwhSave(){
+async function qkwhSave(){
   if(!_qkwhConsumer)return;
   var val=$('qkwhValue').value.trim();
   $('qkwhErr').classList.remove('show');
   if(val===''||isNaN(parseFloat(val))){showQkwhErr('Enter a valid number.');return;}
   if(!session||!session.token){location.replace('./login.html');return;}
-  if(!navigator.onLine){showQkwhErr('Internet connection required to save.');return;}
   var entry={conNo:_qkwhConsumer.conNo,name:_qkwhConsumer.consumerName||_qkwhConsumer.conNo,value:val,source:'Manual'};
+  /* Gap 7.5. This is the whole point of the gap: Quick KWH exists for walking
+     a route consumer by consumer, and it used to refuse to save the moment
+     coverage dropped. queueReadingOffline performs the same in-memory
+     latestKwh update the online path does below, so the previous-reading hint
+     stays correct whichever way the save went. */
+  if(!navigator.onLine){
+    try{
+      await queueReadingOffline(entry.conNo,'KWH',val);
+      toast('Queued: '+entry.name+' — will sync when online','ok');
+      qkwhBackToSearch();
+      $('qkwhSearchInp').value='';$('qkwhResults').innerHTML='';
+    }catch(e){showQkwhErr('Could not queue this reading. Try again.');}
+    return;
+  }
   /* Update the in-memory record immediately so the "last reading" hint is
      already correct if this same consumer is opened again a moment later,
      without waiting on the server to confirm. */

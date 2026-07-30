@@ -379,13 +379,19 @@ const AN_DB = (() => {
    * @param {string} officeId  Office ID from current session
    * @returns {Promise<number>} ID of the pending change record
    */
-  async function addPendingChange(action, data, officeId) {
+  async function addPendingChange(action, data, officeId, queuedBy) {
     await open();
 
+    /* Gap 7.5. queuedBy records WHO created this change. The service worker
+       will only replay a change under that same user, because the server
+       stamps EnteredBy / LastEditedBy from the replaying session -- see the
+       attribution guard in sw.js. Optional: entries queued without it stay
+       replayable by anyone, which is the pre-7.5 behaviour. */
     const change = {
       action,
       data,
       officeId,
+      queuedBy:   queuedBy || '',
       createdAt:  Date.now(),
       retryCount: 0,
     };
@@ -401,10 +407,56 @@ const AN_DB = (() => {
     return p(store('pending_changes').getAll());
   }
 
-  /** Count of pending changes (shown in UI sync badge) */
+  /**
+   * Count of changes still genuinely waiting to sync.
+   * Gap 7.5: dead-lettered entries are EXCLUDED -- they are not waiting for a
+   * connection, they are waiting for a human, and are surfaced separately
+   * through the save banner. Counting them here would show a number that
+   * never goes down no matter how good the signal gets.
+   */
   async function getPendingCount() {
+    const all = await getPendingChanges();
+    return all.filter(c => !c.deadLetter).length;
+  }
+
+  /**
+   * Gap 7.5. One pass over the queue, split the three ways the UI needs:
+   *   pending  - mine (or unattributed), will go on the next sync
+   *   waiting  - queued by a different user, held until they log back in
+   *   dead     - refused 5 times, needs a Retry or Discard decision
+   */
+  async function getQueueStats(username) {
+    const all = await getPendingChanges();
+    const me  = String(username || '');
+    let pending = 0, waiting = 0, dead = 0;
+    all.forEach(c => {
+      if (c.deadLetter) dead++;
+      else if (!c.queuedBy || String(c.queuedBy) === me) pending++;
+      else waiting++;
+    });
+    return { pending, waiting, dead, total: all.length };
+  }
+
+  /** Gap 7.5. The dead-lettered entries, for the save banner. */
+  async function getDeadLetters() {
+    const all = await getPendingChanges();
+    return all.filter(c => c.deadLetter);
+  }
+
+  /**
+   * Gap 7.5. Put a dead-lettered change back in the live queue (banner Retry).
+   * Clears the flag AND resets the retry budget, so a change that failed for a
+   * since-fixed reason gets a fair five attempts again rather than dying on
+   * the first one.
+   */
+  async function revivePendingChange(id) {
     await open();
-    return p(store('pending_changes').count());
+    const rec = await p(store('pending_changes').get(id));
+    if (!rec) return false;
+    rec.deadLetter = false;
+    rec.retryCount = 0;
+    await p(store('pending_changes', 'readwrite').put(rec));
+    return true;
   }
 
   /** Remove one pending change after it synced successfully */
@@ -528,6 +580,9 @@ const AN_DB = (() => {
     addPendingChange,
     getPendingChanges,
     getPendingCount,
+    getQueueStats,
+    getDeadLetters,
+    revivePendingChange,
     removePendingChange,
     clearPending,
 

@@ -17,7 +17,7 @@
 // the new one only appears on the second load. Bumping makes the activate
 // handler delete an-elect-v1 wholesale, forcing a clean fetch.
 // BUMP THIS ON EVERY FRONTEND DEPLOY.
-const CACHE_VERSION  = 'v7';
+const CACHE_VERSION  = 'v8';
 const CACHE_NAME     = `an-elect-${CACHE_VERSION}`;
 const SYNC_TAG       = 'sync-pending-changes';
 const DB_NAME        = 'an_elect_db';
@@ -243,14 +243,17 @@ async function syncPendingChanges() {
   }
 
   // Read pending queue
-  const pending = await dbGetAll(db, 'pending_changes');
-  if (!pending.length) {
+  const all = await dbGetAll(db, 'pending_changes');
+  if (!all.length) {
     console.log('[SW] No pending changes');
     return;
   }
 
-  console.log(`[SW] Processing ${pending.length} pending changes...`);
-  broadcast({ type: 'SYNC_STARTED', count: pending.length });
+  /* Gap 7.5. Dead-lettered entries are changes the server refused repeatedly.
+     They are NEVER replayed automatically and NEVER deleted here -- the app
+     surfaces them in the save banner so the user can Retry or Discard. */
+  const dead  = all.filter(c => c.deadLetter);
+  const queue = all.filter(c => !c.deadLetter);
 
   // Get API URL and session (saved by main app on login)
   const apiUrl  = await dbGetConfig(db, 'apiUrl');
@@ -258,24 +261,63 @@ async function syncPendingChanges() {
 
   if (!apiUrl || !session?.token) {
     console.warn('[SW] Cannot sync — missing API URL or session token');
-    broadcast({ type: 'SYNC_FAILED', reason: 'NO_SESSION' });
+    broadcast({ type: 'SYNC_FAILED', reason: 'NO_SESSION', deadLetter: dead.length });
     return;
   }
 
-  let synced = 0;
-  let failed = 0;
+  /* Gap 7.5 -- attribution guard. The server stamps EnteredBy / LastEditedBy
+     from the session that REPLAYS a change, not from whoever queued it. On a
+     shared department phone that would file one employee's whole route under
+     the next person to log in, and My Readings filters on exactly that field.
+     So a change is only ever replayed by the user who created it; everyone
+     else's entries are left completely untouched (no retry counted, nothing
+     deleted) until that user logs back in. Entries queued before this field
+     existed carry no queuedBy and stay replayable by anyone, preserving the
+     old behaviour rather than stranding them. */
+  const me      = String(session.username || '');
+  const mine    = [];
+  const waiting = [];
+  queue.forEach(c => {
+    if (!c.queuedBy || String(c.queuedBy) === me) mine.push(c);
+    else waiting.push(c);
+  });
 
-  for (const change of pending) {
+  if (!mine.length) {
+    console.log('[SW] Nothing to sync for this user');
+    broadcast({
+      type: 'SYNC_COMPLETE', synced: 0, failed: 0, remaining: 0,
+      waitingForUser: waiting.length, deadLetter: dead.length,
+    });
+    return;
+  }
+
+  console.log(`[SW] Processing ${mine.length} pending changes...`);
+  broadcast({ type: 'SYNC_STARTED', count: mine.length });
+
+  let synced  = 0;
+  let failed  = 0;
+  let deadNow = 0;
+
+  for (const change of mine) {
     try {
+      /* Gap 7.5 -- THE replay bug. change.data is now sent BOTH spread flat
+         and nested under `data`. Code.gs reads flat whitelisted keys per
+         action (payload.consumer, payload.rowIndex, payload.conNo, ...) and
+         never iterates the payload, so the extra `data` key is inert and the
+         spread is safe. Before this it sent ONLY `data:` -- so every queued
+         change arrived with every field undefined, was rejected as
+         "required", and was silently deleted after 5 retries. No offline
+         consumer edit had ever reached the sheet. */
       const res = await fetch(apiUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'text/plain' },
-        body: JSON.stringify({
+        redirect: 'follow',
+        body: JSON.stringify(Object.assign({}, change.data, {
           action:   change.action,
           token:    session.token,
           officeId: change.officeId || session.officeId,
           data:     change.data,
-        }),
+        })),
       });
 
       const result = await res.json();
@@ -285,24 +327,34 @@ async function syncPendingChanges() {
         await dbDelete(db, 'pending_changes', change.id);
         synced++;
       } else {
-        // Increment retry count; give up after 5 failures
+        /* A server REJECTION will answer the same way every time -- resending
+           identical data cannot fix it. So it counts against the retry budget,
+           and at 5 the change is DEAD-LETTERED rather than deleted: it is the
+           user's only copy of that work. Only an explicit Discard destroys it. */
         change.retryCount = (change.retryCount || 0) + 1;
+        change.lastError  = String(result.error || result.message || 'Rejected by the server');
         if (change.retryCount >= 5) {
-          await dbDelete(db, 'pending_changes', change.id);
-          console.warn('[SW] Dropped change after 5 retries:', change.id);
-        } else {
-          await dbPut(db, 'pending_changes', change);
+          change.deadLetter = true;
+          deadNow++;
+          console.warn('[SW] Dead-lettered after 5 rejections:', change.id, change.lastError);
         }
+        await dbPut(db, 'pending_changes', change);
         failed++;
       }
     } catch (err) {
+      /* A network throw is not the change's fault. Do NOT count it against the
+         retry budget -- a long offline spell would otherwise burn through all
+         five and dead-letter perfectly good data. Left queued, untouched. */
       console.error('[SW] Sync error for change', change.id, ':', err.message);
       failed++;
     }
   }
 
   console.log(`[SW] Sync complete — synced: ${synced}, failed: ${failed}`);
-  broadcast({ type: 'SYNC_COMPLETE', synced, failed, remaining: failed });
+  broadcast({
+    type: 'SYNC_COMPLETE', synced, failed, remaining: failed,
+    waitingForUser: waiting.length, deadLetter: dead.length + deadNow,
+  });
 }
 
 // ── Mini IndexedDB Helpers (SW-side, self-contained) ─────────────────────────
