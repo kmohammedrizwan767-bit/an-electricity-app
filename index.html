@@ -489,6 +489,7 @@
   <button class="mi install hidden" id="installBtn" onclick="installApp()"><span class="material-icons-round">install_mobile</span>Install App</button>
   <button class="mi" id="themeMenuItem" onclick="toggleThemeFromMenu()"><span class="material-icons-round" id="themeMenuIcon">dark_mode</span><span id="themeMenuLabel">Dark Mode</span></button>
   <button class="mi" onclick="openChangePass()"><span class="material-icons-round">lock_reset</span>Change Password</button>
+  <button class="mi" onclick="exportConsumers()"><span class="material-icons-round">file_download</span>Export Consumers</button>
   <button class="mi" onclick="openMyReadings()"><span class="material-icons-round">download</span>My Readings</button>
   <button class="mi" onclick="openAbout()"><span class="material-icons-round">info_outline</span>About</button>
   <div class="menu-div"></div>
@@ -2282,6 +2283,117 @@ async function myrFetchRows(year,month){
     toast(err.name==='AbortError'?'Request timed out.':'Network error.','err');
   }
   if(myToken===_myrFetchToken&&activeSheet==='myrSheet'&&_myrMonth===month)myrRender();
+}
+/* ═══ Gap 7.3 - export the filtered consumer list ═══════════════════════
+   Exports exactly what is on screen: same array the list renders from, so
+   the active area chip, status pill, search text and sort order all carry
+   through automatically with no filter logic duplicated here.
+
+   Unlike the readings export this needs NO network - masterList is already
+   in memory - so it deliberately does not check navigator.onLine. Offline,
+   loadXlsxStyleScript() simply fails to reach the CDN and the CSV fallback
+   takes over, which is a complete, openable file. An employee can export a
+   route list with no signal at all. */
+function exportFilterLabel(){
+  var bits=[];
+  if(typeof activeArea!=='undefined'&&activeArea!=='ALL')bits.push(activeArea);
+  if(typeof activeStatus!=='undefined'&&activeStatus!=='ALL')bits.push(activeStatus);
+  if(typeof searchQ!=='undefined'&&searchQ.trim())bits.push('search "'+searchQ.trim()+'"');
+  return bits.length?bits.join(', '):'All consumers';
+}
+var EXPORT_COLS=[
+  ['S.No',           function(c,i){return i+1;},                   7,  'center'],
+  ['Consumer No',    function(c){return c.conNo||'';},             14, null],
+  ['Consumer Name',  function(c){return c.consumerName||'';},      28, null],
+  ['Meter No',       function(c){return c.meterNo||'';},           16, null],
+  ['Phone',          function(c){return c.phoneNo||'';},           14, null],
+  ['Address',        function(c){return c.address||'';},           34, null],
+  ['Area Code',      function(c){return c.transfCode||'';},        12, 'center'],
+  ['Status',         function(c){return c.status||'Active';},      12, 'center'],
+  ['Passbook/SD No', function(c){return c.sdPassbookNo||'';},      18, null]
+];
+function exportBuildSheet(rows,title,subtitle){
+  var last=EXPORT_COLS.length-1;
+  var letters=[];
+  for(var i=0;i<EXPORT_COLS.length;i++)letters.push(String.fromCharCode(65+i));
+  var headerFill={fgColor:{rgb:'0052B4'}};
+  var headerFont={bold:true,color:{rgb:'FFFFFF'},sz:11};
+  var titleFont={bold:true,sz:14,color:{rgb:'0052B4'}};
+  var subFont={italic:true,sz:10,color:{rgb:'5A6A85'}};
+  var thin={style:'thin',color:{rgb:'C5D0E8'}};
+  var cellBorder={top:thin,bottom:thin,left:thin,right:thin};
+
+  var aoa=[[title],[subtitle],EXPORT_COLS.map(function(c){return c[0];})];
+  rows.forEach(function(c,i){
+    aoa.push(EXPORT_COLS.map(function(col){return col[1](c,i);}));
+  });
+
+  var ws=XLSX.utils.aoa_to_sheet(aoa);
+  ws['!cols']=EXPORT_COLS.map(function(c){return {wch:c[2]};});
+  ws['!merges']=[{s:{r:0,c:0},e:{r:0,c:last}},{s:{r:1,c:0},e:{r:1,c:last}}];
+  ws['!freeze']={xSplit:0,ySplit:3};
+  if(ws['A1'])ws['A1'].s={font:titleFont};
+  if(ws['A2'])ws['A2'].s={font:subFont};
+  letters.forEach(function(L){
+    var ref=L+'3';
+    if(ws[ref])ws[ref].s={font:headerFont,fill:headerFill,alignment:{horizontal:'center'},border:cellBorder};
+  });
+  for(var r=4;r<=aoa.length;r++){
+    for(var ci=0;ci<letters.length;ci++){
+      var ref=letters[ci]+r;
+      if(ws[ref])ws[ref].s={border:cellBorder,alignment:EXPORT_COLS[ci][3]?{horizontal:EXPORT_COLS[ci][3]}:undefined};
+    }
+  }
+  var wb=XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb,ws,'Consumers');
+  return wb;
+}
+/* Every field quoted with internal quotes doubled - consumer names and
+   addresses routinely contain commas, which would otherwise shift columns. */
+function exportToCsv(rows,title,subtitle){
+  function q(v){return '"'+String(v==null?'':v).replace(/"/g,'""')+'"';}
+  var out=q(title)+'\n'+q(subtitle)+'\n';
+  out+=EXPORT_COLS.map(function(c){return q(c[0]);}).join(',')+'\n';
+  rows.forEach(function(c,i){
+    out+=EXPORT_COLS.map(function(col){return q(col[1](c,i));}).join(',')+'\n';
+  });
+  return out;
+}
+async function exportConsumers(){
+  if(typeof closeUserMenu==='function')closeUserMenu();
+  var rows=(typeof filtered!=='undefined'&&filtered.length)?filtered.slice():[];
+  if(!rows.length){toast('Nothing to export - the current filter matches no consumers.','err');return;}
+
+  var office=(session&&session.officeName)?session.officeName:'Office';
+  var d=new Date();
+  var pad=function(n){return(n<10?'0':'')+n;};
+  var stamp=d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());
+  var officeSafe=office.replace(/[^A-Za-z0-9]+/g,'_');
+  var base='Consumers_'+officeSafe+'_'+stamp;
+  var title='A&N Electricity \u2014 Consumers \u2014 '+office;
+  /* The subtitle makes the file self-describing. Without it a filtered export
+     is indistinguishable from a full one once it has been emailed on, and
+     someone will read a 40-row file as the whole office. */
+  var subtitle=rows.length+' record'+(rows.length!==1?'s':'')+
+    ' \u2014 filter: '+exportFilterLabel()+
+    ' \u2014 exported '+d.toLocaleString('en-IN',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit',hour12:true});
+
+  toast('Preparing export\u2026');
+  try{
+    await loadXlsxStyleScript();
+    XLSX.writeFile(exportBuildSheet(rows,title,subtitle),base+'.xlsx');
+    toast(rows.length+' consumer'+(rows.length!==1?'s':'')+' exported','ok');
+  }catch(libErr){
+    try{
+      var blob=new Blob([exportToCsv(rows,title,subtitle)],{type:'text/csv;charset=utf-8;'});
+      var url=URL.createObjectURL(blob);
+      var a=document.createElement('a');a.href=url;a.download=base+'.csv';document.body.appendChild(a);a.click();
+      setTimeout(function(){document.body.removeChild(a);URL.revokeObjectURL(url);},1000);
+      toast(rows.length+' consumer'+(rows.length!==1?'s':'')+' exported (plain format \u2014 Excel library unavailable)','ok');
+    }catch(csvErr){
+      toast('Export failed. Please try again.','err');
+    }
+  }
 }
 async function myrDownload(year,month){
   if(!navigator.onLine){toast('Downloads need an internet connection.','err');return;}
